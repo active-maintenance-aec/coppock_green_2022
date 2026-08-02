@@ -1,0 +1,313 @@
+file,term,stat,column,value
+static_cor.tex,Elite Sample,value,1,0.22
+static_cor.tex,Elite Sample,value,2,0.39
+static_cor.tex,Lucid Sample,value,1,0
+static_cor.tex,Lucid Sample,value,2,0.12
+static_cor.tex,MTurk Sample,value,1,0.06
+static_cor.tex,MTurk Sample,value,2,0.3
+study_1_age.tex,18 - 29,value,1,45.1
+study_1_age.tex,18 - 29,value,2,7.2
+study_1_age.tex,18 - 29,value,3,18
+study_1_age.tex,30 - 39,value,1,30.7
+study_1_age.tex,30 - 39,value,2,17.6
+study_1_age.tex,30 - 39,value,3,19.7
+study_1_age.tex,40 - 49,value,1,12.2
+study_1_age.tex,40 - 49,value,2,19.2
+study_1_age.tex,40 - 49,value,3,18.9
+study_1_age.tex,50 - 59,value,1,8.8
+study_1_age.tex,50 - 59,value,2,25
+study_1_age.tex,50 - 59,value,3,16.6
+study_1_age.tex,60+,value,1,3.2
+study_1_age.tex,60+,value,2,31.1
+study_1_age.tex,60+,value,3,26.7
+study_1_educ.tex,College,value,1,39
+study_1_educ.tex,College,value,2,24.9
+study_1_educ.tex,College,value,3,29.4
+study_1_educ.tex,Graduate School,value,1,12.4
+study_1_educ.tex,Graduate School,value,2,71.6
+study_1_educ.tex,Graduate School,value,3,15.1
+study_1_educ.tex,High School,value,1,9.8
+study_1_educ.tex,High School,value,2,0.5
+study_1_educ.tex,High School,value,3,21.2
+study_1_educ.tex,Less than High School,value,1,0.5
+study_1_educ.tex,Less than High School,value,2,0
+study_1_educ.tex,Less than High School,value,3,1.3
+study_1_educ.tex,Some College,value,1,38.3
+study_1_educ.tex,Some College,value,2,3.1
+study_1_educ.tex,Some College,value,3,33
+study_1_female.tex,Female,value,1,47.9
+study_1_female.tex,Female,value,2,32.1
+study_1_female.tex,Female,value,3,51
+study_1_female.tex,Male,value,1,52.1
+study_1_female.tex,Male,value,2,67.9
+study_1_female.tex,Male,value,3,49
+study_1_ideo.tex,,value,1,0
+study_1_ideo.tex,,value,2,24.6
+study_1_ideo.tex,,value,3,0
+study_1_ideo.tex,Conservative,value,1,18.2
+study_1_ideo.tex,Conservative,value,2,0
+study_1_ideo.tex,Conservative,value,3,30.4
+study_1_ideo.tex,Liberal,value,1,44.5
+study_1_ideo.tex,Liberal,value,2,0
+study_1_ideo.tex,Liberal,value,3,25.8
+study_1_ideo.tex,Libertarian,value,1,6.2
+study_1_ideo.tex,Libertarian,value,2,0
+study_1_ideo.tex,Libertarian,value,3,1.7
+study_1_ideo.tex,Moderate,value,1,26.5
+study_1_ideo.tex,Moderate,value,2,0
+study_1_ideo.tex,Moderate,value,3,34
+study_1_ideo.tex,Other,value,1,4.6
+study_1_ideo.tex,Other,value,2,75.4
+study_1_ideo.tex,Other,value,3,8.1
+study_1_n.tex,N,value,1,3001
+study_1_n.tex,N,value,2,2181
+study_1_n.tex,N,value,3,2524
+study_1_pid.tex,Independent,value,1,15.4
+study_1_pid.tex,Independent,value,2,11.9
+study_1_pid.tex,Independent,value,3,15.1
+study_1_pid.tex,Lean Democrat,value,1,15.5
+study_1_pid.tex,Lean Democrat,value,2,10.1
+study_1_pid.tex,Lean Democrat,value,3,6.7
+study_1_pid.tex,Lean Republican,value,1,7.1
+study_1_pid.tex,Lean Republican,value,2,7
+study_1_pid.tex,Lean Republican,value,3,5.7
+study_1_pid.tex,Not very strong Democrat,value,1,25.4
+study_1_pid.tex,Not very strong Democrat,value,2,14.3
+study_1_pid.tex,Not very strong Democrat,value,3,14.4
+study_1_pid.tex,Not very strong Republican,value,1,11
+study_1_pid.tex,Not very strong Republican,value,2,12.2
+study_1_pid.tex,Not very strong Republican,value,3,12.2
+study_1_pid.tex,Strong Democrat,value,1,19.8
+study_1_pid.tex,Strong Democrat,value,2,31.6
+study_1_pid.tex,Strong Democrat,value,3,24.1
+study_1_pid.tex,Strong Republican,value,1,5.7
+study_1_pid.tex,Strong Republican,value,2,12.7
+study_1_pid.tex,Strong Republican,value,3,21.8
+study_1_race.tex,Black,value,1,6.5
+study_1_race.tex,Black,value,2,3.1
+study_1_race.tex,Black,value,3,12
+study_1_race.tex,Hispanic,value,1,5.8
+study_1_race.tex,Hispanic,value,2,4.1
+study_1_race.tex,Hispanic,value,3,7.9
+study_1_race.tex,Other,value,1,10.2
+study_1_race.tex,Other,value,2,9.7
+study_1_race.tex,Other,value,3,5
+study_1_race.tex,White,value,1,77.5
+study_1_race.tex,White,value,2,83
+study_1_race.tex,White,value,3,75
+study_2_age.tex,18 - 29,value,1,15.8
+study_2_age.tex,18 - 29,value,2,18.3
+study_2_age.tex,30 - 39,value,1,17.7
+study_2_age.tex,30 - 39,value,2,19.8
+study_2_age.tex,40 - 49,value,1,16.2
+study_2_age.tex,40 - 49,value,2,18.8
+study_2_age.tex,50 - 59,value,1,20
+study_2_age.tex,50 - 59,value,2,16.3
+study_2_age.tex,60+,value,1,30.4
+study_2_age.tex,60+,value,2,26.8
+study_2_educ.tex,College,value,1,23.8
+study_2_educ.tex,College,value,2,29.3
+study_2_educ.tex,Graduate School,value,1,12.7
+study_2_educ.tex,Graduate School,value,2,14.9
+study_2_educ.tex,High School,value,1,20.3
+study_2_educ.tex,High School,value,2,21
+study_2_educ.tex,Less than High School,value,1,3.3
+study_2_educ.tex,Less than High School,value,2,1.4
+study_2_educ.tex,Some College,value,1,39.8
+study_2_educ.tex,Some College,value,2,33.3
+study_2_female.tex,Female,value,1,62.3
+study_2_female.tex,Female,value,2,51.3
+study_2_female.tex,Male,value,1,37.7
+study_2_female.tex,Male,value,2,48.7
+study_2_n.tex,N,value,1,1087
+study_2_n.tex,N,value,2,2976
+study_2_pid.tex,Independent,value,1,17.7
+study_2_pid.tex,Independent,value,2,14.9
+study_2_pid.tex,Lean Democrat,value,1,5.4
+study_2_pid.tex,Lean Democrat,value,2,6.8
+study_2_pid.tex,Lean Republican,value,1,5.2
+study_2_pid.tex,Lean Republican,value,2,6
+study_2_pid.tex,Not very strong Democrat,value,1,16.7
+study_2_pid.tex,Not very strong Democrat,value,2,14.3
+study_2_pid.tex,Not very strong Republican,value,1,13.5
+study_2_pid.tex,Not very strong Republican,value,2,12.2
+study_2_pid.tex,Strong Democrat,value,1,20.5
+study_2_pid.tex,Strong Democrat,value,2,24
+study_2_pid.tex,Strong Republican,value,1,21
+study_2_pid.tex,Strong Republican,value,2,21.7
+study_2_replication_ssm.tex,Constant (Control Mean),estimate,1,3.061
+study_2_replication_ssm.tex,Constant (Control Mean),estimate,2,0.383
+study_2_replication_ssm.tex,Constant (Control Mean),estimate,3,3.634
+study_2_replication_ssm.tex,Constant (Control Mean),estimate,4,4.788
+study_2_replication_ssm.tex,Constant (Control Mean),estimate,5,4.041
+study_2_replication_ssm.tex,Constant (Control Mean),std.error,1,0.056
+study_2_replication_ssm.tex,Constant (Control Mean),std.error,2,0.013
+study_2_replication_ssm.tex,Constant (Control Mean),std.error,3,0.06
+study_2_replication_ssm.tex,Constant (Control Mean),std.error,4,0.051
+study_2_replication_ssm.tex,Constant (Control Mean),std.error,5,0.056
+study_2_replication_ssm.tex,N,n,1,2954
+study_2_replication_ssm.tex,N,n,2,2950
+study_2_replication_ssm.tex,N,n,3,2953
+study_2_replication_ssm.tex,N,n,4,2950
+study_2_replication_ssm.tex,N,n,5,2953
+study_2_replication_ssm.tex,Religious Exemption,estimate,1,0.41
+study_2_replication_ssm.tex,Religious Exemption,estimate,2,-0.038
+study_2_replication_ssm.tex,Religious Exemption,estimate,3,0.049
+study_2_replication_ssm.tex,Religious Exemption,estimate,4,-0.014
+study_2_replication_ssm.tex,Religious Exemption,estimate,5,0.019
+study_2_replication_ssm.tex,Religious Exemption,std.error,1,0.08
+study_2_replication_ssm.tex,Religious Exemption,std.error,2,0.018
+study_2_replication_ssm.tex,Religious Exemption,std.error,3,0.085
+study_2_replication_ssm.tex,Religious Exemption,std.error,4,0.073
+study_2_replication_ssm.tex,Religious Exemption,std.error,5,0.079
+study_2_ssm.tex,Constant (Control Mean),estimate,1,3.016
+study_2_ssm.tex,Constant (Control Mean),estimate,2,0.381
+study_2_ssm.tex,Constant (Control Mean),estimate,3,3.679
+study_2_ssm.tex,Constant (Control Mean),estimate,4,5.115
+study_2_ssm.tex,Constant (Control Mean),estimate,5,4.164
+study_2_ssm.tex,Constant (Control Mean),std.error,1,0.09
+study_2_ssm.tex,Constant (Control Mean),std.error,2,0.021
+study_2_ssm.tex,Constant (Control Mean),std.error,3,0.099
+study_2_ssm.tex,Constant (Control Mean),std.error,4,0.081
+study_2_ssm.tex,Constant (Control Mean),std.error,5,0.093
+study_2_ssm.tex,N,n,1,1087
+study_2_ssm.tex,N,n,2,1086
+study_2_ssm.tex,N,n,3,1087
+study_2_ssm.tex,N,n,4,1087
+study_2_ssm.tex,N,n,5,1085
+study_2_ssm.tex,Religious Exemption,estimate,1,0.444
+study_2_ssm.tex,Religious Exemption,estimate,2,-0.003
+study_2_ssm.tex,Religious Exemption,estimate,3,0.217
+study_2_ssm.tex,Religious Exemption,estimate,4,-0.075
+study_2_ssm.tex,Religious Exemption,estimate,5,0.087
+study_2_ssm.tex,Religious Exemption,std.error,1,0.133
+study_2_ssm.tex,Religious Exemption,std.error,2,0.029
+study_2_ssm.tex,Religious Exemption,std.error,3,0.143
+study_2_ssm.tex,Religious Exemption,std.error,4,0.115
+study_2_ssm.tex,Religious Exemption,std.error,5,0.131
+study_3.tex,Constant (Control Mean),estimate,1,0.394
+study_3.tex,Constant (Control Mean),estimate,2,-0
+study_3.tex,Constant (Control Mean),std.error,1,0.022
+study_3.tex,Constant (Control Mean),std.error,2,0.077
+study_3.tex,Inequality Treatment,estimate,1,0.261
+study_3.tex,Inequality Treatment,estimate,2,-0.181
+study_3.tex,Inequality Treatment,std.error,1,0.03
+study_3.tex,Inequality Treatment,std.error,2,0.103
+study_3.tex,N,n,1,1020
+study_3.tex,N,n,2,336
+study_3_age.tex,18-29,value,1,14.4
+study_3_age.tex,18-29,value,2,22.7
+study_3_age.tex,30-39,value,1,13.6
+study_3_age.tex,30-39,value,2,18.7
+study_3_age.tex,40-49,value,1,12.6
+study_3_age.tex,40-49,value,2,18.7
+study_3_age.tex,50-99,value,1,21.2
+study_3_age.tex,50-99,value,2,14.9
+study_3_age.tex,60+,value,1,38.1
+study_3_age.tex,60+,value,2,25
+study_3_educ.tex,College,value,1,18.6
+study_3_educ.tex,College,value,2,31.2
+study_3_educ.tex,Graduate School,value,1,14
+study_3_educ.tex,Graduate School,value,2,13.5
+study_3_educ.tex,High School,value,1,30.3
+study_3_educ.tex,High School,value,2,29.3
+study_3_educ.tex,Less than High School,value,1,7.7
+study_3_educ.tex,Less than High School,value,2,2.7
+study_3_educ.tex,Some College,value,1,29.3
+study_3_educ.tex,Some College,value,2,23.3
+study_3_female.tex,Female,value,1,49.9
+study_3_female.tex,Female,value,2,53.1
+study_3_female.tex,Male,value,1,50.1
+study_3_female.tex,Male,value,2,46.9
+study_3_n.tex,N,value,1,1020
+study_3_n.tex,N,value,2,1187
+study_3_pid.tex,Independent,value,1,5.8
+study_3_pid.tex,Independent,value,2,13.9
+study_3_pid.tex,Lean Democrat,value,1,18.4
+study_3_pid.tex,Lean Democrat,value,2,7.4
+study_3_pid.tex,Lean Republican,value,1,20.2
+study_3_pid.tex,Lean Republican,value,2,6.7
+study_3_pid.tex,Not very strong Democrat,value,1,10.9
+study_3_pid.tex,Not very strong Democrat,value,2,11.2
+study_3_pid.tex,Not very strong Republican,value,1,13.1
+study_3_pid.tex,Not very strong Republican,value,2,9.9
+study_3_pid.tex,Strong Democrat,value,1,15
+study_3_pid.tex,Strong Democrat,value,2,28.3
+study_3_pid.tex,Strong Republican,value,1,16.6
+study_3_pid.tex,Strong Republican,value,2,22.6
+study_3_race.tex,Black,value,1,8.5
+study_3_race.tex,Black,value,2,10.6
+study_3_race.tex,Hispanic,value,1,9.2
+study_3_race.tex,Hispanic,value,2,12.9
+study_3_race.tex,Other,value,1,7.1
+study_3_race.tex,Other,value,2,9
+study_3_race.tex,White,value,1,75.2
+study_3_race.tex,White,value,2,67.5
+study_3_replication.tex,Constant (Control Mean),estimate,1,0.446
+study_3_replication.tex,Constant (Control Mean),estimate,2,-0.254
+study_3_replication.tex,Constant (Control Mean),std.error,1,0.029
+study_3_replication.tex,Constant (Control Mean),std.error,2,0.05
+study_3_replication.tex,Inequality Treatment,estimate,1,0.229
+study_3_replication.tex,Inequality Treatment,estimate,2,-0.071
+study_3_replication.tex,Inequality Treatment,std.error,1,0.037
+study_3_replication.tex,Inequality Treatment,std.error,2,0.066
+study_3_replication.tex,N,n,1,1041
+study_3_replication.tex,N,n,2,1026
+study_3_replication.tex,Pure control,estimate,1,0.122
+study_3_replication.tex,Pure control,estimate,2,-0.063
+study_3_replication.tex,Pure control,std.error,1,0.039
+study_3_replication.tex,Pure control,std.error,2,0.068
+study_4_correction.tex,Constant (Control Mean),estimate,1,0.316
+study_4_correction.tex,Constant (Control Mean),estimate,2,0.043
+study_4_correction.tex,Constant (Control Mean),std.error,1,0.03
+study_4_correction.tex,Constant (Control Mean),std.error,2,0.174
+study_4_correction.tex,Correction Treatment,estimate,1,-0.172
+study_4_correction.tex,Correction Treatment,estimate,2,0.174
+study_4_correction.tex,Correction Treatment,std.error,1,0.047
+study_4_correction.tex,Correction Treatment,std.error,2,0.224
+study_4_correction.tex,N,n,1,299
+study_4_correction.tex,N,n,2,26
+study_4_correction_replication.tex,Constant (Control Mean),estimate,1,0.232
+study_4_correction_replication.tex,Constant (Control Mean),estimate,2,0.064
+study_4_correction_replication.tex,Constant (Control Mean),std.error,1,0.021
+study_4_correction_replication.tex,Constant (Control Mean),std.error,2,0.049
+study_4_correction_replication.tex,Correction Treatment,estimate,1,-0.153
+study_4_correction_replication.tex,Correction Treatment,estimate,2,0.077
+study_4_correction_replication.tex,Correction Treatment,std.error,1,0.03
+study_4_correction_replication.tex,Correction Treatment,std.error,2,0.074
+study_4_correction_replication.tex,N,n,1,609
+study_4_correction_replication.tex,N,n,2,111
+welfare.tex,Constant (Aid to the Poor),estimate,1,2.383
+welfare.tex,Constant (Aid to the Poor),estimate,2,4.678
+welfare.tex,Constant (Aid to the Poor),estimate,3,0.813
+welfare.tex,Constant (Aid to the Poor),std.error,1,0.033
+welfare.tex,Constant (Aid to the Poor),std.error,2,0.093
+welfare.tex,Constant (Aid to the Poor),std.error,3,0.017
+welfare.tex,N,n,1,1087
+welfare.tex,N,n,2,1086
+welfare.tex,N,n,3,1084
+welfare.tex,Welfare Wording,estimate,1,-0.593
+welfare.tex,Welfare Wording,estimate,2,-0.241
+welfare.tex,Welfare Wording,estimate,3,-0.002
+welfare.tex,Welfare Wording,std.error,1,0.046
+welfare.tex,Welfare Wording,std.error,2,0.13
+welfare.tex,Welfare Wording,std.error,3,0.024
+welfare_replication.tex,Constant (Aid to the Poor),estimate,1,2.471
+welfare_replication.tex,Constant (Aid to the Poor),estimate,2,4.439
+welfare_replication.tex,Constant (Aid to the Poor),estimate,3,0.82
+welfare_replication.tex,Constant (Aid to the Poor),std.error,1,0.018
+welfare_replication.tex,Constant (Aid to the Poor),std.error,2,0.053
+welfare_replication.tex,Constant (Aid to the Poor),std.error,3,0.01
+welfare_replication.tex,N,n,1,2954
+welfare_replication.tex,N,n,2,2952
+welfare_replication.tex,N,n,3,2949
+welfare_replication.tex,Welfare Wording,estimate,1,-0.457
+welfare_replication.tex,Welfare Wording,estimate,2,-0.123
+welfare_replication.tex,Welfare Wording,estimate,3,-0.017
+welfare_replication.tex,Welfare Wording,std.error,1,0.026
+welfare_replication.tex,Welfare Wording,std.error,2,0.074
+welfare_replication.tex,Welfare Wording,std.error,3,0.014
+"in_text_numbers.R, pooling comparison",Pooled indirect-to-direct ratio,estimate,1,-0.027742882525500147
+"in_text_numbers.R, pooling comparison","Pooled ratio, 95% interval lower bound",conf_low,1,-0.09907045102991306
+"in_text_numbers.R, pooling comparison","Pooled ratio, 95% interval upper bound",conf_high,1,0.04358468597891274
+"in_text_numbers.R, pooling comparison","rmeta versus metafor, largest absolute difference",difference,1,2.7755575615628914e-17

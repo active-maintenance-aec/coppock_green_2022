@@ -1,0 +1,21 @@
+variable,category,Original,Replication
+age,18 - 29,15.8%,18.3%
+age,30 - 39,17.7%,19.8%
+age,40 - 49,16.2%,18.8%
+age,50 - 59,20.0%,16.3%
+age,60+,30.4%,26.8%
+education,Less than High School,3.3%,1.4%
+education,High School,20.3%,21.0%
+education,Some College,39.8%,33.3%
+education,College,23.8%,29.3%
+education,Graduate School,12.7%,14.9%
+party_id,Strong Democrat,20.5%,24.0%
+party_id,Not very strong Democrat,16.7%,14.3%
+party_id,Lean Democrat,5.4%,6.8%
+party_id,Independent,17.7%,14.9%
+party_id,Lean Republican,5.2%,6.0%
+party_id,Not very strong Republican,13.5%,12.2%
+party_id,Strong Republican,21.0%,21.7%
+gender,Male,37.7%,48.7%
+gender,Female,62.3%,51.3%
+n,N,1087,2976

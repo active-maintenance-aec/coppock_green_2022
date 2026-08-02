@@ -1,0 +1,4 @@
+sample,across_domain,within_domain,n_pairs_across,n_pairs_within,n_pairs_total
+MTurk sample,0.06130669731266342,0.2965653076529662,96,24,120
+Elite sample,0.2242456512105674,0.3942426950520823,96,24,120
+Lucid sample,2.884997688806283e-4,0.12233809233039297,96,24,120

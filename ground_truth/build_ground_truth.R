@@ -1,0 +1,759 @@
+# coppock_green_2022/ground_truth/build_ground_truth.R
+# Output: ground_truth/coppock_green_2022_ground_truth.csv
+# Depends on: maintained/output/ (run run_all.R first), ground_truth/archive_values.csv
+# Description: Assemble the ground truth table. value_paper is typed from the
+#   article and the online appendix and is only ever compared against.
+#   value_script is read out of ground_truth/archive_values.csv, which
+#   run_original_archive.R produces by running the deposited scripts and reading
+#   the LaTeX they write. value_rewrite is read out of maintained/output/. No
+#   published number is an input to any computation, here or in maintained/.
+#
+#   value_paper is carried as the string the article prints, not as a number,
+#   because a double cannot record how many decimals were printed: 0.80 and 0.8
+#   are the same double, and a tolerance read off the double would compare a
+#   published 0.80 at five hundredths. The tolerance is derived from the string.
+#
+#   Every quantity is carried in the units the article prints it in. Where the
+#   article gives a percentage the rewrite's proportion is multiplied by 100 at
+#   the point of comparison, so the printed precision and the tolerance line up.
+
+library(here)
+library(tidyverse)
+
+here::i_am("ground_truth/build_ground_truth.R")
+
+out <- function(file) read_csv(here::here("maintained", "output", file), show_col_types = FALSE)
+
+archive <- read_csv(here::here("ground_truth", "archive_values.csv"), show_col_types = FALSE)
+
+pct <- function(x) as.numeric(str_remove(x, "%"))
+
+# Published precision ----
+paper_number <- function(x) as.numeric(str_remove_all(x, "[,%]"))
+
+paper_decimals <- function(x) {
+  stripped <- str_remove_all(x, "[,%]")
+  if_else(str_detect(stripped, fixed(".")),
+          nchar(str_remove(stripped, "^[^.]*\\.")),
+          0L)
+}
+
+agrees <- function(value, paper) {
+  case_when(
+    is.na(value) | is.na(paper) ~ NA_real_,
+    abs(value - paper_number(paper)) <= 0.5 * 10^(-paper_decimals(paper)) ~ 1,
+    .default = 0
+  )
+}
+
+# Joins ----
+# Every join below carries a published value on one side and a pipeline value on
+# the other, so a key that is not unique silently multiplies rows and a key that
+# matches nothing silently produces NA. Both are checked at every join.
+join_checked <- function(x, y, by, label) {
+  if (anyDuplicated(select(x, all_of(by))) != 0) stop(str_glue("{label}: key not unique on the left"))
+  if (anyDuplicated(select(y, all_of(by))) != 0) stop(str_glue("{label}: key not unique on the right"))
+  joined <- left_join(x, y, by = by)
+  if (nrow(joined) != nrow(x)) stop(str_glue("{label}: join changed the row count"))
+  joined
+}
+
+# Demographic tables ----
+# Three appendix tables with the same shape: column percentages by sample, one
+# published table, one set of deposited xtable fragments, one rewrite CSV.
+demographic_block <- function(label, paper_wide, rewrite_file, sample_cols, file_map, note) {
+  paper_long <- paper_wide |>
+    pivot_longer(all_of(sample_cols), names_to = "sample", values_to = "value_paper")
+
+  rewrite_long <- out(rewrite_file) |>
+    pivot_longer(all_of(sample_cols), names_to = "sample", values_to = "value_rewrite") |>
+    mutate(value_rewrite = pct(value_rewrite))
+
+  archive_long <- archive |>
+    filter(file %in% names(file_map)) |>
+    mutate(variable = unname(file_map[file]), sample = sample_cols[column]) |>
+    select(variable, category = term, sample, value_script = value)
+
+  paper_long |>
+    join_checked(rewrite_long, c("variable", "category", "sample"),
+                 str_glue("{label} rewrite")) |>
+    join_checked(archive_long, c("variable", "category", "sample"),
+                 str_glue("{label} archive")) |>
+    transmute(
+      table_figure = label,
+      claim = str_glue("{variable}: {category} ({sample})") |> as.character(),
+      value_script, value_paper, value_rewrite,
+      notes = note
+    )
+}
+
+paper_b2 <- tribble(
+  ~variable, ~category, ~MTurk, ~Elites, ~Lucid,
+  "age", "18 - 29", "45.1%", "7.2%", "18.0%",
+  "age", "30 - 39", "30.7%", "17.6%", "19.7%",
+  "age", "40 - 49", "12.2%", "19.2%", "18.9%",
+  "age", "50 - 59", "8.8%", "25.0%", "16.6%",
+  "age", "60+", "3.2%", "31.1%", "26.7%",
+  "gender", "Male", "52.1%", "67.9%", "49.0%",
+  "gender", "Female", "47.9%", "32.1%", "51.0%",
+  "race", "Black", "6.5%", "3.1%", "12.0%",
+  "race", "Hispanic", "5.8%", "4.1%", "7.9%",
+  "race", "Other", "10.2%", "9.7%", "5.0%",
+  "race", "White", "77.5%", "83.0%", "75.0%",
+  "education", "Less than High School", "0.5%", "0.0%", "1.3%",
+  "education", "High School", "9.8%", "0.5%", "21.2%",
+  "education", "Some College", "38.3%", "3.1%", "33.0%",
+  "education", "College", "39.0%", "24.9%", "29.4%",
+  "education", "Graduate School", "12.4%", "71.6%", "15.1%",
+  "party_id", "Strong Democrat", "19.8%", "31.6%", "24.1%",
+  "party_id", "Not very strong Democrat", "25.4%", "14.3%", "14.4%",
+  "party_id", "Lean Democrat", "15.5%", "10.1%", "6.7%",
+  "party_id", "Independent", "15.4%", "11.9%", "15.1%",
+  "party_id", "Lean Republican", "7.1%", "7.0%", "5.7%",
+  "party_id", "Not very strong Republican", "11.0%", "12.2%", "12.2%",
+  "party_id", "Strong Republican", "5.7%", "12.7%", "21.8%",
+  "ideology", "Conservative", "18.2%", "16.8%", "30.4%",
+  "ideology", "Liberal", "44.5%", "37.3%", "25.8%",
+  "ideology", "Libertarian", "6.2%", "10.2%", "1.7%",
+  "ideology", "Moderate", "26.5%", "32.0%", "34.0%",
+  "ideology", "Other", "4.6%", "3.7%", "8.1%",
+  "n", "N", "3001", "2181", "2524"
+)
+
+paper_c3 <- tribble(
+  ~variable, ~category, ~Original, ~Replication,
+  "age", "18 - 29", "15.8%", "18.3%",
+  "age", "30 - 39", "17.7%", "19.8%",
+  "age", "40 - 49", "16.2%", "18.8%",
+  "age", "50 - 59", "20.0%", "16.3%",
+  "age", "60+", "30.4%", "26.8%",
+  "gender", "Male", "37.7%", "48.7%",
+  "gender", "Female", "62.3%", "51.3%",
+  "education", "Less than High School", "3.3%", "1.4%",
+  "education", "High School", "20.3%", "21.0%",
+  "education", "Some College", "39.8%", "33.3%",
+  "education", "College", "23.8%", "29.3%",
+  "education", "Graduate School", "12.7%", "14.9%",
+  "party_id", "Strong Democrat", "20.5%", "24.0%",
+  "party_id", "Not very strong Democrat", "16.7%", "14.3%",
+  "party_id", "Lean Democrat", "5.4%", "6.8%",
+  "party_id", "Independent", "17.7%", "14.9%",
+  "party_id", "Lean Republican", "5.2%", "6.0%",
+  "party_id", "Not very strong Republican", "13.5%", "12.2%",
+  "party_id", "Strong Republican", "21.0%", "21.7%",
+  "n", "N", "1087", "2976"
+)
+
+paper_d5 <- tribble(
+  ~variable, ~category, ~Original, ~Replication,
+  "age", "18-29", "14.4%", "22.7%",
+  "age", "30-39", "13.6%", "18.7%",
+  "age", "40-49", "12.6%", "18.7%",
+  "age", "50-99", "21.2%", "14.9%",
+  "age", "60+", "38.1%", "25.0%",
+  "gender", "Male", "50.1%", "46.9%",
+  "gender", "Female", "49.9%", "53.1%",
+  "race", "Black", "8.5%", "10.6%",
+  "race", "Hispanic", "9.2%", "12.9%",
+  "race", "Other", "7.1%", "9.0%",
+  "race", "White", "75.2%", "67.5%",
+  "education", "Less than High School", "7.7%", "2.7%",
+  "education", "High School", "30.3%", "29.3%",
+  "education", "Some College", "29.3%", "23.3%",
+  "education", "College", "18.6%", "31.2%",
+  "education", "Graduate School", "14.0%", "13.5%",
+  "party_id", "Strong Democrat", "15.0%", "28.3%",
+  "party_id", "Not very strong Democrat", "10.9%", "11.2%",
+  "party_id", "Lean Democrat", "18.4%", "7.4%",
+  "party_id", "Independent", "5.8%", "13.9%",
+  "party_id", "Lean Republican", "20.2%", "6.7%",
+  "party_id", "Not very strong Republican", "13.1%", "9.9%",
+  "party_id", "Strong Republican", "16.6%", "22.6%",
+  "n", "N", "1020", "1187"
+)
+
+b2_rows <- demographic_block(
+  "Table B.2", paper_b2, "table_b2_sample_demographics.csv",
+  c("MTurk", "Elites", "Lucid"),
+  c(study_1_age.tex = "age", study_1_female.tex = "gender", study_1_race.tex = "race",
+    study_1_educ.tex = "education", study_1_pid.tex = "party_id",
+    study_1_ideo.tex = "ideology", study_1_n.tex = "n"),
+  "Appendix table B.2, column percentages by sample"
+)
+
+c3_rows <- demographic_block(
+  "Table C.3", paper_c3, "table_c3_study2_demographics.csv",
+  c("Original", "Replication"),
+  c(study_2_age.tex = "age", study_2_female.tex = "gender",
+    study_2_educ.tex = "education", study_2_pid.tex = "party_id", study_2_n.tex = "n"),
+  "Appendix table C.3, column percentages by sample"
+)
+
+d5_rows <- demographic_block(
+  "Table D.5", paper_d5, "table_d5_study3_demographics.csv",
+  c("Original", "Replication"),
+  c(study_3_age.tex = "age", study_3_female.tex = "gender", study_3_race.tex = "race",
+    study_3_educ.tex = "education", study_3_pid.tex = "party_id", study_3_n.tex = "n"),
+  "Appendix table D.5, column percentages by sample"
+)
+
+# Regression tables ----
+# Same shape again: a published panel of estimates, standard errors and sample
+# sizes, a deposited stargazer table, a rewrite CSV of the same fits.
+regression_block <- function(label, paper_wide, rewrite_long, file_map, note) {
+  paper_long <- paper_wide |>
+    pivot_longer(c(estimate, std.error, n), names_to = "stat", values_to = "value_paper") |>
+    filter(!is.na(value_paper))
+
+  archive_long <- archive |>
+    filter(file %in% names(file_map$file)) |>
+    mutate(
+      panel = unname(file_map$file[file]),
+      column_label = file_map$columns[column],
+      term = if_else(term == "N", "N", unname(file_map$terms[term]))
+    ) |>
+    select(panel, column_label, term, stat, value_script = value)
+
+  paper_long |>
+    join_checked(rewrite_long, c("panel", "column_label", "term", "stat"),
+                 str_glue("{label} rewrite")) |>
+    join_checked(archive_long, c("panel", "column_label", "term", "stat"),
+                 str_glue("{label} archive")) |>
+    transmute(
+      table_figure = label,
+      claim = str_glue("{panel}, {column_label}, {term}: {stat}") |> as.character(),
+      value_script, value_paper, value_rewrite,
+      notes = note
+    )
+}
+
+# The rewrite writes estimates and standard errors in long form already; N is a
+# column on each row, so it becomes its own stat.
+rewrite_regression_long <- function(file, panel_col, column_col) {
+  raw <- out(file)
+  bind_rows(
+    raw |>
+      transmute(panel = .data[[panel_col]], column_label = as.character(.data[[column_col]]),
+                term, estimate, std.error) |>
+      pivot_longer(c(estimate, std.error), names_to = "stat", values_to = "value_rewrite"),
+    raw |>
+      distinct(panel = .data[[panel_col]], column_label = as.character(.data[[column_col]]), n) |>
+      transmute(panel, column_label, term = "N", stat = "n", value_rewrite = n)
+  )
+}
+
+t2_columns <- c("Employers", "Local Officials", "SSM Amend", "Prayer", "Prayer Amend")
+
+paper_t2 <- tribble(
+  ~panel, ~column_label, ~term, ~estimate, ~std.error, ~n,
+  "Original", "Employers", "Religious exemption", ".444", ".133", NA,
+  "Original", "Local Officials", "Religious exemption", "-.003", ".029", NA,
+  "Original", "SSM Amend", "Religious exemption", ".217", ".143", NA,
+  "Original", "Prayer", "Religious exemption", "-.075", ".115", NA,
+  "Original", "Prayer Amend", "Religious exemption", ".087", ".131", NA,
+  "Original", "Employers", "Constant (control mean)", "3.016", ".090", NA,
+  "Original", "Local Officials", "Constant (control mean)", ".381", ".021", NA,
+  "Original", "SSM Amend", "Constant (control mean)", "3.679", ".099", NA,
+  "Original", "Prayer", "Constant (control mean)", "5.115", ".081", NA,
+  "Original", "Prayer Amend", "Constant (control mean)", "4.164", ".093", NA,
+  "Original", "Employers", "N", NA, NA, "1,087",
+  "Original", "Local Officials", "N", NA, NA, "1,086",
+  "Original", "SSM Amend", "N", NA, NA, "1,087",
+  "Original", "Prayer", "N", NA, NA, "1,087",
+  "Original", "Prayer Amend", "N", NA, NA, "1,085",
+  "Replication", "Employers", "Religious exemption", ".410", ".080", NA,
+  "Replication", "Local Officials", "Religious exemption", "-.038", ".018", NA,
+  "Replication", "SSM Amend", "Religious exemption", ".049", ".085", NA,
+  "Replication", "Prayer", "Religious exemption", "-.014", ".073", NA,
+  "Replication", "Prayer Amend", "Religious exemption", ".019", ".079", NA,
+  "Replication", "Employers", "Constant (control mean)", "3.061", ".056", NA,
+  "Replication", "Local Officials", "Constant (control mean)", ".383", ".013", NA,
+  "Replication", "SSM Amend", "Constant (control mean)", "3.634", ".060", NA,
+  "Replication", "Prayer", "Constant (control mean)", "4.788", ".051", NA,
+  "Replication", "Prayer Amend", "Constant (control mean)", "4.041", ".056", NA,
+  "Replication", "Employers", "N", NA, NA, "2,954",
+  "Replication", "Local Officials", "N", NA, NA, "2,950",
+  "Replication", "SSM Amend", "N", NA, NA, "2,953",
+  "Replication", "Prayer", "N", NA, NA, "2,950",
+  "Replication", "Prayer Amend", "N", NA, NA, "2,953"
+)
+
+t2_rows <- regression_block(
+  "Table 2", paper_t2,
+  rewrite_regression_long("table_2_employment_discrimination.csv", "sample", "outcome"),
+  file_map = list(
+    file = c(study_2_ssm.tex = "Original", study_2_replication_ssm.tex = "Replication"),
+    columns = t2_columns,
+    terms = c(`Religious Exemption` = "Religious exemption",
+              `Constant (Control Mean)` = "Constant (control mean)")
+  ),
+  note = "Table 2, employment discrimination experiment"
+)
+
+t3_columns <- c("Belief in Inequality (Binary)", "Econ. System Justification (Standard Units)")
+
+paper_t3 <- tribble(
+  ~panel, ~column_label, ~term, ~estimate, ~std.error, ~n,
+  "Original", t3_columns[1], "Inequality treatment", ".261", ".030", NA,
+  "Original", t3_columns[2], "Inequality treatment", "-.181", ".103", NA,
+  "Original", t3_columns[1], "Constant (control mean)", ".394", ".022", NA,
+  "Original", t3_columns[2], "Constant (control mean)", "-.000", ".077", NA,
+  "Original", t3_columns[1], "N", NA, NA, "1,020",
+  "Original", t3_columns[2], "N", NA, NA, "336",
+  "Replication", t3_columns[1], "Inequality treatment", ".229", ".037", NA,
+  "Replication", t3_columns[2], "Inequality treatment", "-.071", ".066", NA,
+  "Replication", t3_columns[1], "Pure control", ".122", ".039", NA,
+  "Replication", t3_columns[2], "Pure control", "-.063", ".068", NA,
+  "Replication", t3_columns[1], "Constant (control mean)", ".446", ".029", NA,
+  "Replication", t3_columns[2], "Constant (control mean)", "-.254", ".050", NA,
+  "Replication", t3_columns[1], "N", NA, NA, "1,041",
+  "Replication", t3_columns[2], "N", NA, NA, "1,026"
+)
+
+t3_rows <- regression_block(
+  "Table 3", paper_t3,
+  rewrite_regression_long("table_3_inequality.csv", "sample", "outcome"),
+  file_map = list(
+    file = c(study_3.tex = "Original", study_3_replication.tex = "Replication"),
+    columns = t3_columns,
+    terms = c(`Inequality Treatment` = "Inequality treatment",
+              `Pure control` = "Pure control",
+              `Constant (Control Mean)` = "Constant (control mean)")
+  ),
+  note = "Table 3, income inequality experiment"
+)
+
+t4_columns <- c("Prefer small government", "Prefer large government")
+
+paper_t4 <- tribble(
+  ~panel, ~column_label, ~term, ~estimate, ~std.error, ~n,
+  "Original", t4_columns[1], "Correction treatment", "-.172", ".047", NA,
+  "Original", t4_columns[2], "Correction treatment", ".174", ".224", NA,
+  "Original", t4_columns[1], "Constant (control mean)", ".316", ".030", NA,
+  "Original", t4_columns[2], "Constant (control mean)", ".043", ".174", NA,
+  "Original", t4_columns[1], "N", NA, NA, "299",
+  "Original", t4_columns[2], "N", NA, NA, "26",
+  "Replication", t4_columns[1], "Correction treatment", "-.153", ".030", NA,
+  "Replication", t4_columns[2], "Correction treatment", ".077", ".074", NA,
+  "Replication", t4_columns[1], "Constant (control mean)", ".232", ".021", NA,
+  "Replication", t4_columns[2], "Constant (control mean)", ".064", ".049", NA,
+  "Replication", t4_columns[1], "N", NA, NA, "609",
+  "Replication", t4_columns[2], "N", NA, NA, "111"
+)
+
+t4_rows <- regression_block(
+  "Table 4", paper_t4,
+  rewrite_regression_long("table_4_correction_experiment.csv", "sample", "gov_pref"),
+  file_map = list(
+    file = c(study_4_correction.tex = "Original",
+             study_4_correction_replication.tex = "Replication"),
+    columns = t4_columns,
+    terms = c(`Correction Treatment` = "Correction treatment",
+              `Constant (Control Mean)` = "Constant (control mean)")
+  ),
+  note = "Table 4, consistency correction experiment"
+)
+
+c4_columns <- c("Too Little on Welfare", "Gov Should Reduce Ineq", "Medicaid a Good Thing")
+
+paper_c4 <- tribble(
+  ~panel, ~column_label, ~term, ~estimate, ~std.error, ~n,
+  "Original", c4_columns[1], "Welfare wording", "-0.593", "0.046", NA,
+  "Original", c4_columns[2], "Welfare wording", "-0.241", "0.130", NA,
+  "Original", c4_columns[3], "Welfare wording", "-0.002", "0.024", NA,
+  "Original", c4_columns[1], "Constant (control mean)", "2.383", "0.033", NA,
+  "Original", c4_columns[2], "Constant (control mean)", "4.678", "0.093", NA,
+  "Original", c4_columns[3], "Constant (control mean)", "0.813", "0.017", NA,
+  "Original", c4_columns[1], "N", NA, NA, "1,087",
+  "Original", c4_columns[2], "N", NA, NA, "1,086",
+  "Original", c4_columns[3], "N", NA, NA, "1,084",
+  "Replication", c4_columns[1], "Welfare wording", "-0.457", "0.026", NA,
+  "Replication", c4_columns[2], "Welfare wording", "-0.123", "0.074", NA,
+  "Replication", c4_columns[3], "Welfare wording", "-0.017", "0.014", NA,
+  "Replication", c4_columns[1], "Constant (control mean)", "2.471", "0.018", NA,
+  "Replication", c4_columns[2], "Constant (control mean)", "4.439", "0.053", NA,
+  "Replication", c4_columns[3], "Constant (control mean)", "0.820", "0.010", NA,
+  "Replication", c4_columns[1], "N", NA, NA, "2,954",
+  "Replication", c4_columns[2], "N", NA, NA, "2,952",
+  "Replication", c4_columns[3], "N", NA, NA, "2,949"
+)
+
+c4_rows <- regression_block(
+  "Table C.4", paper_c4,
+  rewrite_regression_long("table_c4_welfare_experiment.csv", "sample", "outcome"),
+  file_map = list(
+    file = c(welfare.tex = "Original", welfare_replication.tex = "Replication"),
+    columns = c4_columns,
+    terms = c(`Welfare Wording` = "Welfare wording",
+              `Constant (Aid to the Poor)` = "Constant (control mean)")
+  ),
+  note = "Appendix table C.4, welfare wording experiment"
+)
+
+# Table 1 ----
+t1 <- out("table_1_static_constraint_correlations.csv")
+t1_archive <- archive |> filter(file == "static_cor.tex")
+
+paper_t1 <- tribble(
+  ~sample, ~scope, ~value_paper,
+  "MTurk sample", "across_domain", ".06",
+  "MTurk sample", "within_domain", ".30",
+  "Elite sample", "across_domain", ".22",
+  "Elite sample", "within_domain", ".39",
+  "Lucid sample", "across_domain", ".00",
+  "Lucid sample", "within_domain", ".12"
+)
+
+t1_rows <- paper_t1 |>
+  join_checked(
+    t1 |>
+      pivot_longer(c(across_domain, within_domain), names_to = "scope",
+                   values_to = "value_rewrite") |>
+      select(sample, scope, value_rewrite),
+    c("sample", "scope"), "Table 1 rewrite"
+  ) |>
+  join_checked(
+    t1_archive |>
+      transmute(sample = str_replace(term, "Sample", "sample"),
+                scope = if_else(column == 1, "across_domain", "within_domain"),
+                value_script = value),
+    c("sample", "scope"), "Table 1 archive"
+  ) |>
+  transmute(
+    table_figure = "Table 1",
+    claim = str_glue("{sample}: average {str_replace(scope, '_', ' ')} correlation") |>
+      as.character(),
+    value_script, value_paper, value_rewrite,
+    notes = "Table 1, average Pearson correlation over the 120 unordered outcome pairs"
+  )
+
+# Figures ----
+# The three coefficient plots print no numbers, so there is nothing in them to
+# compare against cell by cell. What can be checked is how many estimates each
+# carries, and for figure 4 the article states that count in the results section.
+# Each row reads its own figure's CSV, addressed by the figure's own stem.
+figure_file <- function(stem) {
+  file <- str_glue("{stem}.csv") |> as.character()
+  stopifnot(file.exists(here::here("maintained", "output", file)))
+  out(file)
+}
+
+f4 <- figure_file("figure_4_dynamic_constraint_estimates")
+fb2 <- figure_file("figure_b2_wave2_estimates")
+fb3 <- figure_file("figure_b3_wave3_estimates")
+
+figure_rows <- tribble(
+  ~table_figure, ~claim, ~value_script, ~value_paper, ~value_rewrite, ~notes,
+  "Figure 4", "Treatment effects plotted, target issues", NA, "48", sum(f4$target),
+    "Article: 'out of the 48 estimated treatment effects on target issues'. The deposit plots the same estimates but prints no count.",
+  "Figure 4", "Treatment effects plotted, nontarget issues", NA, "144", sum(!f4$target),
+    "Article: 'out of 144 estimated effects on nontarget issues'.",
+  "Figure B.2", "Treatment effects plotted at wave 2", NA, NA, nrow(fb2),
+    "Appendix figure B.2 carries no printed numbers, so there is no published value to compare against. The rewrite writes every plotted estimate to figure_b2_wave2_estimates.csv.",
+  "Figure B.3", "Treatment effects plotted at wave 3", NA, NA, nrow(fb3),
+    "Appendix figure B.3 carries no printed numbers, so there is no published value to compare against. The rewrite writes every plotted estimate to figure_b3_wave3_estimates.csv."
+)
+
+# In-text quantities ----
+pwa <- out("text_precision_weighted_averages.csv")
+ranges <- out("text_precision_weighted_averages_endpoint_ranges.csv")
+counts <- out("text_significance_counts.csv")
+amtrak <- out("text_amtrak_largest_effects.csv")
+inconsistency <- out("text_inconsistency_rates.csv")
+pooled <- out("text_pooled_ratio_metaanalysis.csv")
+pooled_dispersion <- out("text_pooled_ratio_dispersion.csv")
+
+pwa_value <- function(sample_name, quantity_name, column) {
+  value <- pwa[[column]][pwa$sample == sample_name & pwa$quantity == quantity_name]
+  stopifnot(length(value) == 1)
+  value
+}
+
+amtrak_value <- function(study) {
+  value <- amtrak$estimate[amtrak$Study == study & str_detect(amtrak$dv_labels, "^Taxes")]
+  stopifnot(length(value) == 1)
+  value
+}
+
+# The deposit's own ideology table carries three rows with no label, so a logical
+# subset on term picks up NAs; the lookup filters instead.
+archive_value <- function(term_name) {
+  value <- archive |> filter(term == term_name) |> pull(value)
+  stopifnot(length(value) == 1)
+  value
+}
+
+# Sample ratios and the pooled ratio are printed as percentages in the article.
+as_percent <- function(x) 100 * x
+
+meta_agreement <- archive_value("rmeta versus metafor, largest absolute difference")
+
+endpoint_range <- function(sample_name, endpoint_name, sims) {
+  row <- ranges |>
+    filter(sample == sample_name, quantity == "ratio", endpoint == endpoint_name,
+           sims_setting == sims)
+  stopifnot(nrow(row) == 1)
+  c(low = as_percent(row$mc_low), high = as_percent(row$mc_high))
+}
+
+# Whether the published value falls in the range decides the verdict, so the note
+# reports it rather than describing it, and note and verdict cannot drift apart.
+verdict_clause <- function(published, range) {
+  value <- paper_number(published)
+  inside <- value >= range["low"] & value <= range["high"]
+  str_glue("The published {published} lies {if_else(inside, 'inside', 'outside')} that range.")
+}
+
+endpoint_note <- function(sample_name, endpoint_name, published) {
+  archive_sims <- endpoint_range(sample_name, endpoint_name, 10)
+  rewrite_sims <- endpoint_range(sample_name, endpoint_name, 1000)
+  str_glue(
+    "Bootstrap interval endpoint from an unseeded procedure, so it is compared against its own \\
+     distribution rather than to printed precision. Across resamples the endpoint runs from \\
+     {round(archive_sims['low'], 1)}% to {round(archive_sims['high'], 1)}% at the 10 resamples the \\
+     deposit ships, and from {round(rewrite_sims['low'], 1)}% to {round(rewrite_sims['high'], 1)}% \\
+     at the 1,000 the rewrite uses. {verdict_clause(published, archive_sims)}"
+  ) |> as.character()
+}
+
+pooled_range <- function(quantity_name, sims) {
+  row <- pooled_dispersion |> filter(quantity == quantity_name, sims_setting == sims)
+  stopifnot(nrow(row) == 1)
+  c(low = as_percent(row$mc_low), high = as_percent(row$mc_high))
+}
+
+pooled_note <- function(quantity_name, published) {
+  archive_sims <- pooled_range(quantity_name, 10)
+  rewrite_sims <- pooled_range(quantity_name, 1000)
+  str_glue(
+    "The three study-level ratios are fixed, but their weights are unseeded bootstrap \\
+     variances, so this is a draw. Over resamples it runs from {round(archive_sims['low'], 1)}% \\
+     to {round(archive_sims['high'], 1)}% at the 10 resamples the deposit ships and from \\
+     {round(rewrite_sims['low'], 1)}% to {round(rewrite_sims['high'], 1)}% at the 1,000 the \\
+     rewrite uses. {verdict_clause(published, archive_sims)} On identical inputs \\
+     rmeta::meta.summaries and metafor::rma(method = 'FE') return pooled estimates, standard \\
+     errors and interval endpoints agreeing to {signif(meta_agreement, 2)}."
+  ) |> as.character()
+}
+
+text_rows <- tribble(
+  ~table_figure, ~claim, ~value_script, ~value_paper, ~value_rewrite, ~notes,
+  "Text", "Outcome pairs compared (16 choose 2)", NA, "120",
+    t1$n_pairs_total[1],
+    "Article: '16 choose 2 = 120 pairs'. The deposit averages over the 240 ordered pairs instead and prints no count; the correlation matrix is symmetric, so the average is the same.",
+  "Text", "MTurk average within-domain correlation, as given in the body text",
+    t1_archive |> filter(term == "MTurk Sample", column == 2) |> pull(value), ".29",
+    t1$within_domain[t1$sample == "MTurk sample"],
+    "The body text says .29 where table 1 says .30. The quantity is 0.2966, so table 1 rounds it correctly and the sentence does not.",
+  "Text", "MTurk precision-weighted average, target outcomes", NA, "0.42",
+    pwa_value("MTurk", "Within Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "Elite precision-weighted average, target outcomes", NA, "0.22",
+    pwa_value("Elite", "Within Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "Lucid precision-weighted average, target outcomes", NA, "0.245",
+    pwa_value("Lucid", "Within Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "MTurk precision-weighted average, nontarget outcomes", NA, "0.004",
+    pwa_value("MTurk", "Across Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "Elite precision-weighted average, nontarget outcomes", NA, "0.01",
+    pwa_value("Elite", "Across Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "Lucid precision-weighted average, nontarget outcomes", NA, "-0.02",
+    pwa_value("Lucid", "Across Domain", "estimate"),
+    "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
+  "Text", "MTurk indirect-to-direct effect ratio", NA, "0.8%",
+    as_percent(pwa_value("MTurk", "ratio", "estimate")),
+    "Article: 'on MTurk, our best guess is that the average indirect effect is 0.8% of the average direct effect'.",
+  "Text", "Elite indirect-to-direct effect ratio", NA, "6.4%",
+    as_percent(pwa_value("Elite", "ratio", "estimate")),
+    "Article: 'indirect effects are 6.4% the size of the direct effects on average'.",
+  "Text", "Lucid indirect-to-direct effect ratio", NA, "-9.4%",
+    as_percent(pwa_value("Lucid", "ratio", "estimate")),
+    "Article: 'on Lucid, the fraction is in fact negative, at -9.4%'.",
+  "Text", "MTurk ratio, 95% interval lower bound", NA, "-8.1%",
+    as_percent(pwa_value("MTurk", "ratio", "conf_low")), endpoint_note("MTurk", "conf_low", "-8.1%"),
+  "Text", "MTurk ratio, 95% interval upper bound", NA, "8.7%",
+    as_percent(pwa_value("MTurk", "ratio", "conf_high")), endpoint_note("MTurk", "conf_high", "8.7%"),
+  "Text", "Elite ratio, 95% interval lower bound", NA, "-25.7%",
+    as_percent(pwa_value("Elite", "ratio", "conf_low")), endpoint_note("Elite", "conf_low", "-25.7%"),
+  "Text", "Elite ratio, 95% interval upper bound", NA, "26.2%",
+    as_percent(pwa_value("Elite", "ratio", "conf_high")), endpoint_note("Elite", "conf_high", "26.2%"),
+  "Text", "Lucid ratio, 95% interval lower bound", NA, "-24%",
+    as_percent(pwa_value("Lucid", "ratio", "conf_low")), endpoint_note("Lucid", "conf_low", "-24%"),
+  "Text", "Lucid ratio, 95% interval upper bound", NA, "15%",
+    as_percent(pwa_value("Lucid", "ratio", "conf_high")), endpoint_note("Lucid", "conf_high", "15%"),
+  "Text", "Pooled indirect-to-direct ratio",
+    as_percent(archive_value("Pooled indirect-to-direct ratio")), "1.4%",
+    as_percent(pooled$estimate[pooled$model == "Fixed effects"]),
+    pooled_note("estimate", "1.4%"),
+  "Text", "Pooled ratio, 95% interval lower bound",
+    as_percent(archive_value("Pooled ratio, 95% interval lower bound")), "-8%",
+    as_percent(pooled$conf_low[pooled$model == "Fixed effects"]),
+    pooled_note("conf_low", "-8%"),
+  "Text", "Pooled ratio, 95% interval upper bound",
+    as_percent(archive_value("Pooled ratio, 95% interval upper bound")), "6%",
+    as_percent(pooled$conf_high[pooled$model == "Fixed effects"]),
+    pooled_note("conf_high", "6%"),
+  "Text", "Estimated treatment effects on target issues", NA, "48",
+    counts$n_estimates[counts$issue_type == "Target issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Target-issue effects significant at p < 0.05", NA, "39",
+    counts$n_significant[counts$issue_type == "Target issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Target-issue effects significant after Benjamini-Hochberg", NA, "35",
+    counts$n_significant_bh[counts$issue_type == "Target issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Estimated treatment effects on nontarget issues", NA, "144",
+    counts$n_estimates[counts$issue_type == "Nontarget issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Nontarget-issue effects significant at p < 0.05", NA, "9",
+    counts$n_significant[counts$issue_type == "Nontarget issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Nontarget-issue effects significant after Benjamini-Hochberg", NA, "0",
+    counts$n_significant_bh[counts$issue_type == "Nontarget issues"],
+    "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
+  "Text", "Amtrak treatment on the fourth Amtrak outcome, elite sample", NA, "0.52",
+    amtrak_value("Elite Sample"),
+    "Article: 'especially large, at 0.52 standard deviations among elites'. The article calls it the third question in the Amtrak set; it is the fourth item as the deposit orders them.",
+  "Text", "Amtrak treatment on the fourth Amtrak outcome, MTurk sample", NA, "0.73",
+    amtrak_value("MTurk Sample"),
+    "Article: 'and 0.73 standard deviations on MTurk'.",
+  "Text", "Share of the study 2 original sample holding inconsistent preferences", NA, "30%",
+    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Original"]),
+    "Article: 'Among the MTurk sample, 30% of the respondents were inconsistent'. The inconsistency indicator exists only in the study 2 samples, both of which the article elsewhere says were recruited on Lucid, so that sentence attaches the rate to the wrong sample label. The rate itself is the study 2 original sample's. The deposit computes no rate.",
+  "Text", "Share of the study 2 replication sample holding inconsistent preferences", NA, "24%",
+    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Replication"]),
+    "Article: 'this figure was 24% on Lucid'. The deposit computes no rate.",
+  "Text", "Study 2 original sample size", NA, "1,087",
+    inconsistency$n_respondents[inconsistency$sample == "Original"],
+    "Article: 'The 1,087 subjects for this experiment were also recruited via Lucid'."
+)
+
+gt <- bind_rows(t1_rows, t2_rows, t3_rows, t4_rows, b2_rows, c3_rows, c4_rows, d5_rows,
+                figure_rows, text_rows)
+
+# A published value with no rewrite counterpart stops the build ----
+# A mislabelled join would otherwise leave value_rewrite empty, and the row would
+# land in the unverifiable bucket looking like a quantity the pipeline does not
+# produce rather than like a defect in this script.
+orphaned <- gt |> filter(!is.na(value_paper), is.na(value_rewrite))
+if (nrow(orphaned) > 0) {
+  print(orphaned |> select(table_figure, claim, value_paper), n = nrow(orphaned))
+  stop(str_glue("{nrow(orphaned)} published values have no rewrite counterpart."))
+}
+
+# Coverage against the published float list ----
+# Taken from the article and the appendix rather than from what the pipeline
+# happens to produce. The floats carrying no data are the theoretical diagrams,
+# the enumeration of the 32 causal models, and the reproduced treatment images.
+floats <- tribble(
+  ~float, ~carries_data,
+  "Figure 1", FALSE, "Figure 2", FALSE, "Figure 3", FALSE, "Figure 4", TRUE,
+  "Table 1", TRUE, "Table 2", TRUE, "Table 3", TRUE, "Table 4", TRUE,
+  "Table A.1", FALSE, "Figure A.1", FALSE,
+  "Figure B.2", TRUE, "Figure B.3", TRUE, "Table B.2", TRUE,
+  "Table C.3", TRUE, "Table C.4", TRUE,
+  "Figure D.4", FALSE, "Table D.5", TRUE
+)
+
+uncovered <- setdiff(floats$float[floats$carries_data], gt$table_figure)
+if (length(uncovered) > 0) {
+  stop(str_glue("Published floats with no ground truth row: {str_c(uncovered, collapse = ', ')}"))
+}
+
+# Agreement at the precision the article prints ----
+gt <- gt |>
+  mutate(
+    paper_id = "coppock_green_2022",
+    match = agrees(value_script, value_paper),
+    match_rewrite = agrees(value_rewrite, value_paper)
+  )
+
+# The nine quantities that come out of the unseeded bootstrap are draws, not
+# fixed numbers, so agreement to printed precision is the wrong test for them.
+# Each is scored against the range its own resampling produces at the deposit's
+# sims = 10, which is the setting that shipped. The archive column takes the same
+# test: the deposit runs the same estimator at the same setting with no seed.
+stochastic <- bind_rows(
+  expand_grid(sample_name = c("MTurk", "Elite", "Lucid"),
+              endpoint_name = c("conf_low", "conf_high")) |>
+    mutate(claim = str_glue("{sample_name} ratio, 95% interval {if_else(endpoint_name == 'conf_low', 'lower', 'upper')} bound") |> as.character(),
+           range = map2(sample_name, endpoint_name, ~ endpoint_range(.x, .y, 10))),
+  tibble(claim = c("Pooled indirect-to-direct ratio", "Pooled ratio, 95% interval lower bound",
+                   "Pooled ratio, 95% interval upper bound"),
+         range = map(c("estimate", "conf_low", "conf_high"), ~ pooled_range(.x, 10)))
+) |>
+  select(claim, range) |>
+  left_join(select(gt, claim, value_paper, value_script), by = "claim") |>
+  mutate(
+    published = paper_number(value_paper),
+    inside = as.numeric(published >= map_dbl(range, "low") & published <= map_dbl(range, "high"))
+  )
+
+stopifnot(nrow(stochastic) == 9, !any(is.na(stochastic$value_paper)))
+
+gt <- gt |>
+  rows_update(
+    transmute(stochastic, claim,
+              match = if_else(is.na(value_script), NA_real_, inside),
+              match_rewrite = inside),
+    by = "claim"
+  )
+
+# Where the fault lies on every row the rewrite does not match ----
+# Each pattern names one failure and why it is where it is. A row that matches no
+# pattern stops the build: an unexplained zero reads as a failure of this code,
+# and across this paper it never has been.
+locus_patterns <- tribble(
+  ~pattern, ~defect_locus,
+  "^MTurk average within-domain correlation", "paper_internal",
+  "^Pooled ", "paper_internal",
+  " ratio, 95% interval ", "paper_internal"
+)
+
+locus_for <- function(claim) {
+  hit <- locus_patterns$defect_locus[map_lgl(locus_patterns$pattern, ~ str_detect(claim, .x))]
+  if (length(hit) == 0) NA_character_ else hit[1]
+}
+
+gt <- gt |>
+  mutate(defect_locus = if_else(!is.na(match_rewrite) & match_rewrite == 0,
+                                map_chr(claim, locus_for), NA_character_))
+
+unexplained <- gt |> filter(!is.na(match_rewrite), match_rewrite == 0, is.na(defect_locus))
+if (nrow(unexplained) > 0) {
+  print(unexplained |> select(table_figure, claim, value_paper, value_rewrite), n = nrow(unexplained))
+  stop(str_glue("{nrow(unexplained)} rows the rewrite does not match have no recorded defect locus."))
+}
+
+# A note may not contradict its own verdict ----
+# Generating value_rewrite closes one drift channel and leaves this one open: a
+# note that says a value disagrees, on a row scored as agreeing.
+contradiction <- gt |>
+  filter(!is.na(match_rewrite), match_rewrite == 1,
+         str_detect(notes, regex("disagree|does not match|differs|mismatch|cannot be reproduced|is wrong|lies outside",
+                                 ignore_case = TRUE)))
+if (nrow(contradiction) > 0) {
+  print(contradiction |> select(claim, notes), n = nrow(contradiction))
+  stop("A row scored as matching carries a note saying it does not.")
+}
+
+gt <- gt |>
+  select(paper_id, table_figure, claim, value_script, value_paper, match,
+         value_rewrite, match_rewrite, defect_locus, notes)
+
+write_csv(gt, here::here("ground_truth", "coppock_green_2022_ground_truth.csv"))
+
+print(gt |> select(table_figure, claim, value_script, value_paper, match, value_rewrite,
+                   match_rewrite, defect_locus),
+      n = nrow(gt), width = 250)
+
+print(str_glue(
+  "rows: {nrow(gt)}; archive match=1: {sum(gt$match == 1, na.rm = TRUE)}, ",
+  "match=0: {sum(gt$match == 0, na.rm = TRUE)}, match=NA: {sum(is.na(gt$match))}; ",
+  "rewrite match=1: {sum(gt$match_rewrite == 1, na.rm = TRUE)}, ",
+  "match=0: {sum(gt$match_rewrite == 0, na.rm = TRUE)}, ",
+  "match=NA: {sum(is.na(gt$match_rewrite))}"
+))
