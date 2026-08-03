@@ -8,15 +8,15 @@
 - [Paper overview](#paper-overview)
 - [Original archive reproducibility](#original-archive-reproducibility)
 - [Errata](#errata)
-  - [The pooled estimate in the results section has the wrong
-    sign](#the-pooled-estimate-in-the-results-section-has-the-wrong-sign)
   - [The elite ideology column of appendix table B.2 is
     repaired](#the-elite-ideology-column-of-appendix-table-b2-is-repaired)
-  - [One bootstrap interval endpoint cannot be
-    produced](#one-bootstrap-interval-endpoint-cannot-be-produced)
-  - [Two sample labels are inconsistent between
-    tables](#two-sample-labels-are-inconsistent-between-tables)
+  - [The pooled ratio, and what the unseeded bootstrap does to
+    it](#the-pooled-ratio-and-what-the-unseeded-bootstrap-does-to-it)
+  - [Two findings that are not
+    errata](#two-findings-that-are-not-errata)
 - [Ground truth](#ground-truth)
+- [The extraction, and the two instruments that read
+  it](#the-extraction-and-the-two-instruments-that-read-it)
 - [Maintained rewrite](#maintained-rewrite)
   - [What changed and why](#what-changed-and-why)
 - [Figure verification](#figure-verification)
@@ -110,22 +110,35 @@ passes only because it ships the outputs of code that no longer runs.
 
 ## Does the maintained rewrite reproduce the paper?
 
-Yes, with three exceptions, none of which is a defect in this code.
+Yes, with 8 exceptions, none of which is a defect in this code.
 
-Of 340 published quantities recorded in the ground truth, the rewrite
-reproduces 335 to the precision the article prints, fails to reproduce
-3, and has 2 with no published value to check against. Every cell of
-tables 1 through 4 and of appendix tables B.2, C.3, C.4 and D.5
-reproduces, including all 24 sample sizes those four regression tables
-report.
+Of 417 published quantities recorded in the ground truth, the rewrite
+reproduces 392 to the precision the article prints and fails to
+reproduce 8. A further 12 claims are about shape, sign, count or order
+rather than about a value, and 10 of those hold. Every cell of tables 1
+through 4 and of appendix tables B.2, C.3, C.4 and D.5 reproduces,
+including all 24 sample sizes those four regression tables report.
 
-The 3 failures are the article disagreeing with its own data. The pooled
-indirect-to-direct effect ratio is printed with the wrong sign. One
-endpoint of one bootstrap confidence interval cannot be produced by the
-procedure the deposit uses. And the body text gives an average
-correlation of .29 where table 1 gives .30 for the same underlying
-0.2966, which table 1 rounds correctly. All three are set out under
-Errata below.
+The 8 failures are all the article disagreeing with itself, and every
+one of them is a sentence rather than a table cell. The pooled
+indirect-to-direct effect ratio is printed with the wrong sign, in the
+results section and again in the discussion. One endpoint of one
+bootstrap confidence interval cannot be produced by the procedure the
+deposit uses. The body text gives an average correlation of .29 where
+table 1 gives .30 for the same underlying 0.2966. Two graduate degree
+shares and one standard error are stated at a rounding their own tables
+contradict. And study 2’s design paragraph counts three nontarget
+outcome measures where the table and the results paragraph both have
+four.
+
+2 of the descriptive claims also fail, and they are the same mislabel
+twice: the inconsistency rates behind study 4 and the top panel of table
+4 are both attributed to MTurk, and both come from the study 2 original
+sample that the body text and appendix table C.3 identify as Lucid. The
+numbers themselves are right, which is why no value comparison could
+have found them. All 10 are set out as 9 entries in
+`coppock_green_2022_errata.pdf` at the root of this repository, one
+entry per published sentence.
 
 The deposited archive does worse. On the 309 quantities a deposited
 script produces at all, it reproduces 302 and fails 7. The extra
@@ -273,43 +286,14 @@ asserted.
 
 # Errata
 
-## The pooled estimate in the results section has the wrong sign
+Two kinds of correction, kept apart because they are different things.
 
-The article reports: “If we pool the three studies together, our
-estimate is 1.4% (95% CI: -8%, 6%).”
-
-The three inputs are the sample-specific ratios of the
-precision-weighted average nontarget effect to the precision-weighted
-average target effect, together with their respondent-level bootstrap
-standard errors. The deposited `in_text_numbers.R` pools them with
-`rmeta::meta.summaries`, an inverse-variance fixed-effect meta-analysis.
-Two of the three inputs are near zero and the third, Lucid, is negative
-with the second-smallest standard error, so the pooled estimate is
-negative.
-
-| Source                        | Estimate | SE    | 95% CI            |
-|:------------------------------|:---------|:------|:------------------|
-| MTurk sample                  | 0.8%     | 4.4%  | \[-8.7%, 8.6%\]   |
-| Elite sample                  | 6.4%     | 13.4% | \[-25.4%, 26.1%\] |
-| Lucid sample                  | -9.4%    | 6.6%  | \[-23.2%, 2.2%\]  |
-| Pooled, Fixed effects         | -1.7%    | 3.5%  | \[-8.6%, 5.3%\]   |
-| Pooled, Random effects (REML) | -1.9%    | 4.0%  | \[-9.8%, 6.0%\]   |
-| Pooled, as published          | 1.4%     |       | \[-8%, 6%\]       |
-
-The three sample ratios, the pooled estimate this repository computes,
-and the pooled estimate the article prints.
-
-The published interval is the one this repository computes, to the
-precision the article prints it. The published point estimate is its
-magnitude with the sign dropped: an inverse-variance pool of 0.8%, 6.4%
-and -9.4% cannot land above zero at these weights, and a 95% interval
-running from -8% to 6% is not centred on a positive 1.4%. The correction
-is to read the sentence as “our estimate is -1.7%”.
-
-Nothing else in the paper depends on the sign. The claim the sentence
-supports is that the pooled indirect effect is small and
-indistinguishable from zero, and the corrected estimate supports it
-exactly as well.
+**Corrections this code makes to the deposited code** are below.
+**Sentences in the published article that its own data do not support**
+are in `coppock_green_2022_errata.pdf` at the root of this repository,
+which lists nine of them, computes every corrected value from
+`maintained/output/` when it is rendered, and changes no conclusion of
+the article.
 
 ## The elite ideology column of appendix table B.2 is repaired
 
@@ -324,12 +308,52 @@ All 5 published elite ideology percentages reproduce.
 
 This is a correction to a coding error, not to an analytical decision:
 the specification string names each source value and its label, so there
-is nothing to interpret. Nothing else in the paper reads the variable.
+is nothing to interpret.
 
-## One bootstrap interval endpoint cannot be produced
+The same defect reaches two more columns, and they are the reason the
+article’s description of its elite sample can be checked at all.
+`news_how_often` and `talk_politics_how_often` are recoded in the same
+way in the same script, so the deposited clean file stores the
+specification string in place of every respondent’s answer. The two
+figures the article gives for them appear in no table, so nothing else
+in the paper would have caught it. `read_elite_engagement()` rebuilds
+both from the same raw file, and both figures reproduce.
 
-The article gives the Lucid ratio’s 95% interval as “from -24% to 15%”.
-The lower endpoint reproduces. The upper does not, and it is not close.
+## The pooled ratio, and what the unseeded bootstrap does to it
+
+The article’s pooled indirect-to-direct ratio is the errata note’s first
+item, and the evidence for it is worth setting out at length here.
+
+| Source                        | Estimate | SE    | 95% CI            |
+|:------------------------------|:---------|:------|:------------------|
+| MTurk sample                  | 0.8%     | 4.4%  | \[-8.7%, 8.6%\]   |
+| Elite sample                  | 6.4%     | 13.4% | \[-25.4%, 26.1%\] |
+| Lucid sample                  | -9.4%    | 6.6%  | \[-23.2%, 2.2%\]  |
+| Pooled, Fixed effects         | -1.7%    | 3.5%  | \[-8.6%, 5.3%\]   |
+| Pooled, Random effects (REML) | -1.9%    | 4.0%  | \[-9.8%, 6.0%\]   |
+| Pooled, as published          | 1.4%     |       | \[-8%, 6%\]       |
+
+The three sample ratios, the pooled estimate this repository computes,
+and the pooled estimate the article prints.
+
+The three inputs are the sample-specific ratios of the
+precision-weighted average nontarget effect to the precision-weighted
+average target effect, together with their respondent-level bootstrap
+standard errors. The deposited `in_text_numbers.R` pools them with
+`rmeta::meta.summaries` and passes no `method` argument, so it is an
+inverse-variance fixed-effect meta-analysis and
+`metafor::rma(method = "FE")` is the maintained equivalent. Two of the
+three inputs are near zero and the third, Lucid, is negative with the
+second-smallest standard error, so an inverse-variance pool of 0.8%,
+6.4% and -9.4% cannot land above zero at these weights. The published
+interval is the one this repository computes; the published point
+estimate is not.
+
+Neither the archive nor the article sets a seed, so no interval endpoint
+in this paper is a fixed quantity: each is one draw of a bootstrap
+quantile, and how variable a draw depends on how many resamples went
+into it. That variability is measured rather than assumed, by resampling
+the saved draws and recomputing the endpoint.
 
 | Resamples | Endpoint runs from | to   | Published |
 |:----------|:-------------------|:-----|:----------|
@@ -339,39 +363,37 @@ The lower endpoint reproduces. The upper does not, and it is not close.
 The Lucid interval’s upper endpoint over repeated unseeded runs, at the
 resample count the deposit ships and the one the rewrite uses.
 
-Neither the archive nor the article sets a seed, so no interval endpoint
-in this paper is a fixed quantity: each is one draw of a bootstrap
-quantile, and how variable a draw depends on how many resamples went
-into it. That variability is measured here rather than assumed, by
-resampling the saved draws and recomputing the endpoint. The 2.2% this
-repository computes sits inside the range; the published 15% sits
-outside it at both resample counts. The other five endpoints the article
-prints all fall inside their own ranges. What produced the published
-figure is not established, so the ground truth records the disagreement
-without naming a cause beyond the article.
+The 2.2% this repository computes for the Lucid interval’s upper
+endpoint sits inside the range; the published 15% sits outside it at
+both resample counts. The other five endpoints the article prints all
+fall inside their own ranges. What produced the published figure is not
+established, so the ground truth records the disagreement without naming
+a cause beyond the article.
 
-## Two sample labels are inconsistent between tables
+## Two findings that are not errata
 
-Neither affects a number, and neither is corrected in the code.
+**A cross-reference in the appendix.** Appendix section A.2 says the
+elaboration “blow\[s\] up the possible number of graphs from the 32 in
+Table 1 to 256”. The 32 are enumerated in appendix table A.1; table 1 of
+the main text reports levels of static constraint. The count itself is
+right. No quantity changes, so it is recorded here rather than in the
+errata note.
 
-The study 2 sample of 1,087 respondents is described in the body text as
-recruited via Lucid, and appendix table C.3 labels its column “Lucid
-Original”. Table 4 draws its top panel from the same 1,087 respondents
-(`study_2_lucid_clean.rds`, filtered to those with inconsistent
-preferences) and labels the row “N (MTurk)”, and the surrounding text
-says “Among the MTurk sample, 30% of the respondents were inconsistent”.
-No MTurk data file in the deposit contains the `trap_set` indicator that
-defines inconsistency, so 30% can only be the Lucid original sample,
-where it is 30.1%.
+**A stray percent sign.** Appendix section C.2 says an estimate “is not
+significant at the 0.05% level in either sample”. The article’s tables
+mark significance at `p < .05` throughout, and both estimates are indeed
+insignificant at that level, at p = 0.064 and p = 0.097. The claim the
+sentence makes holds; only the unit on the threshold is wrong.
 
-Appendix table D.5 reports N = 1,187 for the study 3 replication, which
-is the number of respondents in the file. Table 3 reports N = 1,041 and
-1,026 for the same study, which are the two regression sample sizes.
-Both are right for what they describe.
+**One sample label is right and reads as though it were not.** Appendix
+table D.5 reports N = 1,187 for the study 3 replication, which is the
+number of respondents in the file. Table 3 reports N = 1,041 and 1,026
+for the same study, which are the two regression sample sizes. Both are
+right for what they describe.
 
 # Ground truth
 
-`ground_truth/coppock_green_2022_ground_truth.csv` records 340 claims.
+`ground_truth/coppock_green_2022_ground_truth.csv` records 417 claims.
 Each row names a published quantity, the value the deposited archive’s
 own scripts produce, the value printed in the article or appendix, and
 the value this rewrite produces. `value_paper` is carried as the string
@@ -381,10 +403,10 @@ only by reading the article or the appendix.
 
 | Section | Claims | Archive matches | Archive fails | Archive silent | No published value | Rewrite matches | Rewrite fails |
 |:---|---:|---:|---:|---:|---:|---:|---:|
-| Appendix tables | 205 | 200 | 5 | 0 | 0 | 205 | 0 |
-| Figures | 4 | 0 | 0 | 4 | 2 | 2 | 0 |
-| In-text quantities | 31 | 2 | 2 | 27 | 0 | 28 | 3 |
-| Main text tables | 100 | 100 | 0 | 0 | 0 | 100 | 0 |
+| Appendix tables | 209 | 200 | 5 | 4 | 0 | 209 | 0 |
+| Figures | 5 | 0 | 0 | 5 | 0 | 5 | 0 |
+| In-text quantities | 99 | 2 | 2 | 95 | 7 | 74 | 8 |
+| Main text tables | 104 | 100 | 0 | 4 | 0 | 104 | 0 |
 
 Ground truth claims by section of the paper.
 
@@ -396,26 +418,48 @@ are the ones with no numbers in them, namely the three theoretical
 diagrams, the enumeration of the 32 causal models in table A.1, and the
 reproduced treatment images in figure D.4.
 
-Two rows have no published value to compare against: appendix figures
-B.2 and B.3 print no numbers at all, so what the rewrite records for
-them is the count of estimates plotted, and there is nothing in the
-article to check it against. Every quantity in the ground truth is read
-out of a file in `maintained/output/` by `build_ground_truth.R`; a
-published value that finds no counterpart there stops the build rather
-than being recorded as unverifiable.
+**Coverage of a float is a fraction, not a yes or no.** Each of the
+eight published tables and three published figures carrying data also
+gets a row of its own recording how many values the article prints in it
+against how many the pipeline writes, so a float covered by one row out
+of a hundred cells could not pass. All eleven are complete, from table
+1’s 6 cells to appendix table B.2’s 87. The three coefficient plots
+print no numbers on their faces, so what they assert is a count of
+estimates plotted: 192 for figure 4 and 128 and 64 for appendix figures
+B.2 and B.3.
 
-| Where | Claim | Published | Rewrite | Fault lies with |
-|:---|:---|:---|:---|:---|
-| Text | MTurk average within-domain correlation, as given in the body text | .29 | 0.297 | paper_internal |
-| Text | Lucid ratio, 95% interval upper bound | 15% | 2.24% | paper_internal |
-| Text | Pooled indirect-to-direct ratio | 1.4% | -1.68% | paper_internal |
+Every quantity in the ground truth is read out of a file in
+`maintained/output/` by `build_ground_truth.R`; a published value that
+finds no counterpart there stops the build rather than being recorded as
+unverifiable.
 
-Every claim the rewrite does not match.
+| Where | Claim | Published | Archive | Rewrite | Fault lies with |
+|:---|:---|:---|:---|:---|:---|
+| Table B.2 | ideology: Conservative (Elites) | 16.8% | 0 | 16.80% | archive |
+| Table B.2 | ideology: Liberal (Elites) | 37.3% | 0 | 37.30% | archive |
+| Table B.2 | ideology: Libertarian (Elites) | 10.2% | 0 | 10.20% | archive |
+| Table B.2 | ideology: Moderate (Elites) | 32.0% | 0 | 32.00% | archive |
+| Table B.2 | ideology: Other (Elites) | 3.7% | 75.4 | 3.70% | archive |
+| Text | MTurk average within-domain correlation, as given in the body text | .29 | 0.3 | 0.297 | paper_internal |
+| Text | Lucid ratio, 95% interval upper bound | 15% |  | 2.24% | paper_internal |
+| Text | Pooled indirect-to-direct ratio | 1.4% | -2.77 | -1.68% | paper_internal |
+| Text | Elite sample holding a graduate degree | 71% |  | 71.57% | paper_internal |
+| Text | MTurk sample holding a graduate degree | 13% |  | 12.40% | paper_internal |
+| Text | Nontarget outcome measures in study 2, as the design paragraph counts them | 3 |  | 4 | paper_internal |
+| Text | Its standard error, restated in prose | 0.06 |  | 0.0663 | paper_internal |
+| Text | Average spillover effect as a share of the direct effect, restated in the discussion | 1.4% |  | -1.68% | paper_internal |
 
-Each of the three is set out under Errata. `defect_locus` is recorded on
-every row the rewrite does not match, and a row that fails without one
-stops the build, because an unexplained zero reads as a failure of this
-code and here none of them is.
+Every claim the archive or the rewrite does not match.
+
+The 8 rows the rewrite does not match, and the 2 descriptive claims that
+do not hold, are set out in `coppock_green_2022_errata.pdf`. The 7 the
+archive does not match are the elite ideology column, described above.
+`defect_locus` is required on every row carrying an adverse verdict, in
+either column and including a descriptive claim that fails, and a row
+that fails without one stops the build: an unexplained zero reads as a
+failure of this code, and here none of them is. The commonest reading of
+the column across this paper is that the archive fails where the rewrite
+succeeds, which is the deposit’s clean data rather than either analysis.
 
 **The unseeded quantities are judged against their own distribution.**
 Nine of the published quantities come out of a bootstrap that neither
@@ -426,6 +470,63 @@ of them to printed precision would be the wrong test. Each is instead
 scored against the range its own resampling produces at the `sims <- 10`
 the deposit ships, and the range is written into the row’s note, so the
 note and the verdict come from the same computation.
+
+# The extraction, and the two instruments that read it
+
+A ground truth built from the pipeline can only ever check the numbers
+the pipeline happens to produce, and the most consequential errors in
+this article are in sentences rather than in tables. So the published
+article and its appendix were read separately from the code, every
+numeric token in them extracted with its surrounding context, and each
+one classified by hand into `ground_truth/published_claims.csv`.
+
+| Claim type | Meaning | Tokens | With a claim block |
+|:---|:---|---:|---:|
+| definitional | Scale endpoints, category counts, a stipulated illustration | 32 | 1 |
+| descriptive | A claim about shape, sign, count or order rather than a value | 17 | 17 |
+| pipeline | A quantity the analysis produces | 84 | 84 |
+| structural | Panel counts, model indices, references to a float’s own layout | 26 | 14 |
+| transcribed | Copied from another paper or from a reproduced op-ed | 10 | 0 |
+
+The extraction: every numeric token in the article and the appendix,
+classified by hand.
+
+The extraction covers digits and spelled-out numbers alike; “the
+experiment was conducted three times” and “all five categories” are
+claims no token scan sees. The four op-eds the appendix reproduces carry
+62 numeric tokens between them, all of them the newspapers’ own figures,
+and they get one row each rather than one row per token. Each published
+float’s cells are compared one by one in the ground truth and summarised
+in the extraction by a single coverage row, which is what the float
+coverage figures above report.
+
+**The coverage gate.** `build_ground_truth.R` will not finish unless
+every `pipeline` and `descriptive` row of the extraction has a
+ground-truth row, every `claim_id` in the ground truth names a claim the
+article actually makes, the two files transcribe every shared published
+value identically, and `maintained/in_text_claims.R` prints exactly 116
+claim lines whose identifiers are the 116 the extraction declares. The
+claims file is run as a program under `capture.output` and into an
+environment of its own, not scanned as text: a block that errors, or
+that ends in a bare expression and so prints nothing when sourced,
+satisfies a textual check completely and this one not at all.
+
+**The second instrument.** `maintained/in_text_claims.R` carries the
+article’s own sentence verbatim in a block comment and then recomputes
+the number underneath it from `maintained/output/`, in the article’s
+units and at the article’s precision. It never reads the ground truth,
+and it reaches each quantity by a different route from the one
+`build_ground_truth.R` takes, so the two can disagree; every one of the
+116 values is compared across them and a disagreement stops the build.
+Running it prints the whole audit trail, which is the last thing
+`run_all.R` does.
+
+The article’s 10 misstatements are collected as 9 entries in
+`coppock_green_2022_errata.pdf` at the root of this repository. Each
+entry quotes the published sentence, gives the corrected sentence with
+the changed token in bold, and computes every value in it from
+`maintained/output/` when the document is rendered, so the note cannot
+go stale in the way the article did.
 
 # Maintained rewrite
 
@@ -449,8 +550,11 @@ which every script sources first.
 | text_significance_counts.R | The counts of significant target and nontarget effects |
 | text_amtrak_largest_effects.R | The two Amtrak effects quoted in the results |
 | text_inconsistency_rates.R | The two inconsistency rates behind study 4 |
+| text_sample_descriptions.R | The study 1 sample composition figures the article states in prose |
+| text_study_2_correlations.R | The correlations among study 2’s five outcome measures |
 | text_precision_weighted_averages.R | The precision-weighted averages, ratios and bootstrap intervals |
 | text_pooled_ratio_metaanalysis.R | The pooled ratio across the three samples |
+| in_text_claims.R | No file: one printed line per claim the article makes in prose |
 
 The maintained rewrite, script by script.
 
@@ -551,11 +655,11 @@ section counts.
 | Published checksums that disagree with what Dataverse serves   | 0        |
 | Files in original/ that are not in the deposit                 | 0        |
 | Deposited files ingested into a derived tabular representation | 9        |
-| Scripts in the maintained rewrite                              | 17       |
-| Ground truth claims                                            | 340      |
-| Claims the rewrite reproduces                                  | 335      |
-| Claims the rewrite does not reproduce                          | 3        |
-| Claims with no published value to check against                | 2        |
+| Scripts in the maintained rewrite                              | 20       |
+| Ground truth claims                                            | 417      |
+| Claims the rewrite reproduces                                  | 392      |
+| Claims the rewrite does not reproduce                          | 8        |
+| Claims with no published value to check against                | 17       |
 
 Verification summary.
 

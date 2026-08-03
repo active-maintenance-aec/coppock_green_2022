@@ -7,6 +7,13 @@
 #   sample, 30% of the respondents were inconsistent; this figure was 24% on
 #   Lucid". The deposited archive computes neither figure. trap_set is the
 #   indicator the cleaning scripts build for that inconsistency.
+#
+#   Two further design quantities the article states in the same passage are
+#   written out here because they describe the same subgroup: how many of the
+#   inconsistent respondents were assigned the correction query ("Half of these
+#   subjects were randomly assigned to receive a query"), and how many spending
+#   items the outcome averages ("[Five spending categories ...] We average all
+#   five responses").
 
 source(here::here("maintained", "helpers.R"))
 
@@ -19,7 +26,9 @@ inconsistency_rate <- function(data, sample_label) {
     n_respondents = nrow(data),
     n_measured = sum(!is.na(data$trap_set)),
     n_inconsistent = sum(data$trap_set == 1, na.rm = TRUE),
-    share_inconsistent = mean(data$trap_set == 1, na.rm = TRUE)
+    share_inconsistent = mean(data$trap_set == 1, na.rm = TRUE),
+    n_assigned_query = sum(data$trap_set == 1 & data$Z_correction == 1, na.rm = TRUE),
+    n_spending_items = sum(str_detect(names(data), "^spend_outcomes_\\d+$"))
   )
 }
 

@@ -28,8 +28,15 @@ here::i_am("README.qmd")
 latex_out <- knitr::is_latex_output()
 latex_only <- function(k, f) if (latex_out) f(k) else k
 
+# value_paper is the string the article prints, so every reader has to force the
+# column type: a column whose entries all look numeric is guessed as double, and
+# that turns a published 0.000 into 0 before it reaches the page.
 gt <- read_csv(here::here("ground_truth", "coppock_green_2022_ground_truth.csv"),
-               show_col_types = FALSE)
+               col_types = cols(.default = col_guess(), value_paper = col_character()))
+claims <- read_csv(here::here("ground_truth", "published_claims.csv"),
+                   col_types = cols(.default = col_character(),
+                                    value_paper = col_character())) |>
+  mutate(needs_block = needs_block == "TRUE")
 manifest <- read_csv(here::here("original_manifest.csv"), show_col_types = FALSE)
 status <- read_csv(here::here("ground_truth", "archive_script_status.csv"),
                    show_col_types = FALSE)
@@ -58,6 +65,14 @@ n_unverifiable <- sum(is.na(gt$match_rewrite))
 
 n_resamples <- nrow(draws) / n_distinct(draws$quantity)
 n_outcomes <- n_distinct(f4$outcome)
+
+n_descriptive_judged <- sum(!is.na(gt$holds))
+n_descriptive_hold <- sum(gt$holds == 1, na.rm = TRUE)
+n_descriptive_fail <- sum(gt$holds == 0, na.rm = TRUE)
+n_blocks <- sum(claims$needs_block)
+
+# Counted from the errata source rather than typed, so the two cannot drift.
+errata_entries <- sum(str_detect(read_lines(here::here("errata.qmd")), "^## [0-9]+[.]"))
 ```
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
@@ -99,11 +114,13 @@ The cleaning scripts are a different matter, and they are why the deposit's clea
 
 ## Does the maintained rewrite reproduce the paper?
 
-Yes, with three exceptions, none of which is a defect in this code.
+Yes, with `r n_rewrite_fail` exceptions, none of which is a defect in this code.
 
-Of `r n_claims` published quantities recorded in the ground truth, the rewrite reproduces `r n_rewrite_match` to the precision the article prints, fails to reproduce `r n_rewrite_fail`, and has `r n_unverifiable` with no published value to check against. Every cell of tables 1 through 4 and of appendix tables B.2, C.3, C.4 and D.5 reproduces, including all `r sum(str_detect(gt$claim, ": n$"))` sample sizes those four regression tables report.
+Of `r n_claims` published quantities recorded in the ground truth, the rewrite reproduces `r n_rewrite_match` to the precision the article prints and fails to reproduce `r n_rewrite_fail`. A further `r n_descriptive_judged` claims are about shape, sign, count or order rather than about a value, and `r n_descriptive_hold` of those hold. Every cell of tables 1 through 4 and of appendix tables B.2, C.3, C.4 and D.5 reproduces, including all `r sum(str_detect(gt$claim, ": n$"))` sample sizes those four regression tables report.
 
-The `r n_rewrite_fail` failures are the article disagreeing with its own data. The pooled indirect-to-direct effect ratio is printed with the wrong sign. One endpoint of one bootstrap confidence interval cannot be produced by the procedure the deposit uses. And the body text gives an average correlation of .29 where table 1 gives .30 for the same underlying `r sprintf("%.4f", t1$within_domain[t1$sample == "MTurk sample"])`, which table 1 rounds correctly. All three are set out under Errata below.
+The `r n_rewrite_fail` failures are all the article disagreeing with itself, and every one of them is a sentence rather than a table cell. The pooled indirect-to-direct effect ratio is printed with the wrong sign, in the results section and again in the discussion. One endpoint of one bootstrap confidence interval cannot be produced by the procedure the deposit uses. The body text gives an average correlation of .29 where table 1 gives .30 for the same underlying `r sprintf("%.4f", t1$within_domain[t1$sample == "MTurk sample"])`. Two graduate degree shares and one standard error are stated at a rounding their own tables contradict. And study 2's design paragraph counts three nontarget outcome measures where the table and the results paragraph both have four.
+
+`r n_descriptive_fail` of the descriptive claims also fail, and they are the same mislabel twice: the inconsistency rates behind study 4 and the top panel of table 4 are both attributed to MTurk, and both come from the study 2 original sample that the body text and appendix table C.3 identify as Lucid. The numbers themselves are right, which is why no value comparison could have found them. All `r n_rewrite_fail + n_descriptive_fail` are set out as `r errata_entries` entries in `coppock_green_2022_errata.pdf` at the root of this repository, one entry per published sentence.
 
 The deposited archive does worse. On the `r n_archive_verifiable` quantities a deposited script produces at all, it reproduces `r n_archive_match` and fails `r n_archive_fail`. The extra failures are one appendix table column that the deposit's own clean data destroys before any analysis script sees it, described below.
 
@@ -165,11 +182,21 @@ latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale
 
 # Errata
 
-## The pooled estimate in the results section has the wrong sign
+Two kinds of correction, kept apart because they are different things.
 
-The article reports: "If we pool the three studies together, our estimate is 1.4% (95% CI: -8%, 6%)."
+**Corrections this code makes to the deposited code** are below. **Sentences in the published article that its own data do not support** are in `coppock_green_2022_errata.pdf` at the root of this repository, which lists nine of them, computes every corrected value from `maintained/output/` when it is rendered, and changes no conclusion of the article.
 
-The three inputs are the sample-specific ratios of the precision-weighted average nontarget effect to the precision-weighted average target effect, together with their respondent-level bootstrap standard errors. The deposited `in_text_numbers.R` pools them with `rmeta::meta.summaries`, an inverse-variance fixed-effect meta-analysis. Two of the three inputs are near zero and the third, Lucid, is negative with the second-smallest standard error, so the pooled estimate is negative.
+## The elite ideology column of appendix table B.2 is repaired
+
+The deposited elite clean data cannot produce the published ideology distribution, for the reason given above. The recode the cleaning script intended is unambiguous, it needs nothing beyond the deposit's own `study_1_elite_wave_1_raw.csv`, and rebuilding it returns the published distribution exactly. `read_elite_ideology()` in `maintained/helpers.R` writes that recode out in `case_when`, and `table_b2_sample_demographics.R` uses it in place of the broken column. All `r sum(str_starts(gt$claim, "ideology") & str_detect(gt$claim, "Elites"))` published elite ideology percentages reproduce.
+
+This is a correction to a coding error, not to an analytical decision: the specification string names each source value and its label, so there is nothing to interpret.
+
+The same defect reaches two more columns, and they are the reason the article's description of its elite sample can be checked at all. `news_how_often` and `talk_politics_how_often` are recoded in the same way in the same script, so the deposited clean file stores the specification string in place of every respondent's answer. The two figures the article gives for them appear in no table, so nothing else in the paper would have caught it. `read_elite_engagement()` rebuilds both from the same raw file, and both figures reproduce.
+
+## The pooled ratio, and what the unseeded bootstrap does to it
+
+The article's pooled indirect-to-direct ratio is the errata note's first item, and the evidence for it is worth setting out at length here.
 
 ```{r errata_pool}
 kbl <- bind_rows(
@@ -189,19 +216,9 @@ kbl <- bind_rows(
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "hold_position")))
 ```
 
-The published interval is the one this repository computes, to the precision the article prints it. The published point estimate is its magnitude with the sign dropped: an inverse-variance pool of `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "MTurk"])`, `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "Elite"])` and `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "Lucid"])` cannot land above zero at these weights, and a 95% interval running from -8% to 6% is not centred on a positive 1.4%. The correction is to read the sentence as "our estimate is `r sprintf("%.1f%%", 100 * pool$estimate[pool$model == "Fixed effects"])`".
+The three inputs are the sample-specific ratios of the precision-weighted average nontarget effect to the precision-weighted average target effect, together with their respondent-level bootstrap standard errors. The deposited `in_text_numbers.R` pools them with `rmeta::meta.summaries` and passes no `method` argument, so it is an inverse-variance fixed-effect meta-analysis and `metafor::rma(method = "FE")` is the maintained equivalent. Two of the three inputs are near zero and the third, Lucid, is negative with the second-smallest standard error, so an inverse-variance pool of `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "MTurk"])`, `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "Elite"])` and `r sprintf("%.1f%%", 100 * ratios$estimate[ratios$sample == "Lucid"])` cannot land above zero at these weights. The published interval is the one this repository computes; the published point estimate is not.
 
-Nothing else in the paper depends on the sign. The claim the sentence supports is that the pooled indirect effect is small and indistinguishable from zero, and the corrected estimate supports it exactly as well.
-
-## The elite ideology column of appendix table B.2 is repaired
-
-The deposited elite clean data cannot produce the published ideology distribution, for the reason given above. The recode the cleaning script intended is unambiguous, it needs nothing beyond the deposit's own `study_1_elite_wave_1_raw.csv`, and rebuilding it returns the published distribution exactly. `read_elite_ideology()` in `maintained/helpers.R` writes that recode out in `case_when`, and `table_b2_sample_demographics.R` uses it in place of the broken column. All `r sum(str_starts(gt$claim, "ideology") & str_detect(gt$claim, "Elites"))` published elite ideology percentages reproduce.
-
-This is a correction to a coding error, not to an analytical decision: the specification string names each source value and its label, so there is nothing to interpret. Nothing else in the paper reads the variable.
-
-## One bootstrap interval endpoint cannot be produced
-
-The article gives the Lucid ratio's 95% interval as "from -24% to 15%". The lower endpoint reproduces. The upper does not, and it is not close.
+Neither the archive nor the article sets a seed, so no interval endpoint in this paper is a fixed quantity: each is one draw of a bootstrap quantile, and how variable a draw depends on how many resamples went into it. That variability is measured rather than assumed, by resampling the saved draws and recomputing the endpoint.
 
 ```{r errata_endpoint}
 ranges <- output_file("text_precision_weighted_averages_endpoint_ranges.csv") |>
@@ -219,15 +236,15 @@ kbl <- ranges |>
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "hold_position")))
 ```
 
-Neither the archive nor the article sets a seed, so no interval endpoint in this paper is a fixed quantity: each is one draw of a bootstrap quantile, and how variable a draw depends on how many resamples went into it. That variability is measured here rather than assumed, by resampling the saved draws and recomputing the endpoint. The `r sprintf("%.1f%%", 100 * ratios$conf_high[ratios$sample == "Lucid"])` this repository computes sits inside the range; the published 15% sits outside it at both resample counts. The other five endpoints the article prints all fall inside their own ranges. What produced the published figure is not established, so the ground truth records the disagreement without naming a cause beyond the article.
+The `r sprintf("%.1f%%", 100 * ratios$conf_high[ratios$sample == "Lucid"])` this repository computes for the Lucid interval's upper endpoint sits inside the range; the published 15% sits outside it at both resample counts. The other five endpoints the article prints all fall inside their own ranges. What produced the published figure is not established, so the ground truth records the disagreement without naming a cause beyond the article.
 
-## Two sample labels are inconsistent between tables
+## Two findings that are not errata
 
-Neither affects a number, and neither is corrected in the code.
+**A cross-reference in the appendix.** Appendix section A.2 says the elaboration "blow[s] up the possible number of graphs from the 32 in Table 1 to 256". The 32 are enumerated in appendix table A.1; table 1 of the main text reports levels of static constraint. The count itself is right. No quantity changes, so it is recorded here rather than in the errata note.
 
-The study 2 sample of 1,087 respondents is described in the body text as recruited via Lucid, and appendix table C.3 labels its column "Lucid Original". Table 4 draws its top panel from the same 1,087 respondents (`study_2_lucid_clean.rds`, filtered to those with inconsistent preferences) and labels the row "N (MTurk)", and the surrounding text says "Among the MTurk sample, 30% of the respondents were inconsistent". No MTurk data file in the deposit contains the `trap_set` indicator that defines inconsistency, so 30% can only be the Lucid original sample, where it is `r sprintf("%.1f%%", 100 * with(output_file("text_inconsistency_rates.csv"), share_inconsistent[sample == "Original"]))`.
+**A stray percent sign.** Appendix section C.2 says an estimate "is not significant at the 0.05% level in either sample". The article's tables mark significance at `p < .05` throughout, and both estimates are indeed insignificant at that level, at `r sprintf("p = %.3f", output_file("table_c4_welfare_experiment.csv") |> filter(sample == "Original", outcome == "Gov Should Reduce Ineq", term == "Welfare wording") |> pull(p.value))` and `r sprintf("p = %.3f", output_file("table_c4_welfare_experiment.csv") |> filter(sample == "Replication", outcome == "Gov Should Reduce Ineq", term == "Welfare wording") |> pull(p.value))`. The claim the sentence makes holds; only the unit on the threshold is wrong.
 
-Appendix table D.5 reports N = 1,187 for the study 3 replication, which is the number of respondents in the file. Table 3 reports N = 1,041 and 1,026 for the same study, which are the two regression sample sizes. Both are right for what they describe.
+**One sample label is right and reads as though it were not.** Appendix table D.5 reports N = 1,187 for the study 3 replication, which is the number of respondents in the file. Table 3 reports N = 1,041 and 1,026 for the same study, which are the two regression sample sizes. Both are right for what they describe.
 
 # Ground truth
 
@@ -259,25 +276,59 @@ latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale
 
 Coverage is checked against the article's own float list rather than against what the pipeline happens to produce: `build_ground_truth.R` enumerates every numbered table and figure in the paper and the appendix and stops if any float carrying data has no row. The floats with no rows are the ones with no numbers in them, namely the three theoretical diagrams, the enumeration of the 32 causal models in table A.1, and the reproduced treatment images in figure D.4.
 
-Two rows have no published value to compare against: appendix figures B.2 and B.3 print no numbers at all, so what the rewrite records for them is the count of estimates plotted, and there is nothing in the article to check it against. Every quantity in the ground truth is read out of a file in `maintained/output/` by `build_ground_truth.R`; a published value that finds no counterpart there stops the build rather than being recorded as unverifiable.
+**Coverage of a float is a fraction, not a yes or no.** Each of the eight published tables and three published figures carrying data also gets a row of its own recording how many values the article prints in it against how many the pipeline writes, so a float covered by one row out of a hundred cells could not pass. All eleven are complete, from table 1's `r gt$value_rewrite[which(gt$claim_id == "float_table_1")]` cells to appendix table B.2's `r gt$value_rewrite[which(gt$claim_id == "float_table_b2")]`. The three coefficient plots print no numbers on their faces, so what they assert is a count of estimates plotted: `r gt$value_rewrite[which(gt$claim_id == "float_figure_4")]` for figure 4 and `r gt$value_rewrite[which(gt$claim_id == "float_figure_b2")]` and `r gt$value_rewrite[which(gt$claim_id == "float_figure_b3")]` for appendix figures B.2 and B.3.
+
+Every quantity in the ground truth is read out of a file in `maintained/output/` by `build_ground_truth.R`; a published value that finds no counterpart there stops the build rather than being recorded as unverifiable.
 
 ```{r gt_failures}
 kbl <- gt |>
-  filter(match_rewrite == 0) |>
+  filter(match_rewrite == 0 | match == 0) |>
   transmute(Where = table_figure, Claim = claim,
             Published = value_paper,
+            Archive = if_else(is.na(value_script), "", sprintf("%.3g", value_script)),
             Rewrite = if_else(str_ends(value_paper, "%"),
                               sprintf("%.2f%%", value_rewrite),
                               sprintf("%.3g", value_rewrite)),
             `Fault lies with` = defect_locus) |>
   kable(booktabs = TRUE,
-        caption = "Every claim the rewrite does not match.")
+        caption = "Every claim the archive or the rewrite does not match.")
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale_down", "hold_position")))
 ```
 
-Each of the three is set out under Errata. `defect_locus` is recorded on every row the rewrite does not match, and a row that fails without one stops the build, because an unexplained zero reads as a failure of this code and here none of them is.
+The `r n_rewrite_fail` rows the rewrite does not match, and the `r n_descriptive_fail` descriptive claims that do not hold, are set out in `coppock_green_2022_errata.pdf`. The `r n_archive_fail` the archive does not match are the elite ideology column, described above. `defect_locus` is required on every row carrying an adverse verdict, in either column and including a descriptive claim that fails, and a row that fails without one stops the build: an unexplained zero reads as a failure of this code, and here none of them is. The commonest reading of the column across this paper is that the archive fails where the rewrite succeeds, which is the deposit's clean data rather than either analysis.
 
 **The unseeded quantities are judged against their own distribution.** Nine of the published quantities come out of a bootstrap that neither the archive nor the article seeds: the six interval endpoints of the three sample ratios, and the pooled estimate and its two endpoints, whose weights are themselves unseeded bootstrap variances. Comparing any of them to printed precision would be the wrong test. Each is instead scored against the range its own resampling produces at the `sims <- 10` the deposit ships, and the range is written into the row's note, so the note and the verdict come from the same computation.
+
+# The extraction, and the two instruments that read it
+
+A ground truth built from the pipeline can only ever check the numbers the pipeline happens to produce, and the most consequential errors in this article are in sentences rather than in tables. So the published article and its appendix were read separately from the code, every numeric token in them extracted with its surrounding context, and each one classified by hand into `ground_truth/published_claims.csv`.
+
+```{r extraction_table}
+kbl <- claims |>
+  count(`Claim type` = claim_type, name = "Tokens") |>
+  left_join(claims |> filter(needs_block) |> count(claim_type, name = "With a claim block"),
+            by = c(`Claim type` = "claim_type")) |>
+  mutate(`With a claim block` = replace_na(`With a claim block`, 0L),
+         Meaning = c(
+           "Scale endpoints, category counts, a stipulated illustration",
+           "A claim about shape, sign, count or order rather than a value",
+           "A quantity the analysis produces",
+           "Panel counts, model indices, references to a float's own layout",
+           "Copied from another paper or from a reproduced op-ed"
+         )) |>
+  select(`Claim type`, Meaning, Tokens, `With a claim block`) |>
+  kable(booktabs = TRUE,
+        caption = "The extraction: every numeric token in the article and the appendix, classified by hand.")
+latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale_down", "hold_position")))
+```
+
+The extraction covers digits and spelled-out numbers alike; "the experiment was conducted three times" and "all five categories" are claims no token scan sees. The four op-eds the appendix reproduces carry `r sum(as.integer(str_extract(claims$notes[str_starts(claims$claim_id, "app_b_oped")], "^\\d+")))` numeric tokens between them, all of them the newspapers' own figures, and they get one row each rather than one row per token. Each published float's cells are compared one by one in the ground truth and summarised in the extraction by a single coverage row, which is what the float coverage figures above report.
+
+**The coverage gate.** `build_ground_truth.R` will not finish unless every `pipeline` and `descriptive` row of the extraction has a ground-truth row, every `claim_id` in the ground truth names a claim the article actually makes, the two files transcribe every shared published value identically, and `maintained/in_text_claims.R` prints exactly `r n_blocks` claim lines whose identifiers are the `r n_blocks` the extraction declares. The claims file is run as a program under `capture.output` and into an environment of its own, not scanned as text: a block that errors, or that ends in a bare expression and so prints nothing when sourced, satisfies a textual check completely and this one not at all.
+
+**The second instrument.** `maintained/in_text_claims.R` carries the article's own sentence verbatim in a block comment and then recomputes the number underneath it from `maintained/output/`, in the article's units and at the article's precision. It never reads the ground truth, and it reaches each quantity by a different route from the one `build_ground_truth.R` takes, so the two can disagree; every one of the `r n_blocks` values is compared across them and a disagreement stops the build. Running it prints the whole audit trail, which is the last thing `run_all.R` does.
+
+The article's `r n_rewrite_fail + n_descriptive_fail` misstatements are collected as `r errata_entries` entries in `coppock_green_2022_errata.pdf` at the root of this repository. Each entry quotes the published sentence, gives the corrected sentence with the changed token in bold, and computes every value in it from `maintained/output/` when the document is rendered, so the note cannot go stale in the way the article did.
 
 # Maintained rewrite
 
@@ -301,8 +352,11 @@ scripts <- tribble(
   "text_significance_counts.R", "The counts of significant target and nontarget effects",
   "text_amtrak_largest_effects.R", "The two Amtrak effects quoted in the results",
   "text_inconsistency_rates.R", "The two inconsistency rates behind study 4",
+  "text_sample_descriptions.R", "The study 1 sample composition figures the article states in prose",
+  "text_study_2_correlations.R", "The correlations among study 2's five outcome measures",
   "text_precision_weighted_averages.R", "The precision-weighted averages, ratios and bootstrap intervals",
-  "text_pooled_ratio_metaanalysis.R", "The pooled ratio across the three samples"
+  "text_pooled_ratio_metaanalysis.R", "The pooled ratio across the three samples",
+  "in_text_claims.R", "No file: one printed line per claim the article makes in prose"
 )
 stopifnot(setequal(scripts$Script, list.files(here::here("maintained"), pattern = "[.]R$")))
 kbl <- kable(scripts, booktabs = TRUE,

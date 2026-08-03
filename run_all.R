@@ -32,6 +32,8 @@ source(here::here("maintained", "figure_b3_wave3_estimates.R"))
 source(here::here("maintained", "text_significance_counts.R"))
 source(here::here("maintained", "text_amtrak_largest_effects.R"))
 source(here::here("maintained", "text_inconsistency_rates.R"))
+source(here::here("maintained", "text_sample_descriptions.R"))
+source(here::here("maintained", "text_study_2_correlations.R"))
 
 # text_precision_weighted_averages.R bootstraps 1,000 resamples of three samples
 # and takes around six minutes; text_pooled_ratio_metaanalysis.R reads its output.
@@ -50,4 +52,14 @@ source(here::here("download_original.R"))
 # ground_truth/archive_values.csv, which ground_truth/run_original_archive.R
 # produces; that script needs the packages the deposit was written against and
 # is deliberately not part of this run.
+#
+# build_ground_truth.R also runs maintained/in_text_claims.R under capture.output
+# to check coverage, so the run below is the second of two and exists to put the
+# claim lines in the console log where a reader can see them.
 source(here::here("ground_truth", "build_ground_truth.R"))
+
+# In-text claims ----
+# One block per claim the article makes in prose, each carrying the article's own
+# sentence and recomputing the number from maintained/output/ by a path of its
+# own. Where this file and build_ground_truth.R disagree, one of them is wrong.
+source(here::here("maintained", "in_text_claims.R"))

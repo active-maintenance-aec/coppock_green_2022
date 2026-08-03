@@ -77,6 +77,37 @@ read_elite_ideology <- function() {
     )
 }
 
+# The elite sample's two political engagement items, rebuilt from the deposited
+# wave 1 raw file for the same reason ideo_5 is: study_1_elite_cleaning.R writes
+# all three recodes in car's specification-string syntax without attaching car,
+# so dplyr::recode stores the whole specification string in every row. Q55 and Q56
+# are the news and political conversation frequency items; the deposit's own
+# specification leaves Q56 = 5 unmapped, which is preserved here as NA rather than
+# guessed at.
+read_elite_engagement <- function() {
+  raw <- read_csv(file.path(data_dir, "study_1_elite_wave_1_raw.csv"),
+                  show_col_types = FALSE)
+  raw |>
+    transmute(
+      subject_id,
+      news_how_often = case_when(
+        Q55 == 7 ~ "Several times an hour",
+        Q55 == 1 ~ "Several times a day",
+        Q55 == 2 ~ "Once a day",
+        Q55 == 3 ~ "Several times a week",
+        Q55 == 4 ~ "Several times a month",
+        Q55 == 6 ~ "Never"
+      ),
+      talk_politics_how_often = case_when(
+        Q56 == 1 ~ "Several times a day",
+        Q56 == 2 ~ "Once a day",
+        Q56 == 3 ~ "Several times a week",
+        Q56 == 4 ~ "Several times a month",
+        Q56 == 6 ~ "Never"
+      )
+    )
+}
+
 # Every treatment effect for one sample at one wave: 4 treatment contrasts by 16
 # outcomes. Figure 4, appendix figures B2 and B3, the precision-weighted
 # averages, and the in-text significance counts all read the same estimates.

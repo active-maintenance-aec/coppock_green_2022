@@ -1,0 +1,21 @@
+sample,outcome_1,outcome_2,target_pair,correlation
+Original,Prayer,Prayer Amend,FALSE,0.6526031169919977
+Original,Employers,SSM Amend,TRUE,0.5915181762330419
+Original,SSM Amend,Prayer Amend,FALSE,0.4659280869049336
+Original,Local Officials,SSM Amend,FALSE,0.4475735770099751
+Original,SSM Amend,Prayer,FALSE,0.37888251355271935
+Original,Employers,Local Officials,TRUE,0.37595389706239546
+Original,Employers,Prayer Amend,TRUE,0.3378200400601569
+Original,Employers,Prayer,TRUE,0.3191254248590818
+Original,Local Officials,Prayer,FALSE,0.2872884399594619
+Original,Local Officials,Prayer Amend,FALSE,0.25558084756342153
+Replication,Prayer,Prayer Amend,FALSE,0.7012821629101567
+Replication,Employers,SSM Amend,TRUE,0.6185504711527365
+Replication,SSM Amend,Prayer Amend,FALSE,0.5401501295911245
+Replication,SSM Amend,Prayer,FALSE,0.4762267176955321
+Replication,Employers,Prayer Amend,TRUE,0.43296937117524115
+Replication,Employers,Prayer,TRUE,0.4250928709557847
+Replication,Local Officials,SSM Amend,FALSE,0.42111409311279424
+Replication,Employers,Local Officials,TRUE,0.39598639799640045
+Replication,Local Officials,Prayer,FALSE,0.3062458541363649
+Replication,Local Officials,Prayer Amend,FALSE,0.2951186104581958

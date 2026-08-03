@@ -420,10 +420,12 @@ t1_rows <- paper_t1 |>
     c("sample", "scope"), "Table 1 archive"
   ) |>
   transmute(
+    claim_id = str_glue("t1_{str_to_lower(word(sample))}_{str_remove(scope, '_domain')}") |>
+      as.character(),
     table_figure = "Table 1",
     claim = str_glue("{sample}: average {str_replace(scope, '_', ' ')} correlation") |>
       as.character(),
-    value_script, value_paper, value_rewrite,
+    value_script, value_paper, value_rewrite, digits = 2L,
     notes = "Table 1, average Pearson correlation over the 120 unordered outcome pairs"
   )
 
@@ -447,12 +449,49 @@ figure_rows <- tribble(
   "Figure 4", "Treatment effects plotted, target issues", NA, "48", sum(f4$target),
     "Article: 'out of the 48 estimated treatment effects on target issues'. The deposit plots the same estimates but prints no count.",
   "Figure 4", "Treatment effects plotted, nontarget issues", NA, "144", sum(!f4$target),
-    "Article: 'out of 144 estimated effects on nontarget issues'.",
-  "Figure B.2", "Treatment effects plotted at wave 2", NA, NA, nrow(fb2),
-    "Appendix figure B.2 carries no printed numbers, so there is no published value to compare against. The rewrite writes every plotted estimate to figure_b2_wave2_estimates.csv.",
-  "Figure B.3", "Treatment effects plotted at wave 3", NA, NA, nrow(fb3),
-    "Appendix figure B.3 carries no printed numbers, so there is no published value to compare against. The rewrite writes every plotted estimate to figure_b3_wave3_estimates.csv."
+    "Article: 'out of 144 estimated effects on nontarget issues'."
 )
+
+# Float coverage ----
+# The covered fraction of each published float, not the presence of at least one
+# row. value_paper is the number of cells the article prints, counted off the
+# page; value_rewrite is the number the pipeline writes. The three coefficient
+# plots print no numbers on their faces, so what they assert is a count of
+# plotted estimates: 16 outcomes by 4 treatments by however many samples the
+# panel carries.
+regression_cells <- function(file, panel_col, column_col) {
+  raw <- out(file)
+  2 * nrow(raw) + nrow(distinct(raw, .data[[panel_col]], .data[[column_col]]))
+}
+
+demographic_cells <- function(file, sample_cols) nrow(out(file)) * length(sample_cols)
+
+float_rows <- tribble(
+  ~claim_id, ~table_figure, ~claim, ~value_paper, ~value_rewrite,
+  "float_table_1", "Table 1", "Published cells covered", "6", 2 * nrow(t1),
+  "float_table_2", "Table 2", "Published cells covered", "50",
+    regression_cells("table_2_employment_discrimination.csv", "sample", "outcome"),
+  "float_table_3", "Table 3", "Published cells covered", "24",
+    regression_cells("table_3_inequality.csv", "sample", "outcome"),
+  "float_table_4", "Table 4", "Published cells covered", "20",
+    regression_cells("table_4_correction_experiment.csv", "sample", "gov_pref"),
+  "float_table_b2", "Table B.2", "Published cells covered", "87",
+    demographic_cells("table_b2_sample_demographics.csv", c("MTurk", "Elites", "Lucid")),
+  "float_table_c3", "Table C.3", "Published cells covered", "40",
+    demographic_cells("table_c3_study2_demographics.csv", c("Original", "Replication")),
+  "float_table_c4", "Table C.4", "Published cells covered", "30",
+    regression_cells("table_c4_welfare_experiment.csv", "sample", "outcome"),
+  "float_table_d5", "Table D.5", "Published cells covered", "48",
+    demographic_cells("table_d5_study3_demographics.csv", c("Original", "Replication")),
+  "float_figure_4", "Figure 4", "Estimates plotted", "192", nrow(f4),
+  "float_figure_b2", "Figure B.2", "Estimates plotted", "128", nrow(fb2),
+  "float_figure_b3", "Figure B.3", "Estimates plotted", "64", nrow(fb3)
+) |>
+  mutate(
+    value_script = NA_real_,
+    digits = 0L,
+    notes = "Coverage of the float rather than one of its cells: the number of values the article prints in it against the number the pipeline writes. Each cell is compared separately in the rows above."
+  )
 
 # In-text quantities ----
 pwa <- out("text_precision_weighted_averages.csv")
@@ -537,102 +576,365 @@ pooled_note <- function(quantity_name, published) {
 }
 
 text_rows <- tribble(
-  ~table_figure, ~claim, ~value_script, ~value_paper, ~value_rewrite, ~notes,
-  "Text", "Outcome pairs compared (16 choose 2)", NA, "120",
-    t1$n_pairs_total[1],
+  ~claim_id, ~table_figure, ~claim, ~value_script, ~value_paper, ~value_rewrite, ~digits, ~notes,
+  "s1_pairs_total", "Text", "Outcome pairs compared (16 choose 2)", NA, "120",
+    t1$n_pairs_total[1], 0L,
     "Article: '16 choose 2 = 120 pairs'. The deposit averages over the 240 ordered pairs instead and prints no count; the correlation matrix is symmetric, so the average is the same.",
-  "Text", "MTurk average within-domain correlation, as given in the body text",
+  "s1_mturk_within_text", "Text", "MTurk average within-domain correlation, as given in the body text",
     t1_archive |> filter(term == "MTurk Sample", column == 2) |> pull(value), ".29",
-    t1$within_domain[t1$sample == "MTurk sample"],
+    t1$within_domain[t1$sample == "MTurk sample"], 2L,
     "The body text says .29 where table 1 says .30. The quantity is 0.2966, so table 1 rounds it correctly and the sentence does not.",
-  "Text", "MTurk precision-weighted average, target outcomes", NA, "0.42",
-    pwa_value("MTurk", "Within Domain", "estimate"),
+  "s1_pwa_target_mturk", "Text", "MTurk precision-weighted average, target outcomes", NA, "0.42",
+    pwa_value("MTurk", "Within Domain", "estimate"), 2L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "Elite precision-weighted average, target outcomes", NA, "0.22",
-    pwa_value("Elite", "Within Domain", "estimate"),
+  "s1_pwa_target_elite", "Text", "Elite precision-weighted average, target outcomes", NA, "0.22",
+    pwa_value("Elite", "Within Domain", "estimate"), 2L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "Lucid precision-weighted average, target outcomes", NA, "0.245",
-    pwa_value("Lucid", "Within Domain", "estimate"),
+  "s1_pwa_target_lucid", "Text", "Lucid precision-weighted average, target outcomes", NA, "0.245",
+    pwa_value("Lucid", "Within Domain", "estimate"), 3L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "MTurk precision-weighted average, nontarget outcomes", NA, "0.004",
-    pwa_value("MTurk", "Across Domain", "estimate"),
+  "s1_pwa_nontarget_mturk", "Text", "MTurk precision-weighted average, nontarget outcomes", NA, "0.004",
+    pwa_value("MTurk", "Across Domain", "estimate"), 3L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "Elite precision-weighted average, nontarget outcomes", NA, "0.01",
-    pwa_value("Elite", "Across Domain", "estimate"),
+  "s1_pwa_nontarget_elite", "Text", "Elite precision-weighted average, nontarget outcomes", NA, "0.01",
+    pwa_value("Elite", "Across Domain", "estimate"), 2L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "Lucid precision-weighted average, nontarget outcomes", NA, "-0.02",
-    pwa_value("Lucid", "Across Domain", "estimate"),
+  "s1_pwa_nontarget_lucid", "Text", "Lucid precision-weighted average, nontarget outcomes", NA, "-0.02",
+    pwa_value("Lucid", "Across Domain", "estimate"), 2L,
     "The deposited in_text_numbers.R computes this and prints nothing when sourced.",
-  "Text", "MTurk indirect-to-direct effect ratio", NA, "0.8%",
-    as_percent(pwa_value("MTurk", "ratio", "estimate")),
+  "s1_ratio_mturk", "Text", "MTurk indirect-to-direct effect ratio", NA, "0.8%",
+    as_percent(pwa_value("MTurk", "ratio", "estimate")), 1L,
     "Article: 'on MTurk, our best guess is that the average indirect effect is 0.8% of the average direct effect'.",
-  "Text", "Elite indirect-to-direct effect ratio", NA, "6.4%",
-    as_percent(pwa_value("Elite", "ratio", "estimate")),
+  "s1_ratio_elite", "Text", "Elite indirect-to-direct effect ratio", NA, "6.4%",
+    as_percent(pwa_value("Elite", "ratio", "estimate")), 1L,
     "Article: 'indirect effects are 6.4% the size of the direct effects on average'.",
-  "Text", "Lucid indirect-to-direct effect ratio", NA, "-9.4%",
-    as_percent(pwa_value("Lucid", "ratio", "estimate")),
+  "s1_ratio_lucid", "Text", "Lucid indirect-to-direct effect ratio", NA, "-9.4%",
+    as_percent(pwa_value("Lucid", "ratio", "estimate")), 1L,
     "Article: 'on Lucid, the fraction is in fact negative, at -9.4%'.",
-  "Text", "MTurk ratio, 95% interval lower bound", NA, "-8.1%",
-    as_percent(pwa_value("MTurk", "ratio", "conf_low")), endpoint_note("MTurk", "conf_low", "-8.1%"),
-  "Text", "MTurk ratio, 95% interval upper bound", NA, "8.7%",
-    as_percent(pwa_value("MTurk", "ratio", "conf_high")), endpoint_note("MTurk", "conf_high", "8.7%"),
-  "Text", "Elite ratio, 95% interval lower bound", NA, "-25.7%",
-    as_percent(pwa_value("Elite", "ratio", "conf_low")), endpoint_note("Elite", "conf_low", "-25.7%"),
-  "Text", "Elite ratio, 95% interval upper bound", NA, "26.2%",
-    as_percent(pwa_value("Elite", "ratio", "conf_high")), endpoint_note("Elite", "conf_high", "26.2%"),
-  "Text", "Lucid ratio, 95% interval lower bound", NA, "-24%",
-    as_percent(pwa_value("Lucid", "ratio", "conf_low")), endpoint_note("Lucid", "conf_low", "-24%"),
-  "Text", "Lucid ratio, 95% interval upper bound", NA, "15%",
-    as_percent(pwa_value("Lucid", "ratio", "conf_high")), endpoint_note("Lucid", "conf_high", "15%"),
-  "Text", "Pooled indirect-to-direct ratio",
+  "s1_ratio_mturk_low", "Text", "MTurk ratio, 95% interval lower bound", NA, "-8.1%",
+    as_percent(pwa_value("MTurk", "ratio", "conf_low")), 1L, endpoint_note("MTurk", "conf_low", "-8.1%"),
+  "s1_ratio_mturk_high", "Text", "MTurk ratio, 95% interval upper bound", NA, "8.7%",
+    as_percent(pwa_value("MTurk", "ratio", "conf_high")), 1L, endpoint_note("MTurk", "conf_high", "8.7%"),
+  "s1_ratio_elite_low", "Text", "Elite ratio, 95% interval lower bound", NA, "-25.7%",
+    as_percent(pwa_value("Elite", "ratio", "conf_low")), 1L, endpoint_note("Elite", "conf_low", "-25.7%"),
+  "s1_ratio_elite_high", "Text", "Elite ratio, 95% interval upper bound", NA, "26.2%",
+    as_percent(pwa_value("Elite", "ratio", "conf_high")), 1L, endpoint_note("Elite", "conf_high", "26.2%"),
+  "s1_ratio_lucid_low", "Text", "Lucid ratio, 95% interval lower bound", NA, "-24%",
+    as_percent(pwa_value("Lucid", "ratio", "conf_low")), 0L, endpoint_note("Lucid", "conf_low", "-24%"),
+  "s1_ratio_lucid_high", "Text", "Lucid ratio, 95% interval upper bound", NA, "15%",
+    as_percent(pwa_value("Lucid", "ratio", "conf_high")), 0L, endpoint_note("Lucid", "conf_high", "15%"),
+  "s1_ratio_pooled", "Text", "Pooled indirect-to-direct ratio",
     as_percent(archive_value("Pooled indirect-to-direct ratio")), "1.4%",
-    as_percent(pooled$estimate[pooled$model == "Fixed effects"]),
+    as_percent(pooled$estimate[pooled$model == "Fixed effects"]), 1L,
     pooled_note("estimate", "1.4%"),
-  "Text", "Pooled ratio, 95% interval lower bound",
+  "s1_ratio_pooled_low", "Text", "Pooled ratio, 95% interval lower bound",
     as_percent(archive_value("Pooled ratio, 95% interval lower bound")), "-8%",
-    as_percent(pooled$conf_low[pooled$model == "Fixed effects"]),
+    as_percent(pooled$conf_low[pooled$model == "Fixed effects"]), 0L,
     pooled_note("conf_low", "-8%"),
-  "Text", "Pooled ratio, 95% interval upper bound",
+  "s1_ratio_pooled_high", "Text", "Pooled ratio, 95% interval upper bound",
     as_percent(archive_value("Pooled ratio, 95% interval upper bound")), "6%",
-    as_percent(pooled$conf_high[pooled$model == "Fixed effects"]),
+    as_percent(pooled$conf_high[pooled$model == "Fixed effects"]), 0L,
     pooled_note("conf_high", "6%"),
-  "Text", "Estimated treatment effects on target issues", NA, "48",
-    counts$n_estimates[counts$issue_type == "Target issues"],
+  "s1_target_estimates", "Text", "Estimated treatment effects on target issues", NA, "48",
+    counts$n_estimates[counts$issue_type == "Target issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Target-issue effects significant at p < 0.05", NA, "39",
-    counts$n_significant[counts$issue_type == "Target issues"],
+  "s1_target_significant", "Text", "Target-issue effects significant at p < 0.05", NA, "39",
+    counts$n_significant[counts$issue_type == "Target issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Target-issue effects significant after Benjamini-Hochberg", NA, "35",
-    counts$n_significant_bh[counts$issue_type == "Target issues"],
+  "s1_target_significant_bh", "Text", "Target-issue effects significant after Benjamini-Hochberg", NA, "35",
+    counts$n_significant_bh[counts$issue_type == "Target issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Estimated treatment effects on nontarget issues", NA, "144",
-    counts$n_estimates[counts$issue_type == "Nontarget issues"],
+  "s1_nontarget_estimates", "Text", "Estimated treatment effects on nontarget issues", NA, "144",
+    counts$n_estimates[counts$issue_type == "Nontarget issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Nontarget-issue effects significant at p < 0.05", NA, "9",
-    counts$n_significant[counts$issue_type == "Nontarget issues"],
+  "s1_nontarget_significant", "Text", "Nontarget-issue effects significant at p < 0.05", NA, "9",
+    counts$n_significant[counts$issue_type == "Nontarget issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Nontarget-issue effects significant after Benjamini-Hochberg", NA, "0",
-    counts$n_significant_bh[counts$issue_type == "Nontarget issues"],
+  "s1_nontarget_significant_bh", "Text", "Nontarget-issue effects significant after Benjamini-Hochberg", NA, "0",
+    counts$n_significant_bh[counts$issue_type == "Nontarget issues"], 0L,
     "Read off the wave 1 estimates figure 4 plots; the deposit prints no count.",
-  "Text", "Amtrak treatment on the fourth Amtrak outcome, elite sample", NA, "0.52",
-    amtrak_value("Elite Sample"),
-    "Article: 'especially large, at 0.52 standard deviations among elites'. The article calls it the third question in the Amtrak set; it is the fourth item as the deposit orders them.",
-  "Text", "Amtrak treatment on the fourth Amtrak outcome, MTurk sample", NA, "0.73",
-    amtrak_value("MTurk Sample"),
+  "s1_amtrak_elite", "Text", "Amtrak treatment on the third Amtrak outcome, elite sample", NA, "0.52",
+    amtrak_value("Elite Sample"), 2L,
+    "Article: 'especially large, at 0.52 standard deviations among elites'. The article calls it the third question in the Amtrak set, and it is the third of the four Amtrak outcomes in the deposit's own ordering.",
+  "s1_amtrak_mturk", "Text", "Amtrak treatment on the third Amtrak outcome, MTurk sample", NA, "0.73",
+    amtrak_value("MTurk Sample"), 2L,
     "Article: 'and 0.73 standard deviations on MTurk'.",
-  "Text", "Share of the study 2 original sample holding inconsistent preferences", NA, "30%",
-    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Original"]),
+  "disc_inconsistent_original", "Text", "Share of the study 2 original sample holding inconsistent preferences", NA, "30%",
+    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Original"]), 0L,
     "Article: 'Among the MTurk sample, 30% of the respondents were inconsistent'. The inconsistency indicator exists only in the study 2 samples, both of which the article elsewhere says were recruited on Lucid, so that sentence attaches the rate to the wrong sample label. The rate itself is the study 2 original sample's. The deposit computes no rate.",
-  "Text", "Share of the study 2 replication sample holding inconsistent preferences", NA, "24%",
-    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Replication"]),
+  "disc_inconsistent_replication", "Text", "Share of the study 2 replication sample holding inconsistent preferences", NA, "24%",
+    as_percent(inconsistency$share_inconsistent[inconsistency$sample == "Replication"]), 0L,
     "Article: 'this figure was 24% on Lucid'. The deposit computes no rate.",
-  "Text", "Study 2 original sample size", NA, "1,087",
-    inconsistency$n_respondents[inconsistency$sample == "Original"],
+  "s2_n_original", "Text", "Study 2 original sample size", NA, "1,087",
+    inconsistency$n_respondents[inconsistency$sample == "Original"], 0L,
     "Article: 'The 1,087 subjects for this experiment were also recruited via Lucid'."
 )
 
+# Claims stated in prose ----
+# Everything the article asserts numerically outside a float. Each row carries the
+# claim_id that ties it to ground_truth/published_claims.csv and to the block in
+# maintained/in_text_claims.R that recomputes it by its own path. Rows flagged
+# descriptive make a claim about shape, sign, count or order rather than naming a
+# value, so their verdict is carried in holds and not in match_rewrite; rows
+# flagged approximate name a rough magnitude the article itself hedges, and return
+# no verdict at all.
+descriptions <- out("text_sample_descriptions.csv")
+study_2_cors <- out("text_study_2_correlations.csv")
+t2_out <- out("table_2_employment_discrimination.csv")
+t3_out <- out("table_3_inequality.csv")
+t4_out <- out("table_4_correction_experiment.csv")
+c4_out <- out("table_c4_welfare_experiment.csv")
+b2_out <- out("table_b2_sample_demographics.csv")
+c3_out <- out("table_c3_study2_demographics.csv")
+
+description_share <- function(sample_name, quantity_name) {
+  row <- descriptions |> filter(sample == sample_name, quantity == quantity_name)
+  stopifnot(nrow(row) == 1)
+  100 * row$n_yes / row$n_sample
+}
+
+description_n <- function(sample_name) {
+  n <- unique(descriptions$n_sample[descriptions$sample == sample_name])
+  stopifnot(length(n) == 1)
+  n
+}
+
+regression_value <- function(tab, panel, column, term_name, statistic) {
+  value <- tab[[statistic]][tab[[1]] == panel & tab[[2]] == column & tab$term == term_name]
+  stopifnot(length(value) == 1)
+  value
+}
+
+demographic_n <- function(tab, column) {
+  value <- tab[[column]][tab$variable == "n"]
+  stopifnot(length(value) == 1)
+  as.numeric(value)
+}
+
+# Target-cell averages, the quantity every descriptive claim about the shaded
+# diagonal of figure 4 is made against.
+target_means <- f4 |>
+  filter(target) |>
+  summarize(mean_estimate = mean(estimate), .by = c(treatment, Study))
+
+wall_street_means <- target_means$mean_estimate[target_means$treatment == "Treatment: Wall Street"]
+sample_leaders <- target_means |>
+  slice_max(mean_estimate, n = 1, by = Study) |>
+  pull(treatment)
+amtrak_means <- target_means$mean_estimate[target_means$treatment == "Treatment: Amtrak" &
+                                             target_means$Study != "Lucid Sample"]
+nontarget_estimates <- f4$estimate[!f4$target]
+s2_nontarget <- t2_out |> filter(term == "Religious exemption", outcome != "Employers")
+s2_original_cors <- study_2_cors$correlation[study_2_cors$sample == "Original"]
+t4_treatment <- t4_out |> filter(term == "Correction treatment")
+t4_precision <- t4_treatment |>
+  select(sample, gov_pref, std.error) |>
+  pivot_wider(names_from = gov_pref, values_from = std.error)
+pooled_se <- as_percent(pooled$std.error[pooled$model == "Fixed effects"])
+half_widths <- (f4$conf.high - f4$conf.low) / (2 * f4$std.error)
+
+prose_rows <- tribble(
+  ~claim_id, ~claim, ~value_paper, ~value_rewrite, ~digits, ~descriptive, ~approximate, ~holds, ~notes,
+  "s1_times_conducted", "Samples study 1 was run in", "3", ncol(b2_out) - 2, 0L, FALSE, FALSE, NA,
+    "Article: 'The experiment was conducted three times'.",
+  "s1_n_mturk", "MTurk sample size, stated in prose", "3,001", description_n("MTurk"), 0L, FALSE, FALSE, NA,
+    "The same quantity appendix table B.2 prints in its N row, transcribed a second time from the body text.",
+  "s1_n_elite", "Elite sample size, stated in prose", "2,181", description_n("Elite"), 0L, FALSE, FALSE, NA,
+    "As above.",
+  "s1_n_lucid", "Lucid sample size, stated in prose", "2,524", description_n("Lucid"), 0L, FALSE, FALSE, NA,
+    "As above.",
+  "s1_college_elite", "Elite sample holding a college degree", "96%",
+    description_share("Elite", "College degree or more"), 0L, FALSE, FALSE, NA,
+    "College and Graduate School together. Appendix table B.2 prints the two categories separately and never their sum, so nothing in the article checks this figure against a table.",
+  "s1_college_mturk", "MTurk sample holding a college degree", "51%",
+    description_share("MTurk", "College degree or more"), 0L, FALSE, FALSE, NA, "As above.",
+  "s1_college_lucid", "Lucid sample holding a college degree", "44%",
+    description_share("Lucid", "College degree or more"), 0L, FALSE, FALSE, NA, "As above.",
+  "s1_graduate_elite", "Elite sample holding a graduate degree", "71%",
+    description_share("Elite", "Graduate degree"), 0L, FALSE, FALSE, NA,
+    "Appendix table B.2 prints 71.6% for the same category, which rounds to 72%, so the sentence truncates where the table rounds.",
+  "s1_graduate_mturk", "MTurk sample holding a graduate degree", "13%",
+    description_share("MTurk", "Graduate degree"), 0L, FALSE, FALSE, NA,
+    "Appendix table B.2 prints 12.4% for the same category, which rounds to 12%.",
+  "s1_graduate_lucid", "Lucid sample holding a graduate degree", "15%",
+    description_share("Lucid", "Graduate degree"), 0L, FALSE, FALSE, NA,
+    "Appendix table B.2 prints 15.1% for the same category.",
+  "s1_strong_partisan_elite", "Elite sample describing themselves as strong partisans", "44%",
+    description_share("Elite", "Strong partisan"), 0L, FALSE, FALSE, NA,
+    "The two endpoints of the seven-point party identification scale in appendix table B.2.",
+  "s1_strong_partisan_mturk", "MTurk sample describing themselves as strong partisans", "25",
+    description_share("MTurk", "Strong partisan"), 0L, TRUE, FALSE,
+    as.numeric(round(description_share("MTurk", "Strong partisan")) == 25),
+    "The article says 'only a quarter of the MTurk sample do so', so the test is against a quarter rather than a printed figure.",
+  "s1_strong_partisan_lucid", "Lucid sample describing themselves as strong partisans", "46%",
+    description_share("Lucid", "Strong partisan"), 0L, FALSE, FALSE, NA, "As above.",
+  "s1_news_daily", "Elite sample reading the news at least daily", "97%",
+    description_share("Elite", "Reads the news at least daily"), 0L, FALSE, FALSE, NA,
+    "Appears in no table. The deposited elite clean file stores this item as an unevaluated recode specification string, so it is rebuilt from the deposit's own wave 1 raw file the same way the ideology column is.",
+  "s1_talk_politics_daily", "Elite sample talking politics at least once a day", "64%",
+    description_share("Elite", "Talks politics at least once a day"), 0L, FALSE, FALSE, NA,
+    "As above.",
+  "s1_conditions", "Experimental conditions in study 1", "5",
+    n_distinct(f4$term) + 1, 0L, FALSE, FALSE, NA,
+    "Four op-ed treatment contrasts plus the control they are taken against.",
+  "s1_opeds", "Op-ed treatments analyzed", "4", n_distinct(f4$treatment), 0L, FALSE, FALSE, NA,
+    "The climate change arm is set aside by the article and by every script here.",
+  "s1_questions_per_attitude", "Outcome questions per issue area", "4",
+    n_distinct(f4$outcome) / n_distinct(f4$dv_cat_label), 0L, FALSE, FALSE, NA, "",
+  "s1_outcomes", "Outcome questions in total", "16", n_distinct(f4$outcome), 0L, FALSE, FALSE, NA, "",
+  "s1_pairs_choose", "Outcome questions entering the pairwise correlations", "16",
+    (1 + sqrt(1 + 8 * t1$n_pairs_total[1])) / 2, 0L, FALSE, FALSE, NA,
+    "Recovered from the pair count rather than counted again: 120 unordered pairs implies 16 questions.",
+  "s1_panels", "Panels in figure 4", "16", nrow(distinct(f4, treatment, dv_cat_label)), 0L, FALSE, FALSE, NA, "",
+  "s1_attitudes", "Attitudes the rows of panels correspond to", "4",
+    n_distinct(f4$dv_cat_label), 0L, FALSE, FALSE, NA, "",
+  "s1_ci_level", "Confidence level of the intervals figure 4 draws", "95",
+    100 * mean(2 * pnorm(half_widths) - 1), 0L, FALSE, FALSE, NA,
+    "Stated nowhere in the deposit's code and recovered from the plotted half widths, which run at 1.96 standard errors.",
+  "s1_elite_within_text", "Elite within-domain correlation, restated in prose", "0.39",
+    t1$within_domain[t1$sample == "Elite sample"], 2L, FALSE, FALSE, NA, "",
+  "s1_elite_across_text", "Elite across-domain correlation, restated in prose", "0.22",
+    t1$across_domain[t1$sample == "Elite sample"], 2L, FALSE, FALSE, NA, "",
+  "s1_mturk_across_text", "MTurk across-domain correlation, restated in prose", "0.06",
+    t1$across_domain[t1$sample == "MTurk sample"], 2L, FALSE, FALSE, NA, "",
+  "s1_lucid_within_text", "Lucid within-domain correlation, restated in prose", "0.12",
+    t1$within_domain[t1$sample == "Lucid sample"], 2L, FALSE, FALSE, NA, "",
+  "s1_lucid_across_text", "Lucid across-domain correlation, restated in prose", "0.00",
+    t1$across_domain[t1$sample == "Lucid sample"], 2L, FALSE, FALSE, NA, "",
+  "s1_wallstreet_largest", "The Wall Street treatment has the largest target-issue effect of the four", NA,
+    sum(sample_leaders == "Treatment: Wall Street"), 0L, TRUE, FALSE,
+    as.numeric(all(sample_leaders == "Treatment: Wall Street")),
+    "True in all three samples: the Wall Street target-cell average leads in each.",
+  "s1_wallstreet_magnitude", "The Wall Street target effects average nearly 0.5 standard deviations in all three samples",
+    "0.5", min(wall_street_means), 2L, TRUE, FALSE, NA,
+    "Hedged by the article, so no verdict is returned. The three averages are the elite, Lucid and MTurk target-cell means; the smallest is the Lucid one, which is the one furthest from 0.5.",
+  "s1_amtrak_magnitude", "The Amtrak target effects hover around one-third of a standard deviation",
+    "0.33", mean(amtrak_means), 2L, TRUE, FALSE, NA,
+    "Hedged by the article, so no verdict is returned. The claim is made about elites and MTurk only; the value here is the mean of those two target-cell averages.",
+  "s1_amtrak_question_index", "Position of the Amtrak question with the largest effects", "3",
+    as.numeric(str_extract(unique(amtrak$outcome[str_detect(amtrak$dv_labels, "^Taxes")]),
+                           "(?<=amtrak_)\\d+")), 0L, FALSE, FALSE, NA,
+    "The article calls it the third question in the Amtrak set; it is the third of the four in the deposit's own variable ordering, and the appendix questionnaire's third Amtrak item is the one about how new taxes would be spent.",
+  "s1_nontarget_near_zero", "In nearly every case the nontarget estimates are very close to zero", NA,
+    max(abs(nontarget_estimates)), 2L, TRUE, FALSE, NA,
+    "Not reducible to a verdict, so none is returned. The largest of the 144 nontarget estimates in absolute value is recorded here; the block in in_text_claims.R prints the whole distribution.",
+  "s1_power_low", "The study is powered to detect indirect effects of 10 per cent of the direct effect",
+    "10", paper_number("10%") / pooled_se, 1L, TRUE, FALSE,
+    as.numeric(paper_number("10%") / pooled_se > 1.96),
+    "Expressed as the number of pooled standard errors in a ratio of 10 per cent, which is what 'well powered to detect' has to mean here.",
+  "s1_power_high", "The study is powered to detect indirect effects of 20 per cent of the direct effect",
+    "20", paper_number("20%") / pooled_se, 1L, TRUE, FALSE,
+    as.numeric(paper_number("20%") / pooled_se > 1.96), "As above.",
+  "s2_nontarget_measures_text", "Nontarget outcome measures in study 2, as the design paragraph counts them",
+    "3", n_distinct(t2_out$outcome) - 1, 0L, FALSE, FALSE, NA,
+    "The design paragraph describes one measure plus 'the other two'. Table 2 reports four, and the results paragraph two paragraphs later says four.",
+  "s2_nontarget_measures_table", "Nontarget outcome measures in study 2, as the results paragraph counts them",
+    "4", n_distinct(t2_out$outcome) - 1, 0L, FALSE, FALSE, NA, "",
+  "s2_correlation_low", "Lower end of the correlations among the five study 2 outcomes", "0.3",
+    min(s2_original_cors), 1L, TRUE, FALSE,
+    as.numeric(round(min(s2_original_cors), 1) == 0.3),
+    "Ten pairwise correlations in the original sample. The smallest is 0.26 and the largest 0.65, and the article's stated range holds at the one decimal place it prints.",
+  "s2_correlation_high", "Upper end of the same range", "0.7", max(s2_original_cors), 1L, TRUE, FALSE,
+    as.numeric(round(max(s2_original_cors), 1) == 0.7), "As above.",
+  "s2_effect_original", "Religious exemption effect on the employers question, restated in prose", "0.44",
+    regression_value(t2_out, "Original", "Employers", "Religious exemption", "estimate"), 2L,
+    FALSE, FALSE, NA, "",
+  "s2_effect_replication", "The same effect in the replication, restated in prose", "0.41",
+    regression_value(t2_out, "Replication", "Employers", "Religious exemption", "estimate"), 2L,
+    FALSE, FALSE, NA, "",
+  "s2_sign_split_original", "Two of the four nontarget estimates are positive in the original sample", NA,
+    sum(s2_nontarget$estimate[s2_nontarget$sample == "Original"] > 0), 0L, TRUE, FALSE,
+    as.numeric(sum(s2_nontarget$estimate[s2_nontarget$sample == "Original"] > 0) == 2), "",
+  "s2_sign_split_replication", "The same split in the replication", NA,
+    sum(s2_nontarget$estimate[s2_nontarget$sample == "Replication"] > 0), 0L, TRUE, FALSE,
+    as.numeric(sum(s2_nontarget$estimate[s2_nontarget$sample == "Replication"] > 0) == 2), "",
+  "s3_belief_effect_original", "Effect on belief in rising inequality, original study", "25",
+    100 * regression_value(t3_out, "Original", "Belief in Inequality (Binary)",
+                           "Inequality treatment", "estimate"), 1L, TRUE, TRUE, NA,
+    "The article writes 'approximately 25 percentage points in both samples', so this is compared as a rough magnitude and returns no verdict.",
+  "s3_belief_effect_replication", "The same effect in the replication", "25",
+    100 * regression_value(t3_out, "Replication", "Belief in Inequality (Binary)",
+                           "Inequality treatment", "estimate"), 1L, TRUE, TRUE, NA, "As above.",
+  "s3_se_bound", "The standard errors of that effect are smaller than 4 percentage points", "4",
+    100 * max(regression_value(t3_out, "Original", "Belief in Inequality (Binary)",
+                               "Inequality treatment", "std.error"),
+              regression_value(t3_out, "Replication", "Belief in Inequality (Binary)",
+                               "Inequality treatment", "std.error")), 1L, TRUE, FALSE,
+    as.numeric(100 * max(regression_value(t3_out, "Original", "Belief in Inequality (Binary)",
+                                          "Inequality treatment", "std.error"),
+                         regression_value(t3_out, "Replication", "Belief in Inequality (Binary)",
+                                          "Inequality treatment", "std.error")) < 4),
+    "A threshold claim, so the comparison is an inequality rather than an equality. The larger of the two standard errors is the one recorded.",
+  "s3_esj_original", "Economic system justification effect in the original study, restated in prose", "-0.18",
+    regression_value(t3_out, "Original", "Econ. System Justification (Standard Units)",
+                     "Inequality treatment", "estimate"), 2L, FALSE, FALSE, NA, "",
+  "s3_esj_original_se", "Its standard error, restated in prose", "0.10",
+    regression_value(t3_out, "Original", "Econ. System Justification (Standard Units)",
+                     "Inequality treatment", "std.error"), 2L, FALSE, FALSE, NA, "",
+  "s3_esj_replication", "Economic system justification effect in the replication, restated in prose", "-0.07",
+    regression_value(t3_out, "Replication", "Econ. System Justification (Standard Units)",
+                     "Inequality treatment", "estimate"), 2L, FALSE, FALSE, NA, "",
+  "s3_esj_replication_se", "Its standard error, restated in prose", "0.06",
+    regression_value(t3_out, "Replication", "Econ. System Justification (Standard Units)",
+                     "Inequality treatment", "std.error"), 2L, FALSE, FALSE, NA,
+    "Table 3 prints .066 for the same standard error, which rounds to 0.07, so the sentence truncates where the table rounds.",
+  "t3_note_third", "A random third of original study respondents answered the system justification question", "3",
+    regression_value(t3_out, "Original", "Belief in Inequality (Binary)", "Inequality treatment", "n") /
+      regression_value(t3_out, "Original", "Econ. System Justification (Standard Units)",
+                       "Inequality treatment", "n"), 0L, FALSE, FALSE, NA,
+    "Recorded as the denominator the table 3 note implies: original study respondents per system justification respondent.",
+  "disc_target_significant", "Target-issue effects that were significant, restated in the discussion", "39",
+    counts$n_significant[counts$issue_type == "Target issues"], 0L, FALSE, FALSE, NA, "",
+  "disc_target_estimates", "Target-issue opportunities, restated in the discussion", "48",
+    counts$n_estimates[counts$issue_type == "Target issues"], 0L, FALSE, FALSE, NA, "",
+  "disc_nontarget_significant", "Nontarget-issue effects that were significant, restated in the discussion", "9",
+    counts$n_significant[counts$issue_type == "Nontarget issues"], 0L, FALSE, FALSE, NA, "",
+  "disc_nontarget_estimates", "Nontarget-issue opportunities, restated in the discussion", "144",
+    counts$n_estimates[counts$issue_type == "Nontarget issues"], 0L, FALSE, FALSE, NA, "",
+  "disc_spillover_ratio", "Average spillover effect as a share of the direct effect, restated in the discussion",
+    "1.4%", as_percent(pooled$estimate[pooled$model == "Fixed effects"]), 1L, FALSE, FALSE, NA,
+    "The same pooled quantity the results section prints, and wrong in the same way and the same place.",
+  "disc_inconsistent_sample_label", "The inconsistency rates come from the MTurk sample", NA,
+    inconsistency$n_respondents[inconsistency$sample == "Original"], 0L, TRUE, FALSE, 0,
+    "The 30 per cent is computed over the study 2 original sample, which the body text says was 'also recruited via Lucid' and which appendix table C.3 heads 'Lucid Original'. The trap_set indicator that defines inconsistency appears in no MTurk data file in the deposit, so the denominator recorded here is the one the rate is taken over.",
+  "disc_correction_sample_label", "Table 4's top panel is the MTurk sample", NA,
+    sum(t4_out$n[t4_out$sample == "Original" & t4_out$term == "Correction treatment"]), 0L,
+    TRUE, FALSE, 0,
+    "Table 4's top panel is fitted on the inconsistent subset of that same study 2 original sample, and its two column sample sizes add to the figure recorded here out of the 327 inconsistent respondents in it. The published row label reads 'N (MTurk)'.",
+  "disc_spending_categories", "Spending items averaged into the study 4 outcome", "5",
+    inconsistency$n_spending_items[inconsistency$sample == "Original"], 0L, FALSE, FALSE, NA, "",
+  "disc_half_assigned", "Half of the inconsistent respondents were assigned the correction query", "2",
+    inconsistency$n_inconsistent[inconsistency$sample == "Original"] /
+      inconsistency$n_assigned_query[inconsistency$sample == "Original"], 0L, FALSE, FALSE, NA,
+    "Recorded as the denominator the sentence implies: inconsistent respondents per respondent assigned the query.",
+  "disc_correction_small", "Correction effect among small-government respondents, original sample", "-0.172",
+    regression_value(t4_treatment, "Original", "Prefer small government", "Correction treatment", "estimate"),
+    3L, FALSE, FALSE, NA,
+    "The article gives this as the MTurk figure. It is computed from the study 2 original sample, which the body text and appendix table C.3 both identify as Lucid.",
+  "disc_correction_small_replication", "Correction effect among small-government respondents, replication", "-0.153",
+    regression_value(t4_treatment, "Replication", "Prefer small government", "Correction treatment", "estimate"),
+    3L, FALSE, FALSE, NA, "",
+  "disc_large_gov_imprecise", "Estimates are less precise among respondents preferring larger government", NA,
+    sum(t4_precision$`Prefer large government` > t4_precision$`Prefer small government`), 0L, TRUE, FALSE,
+    as.numeric(all(t4_precision$`Prefer large government` > t4_precision$`Prefer small government`)),
+    "True in both samples.",
+  "app_c_n_study_1", "Study 1 Lucid sample size, restated in the appendix", "2,524",
+    demographic_n(b2_out, "Lucid"), 0L, FALSE, FALSE, NA, "",
+  "app_c_n_study_2", "Study 2 replication sample size", "2,976",
+    demographic_n(c3_out, "Replication"), 0L, FALSE, FALSE, NA, "",
+  "app_c_welfare_original", "Welfare wording effect in the original sample, restated in prose", "0.59",
+    abs(regression_value(c4_out, "Original", "Too Little on Welfare", "Welfare wording", "estimate")),
+    2L, FALSE, FALSE, NA, "The appendix states the magnitude without its sign.",
+  "app_c_welfare_replication", "The same effect in the replication, restated in prose", "0.46",
+    abs(regression_value(c4_out, "Replication", "Too Little on Welfare", "Welfare wording", "estimate")),
+    2L, FALSE, FALSE, NA, "",
+  "app_d_outcomes_used", "Outcomes taken from Trump and White (2018)", "2",
+    n_distinct(t3_out$outcome), 0L, FALSE, FALSE, NA, ""
+) |>
+  mutate(table_figure = "Text", value_script = NA_real_, .before = claim)
+
 gt <- bind_rows(t1_rows, t2_rows, t3_rows, t4_rows, b2_rows, c3_rows, c4_rows, d5_rows,
-                figure_rows, text_rows)
+                figure_rows, float_rows, text_rows, prose_rows)
 
 # A published value with no rewrite counterpart stops the build ----
 # A mislabelled join would otherwise leave value_rewrite empty, and the row would
@@ -664,11 +966,19 @@ if (length(uncovered) > 0) {
 }
 
 # Agreement at the precision the article prints ----
+# A descriptive claim names a shape, a sign, a count or an ordering rather than a
+# value, and an approximate claim names a rough magnitude the article itself
+# hedges. Neither is testable by comparing printed digits, so match and
+# match_rewrite stay NA on both and the descriptive verdict lives in holds. That
+# is three states, not two, and the locus gate below reads all three.
 gt <- gt |>
   mutate(
     paper_id = "coppock_green_2022",
-    match = agrees(value_script, value_paper),
-    match_rewrite = agrees(value_rewrite, value_paper)
+    descriptive = replace_na(descriptive, FALSE),
+    approximate = replace_na(approximate, FALSE),
+    comparable = !descriptive & !approximate,
+    match = if_else(comparable, agrees(value_script, value_paper), NA_real_),
+    match_rewrite = if_else(comparable, agrees(value_rewrite, value_paper), NA_real_)
   )
 
 # The nine quantities that come out of the unseeded bootstrap are draws, not
@@ -677,16 +987,17 @@ gt <- gt |>
 # sims = 10, which is the setting that shipped. The archive column takes the same
 # test: the deposit runs the same estimator at the same setting with no seed.
 stochastic <- bind_rows(
-  expand_grid(sample_name = c("MTurk", "Elite", "Lucid"),
+  expand_grid(sample_name = c("mturk", "elite", "lucid"),
               endpoint_name = c("conf_low", "conf_high")) |>
-    mutate(claim = str_glue("{sample_name} ratio, 95% interval {if_else(endpoint_name == 'conf_low', 'lower', 'upper')} bound") |> as.character(),
-           range = map2(sample_name, endpoint_name, ~ endpoint_range(.x, .y, 10))),
-  tibble(claim = c("Pooled indirect-to-direct ratio", "Pooled ratio, 95% interval lower bound",
-                   "Pooled ratio, 95% interval upper bound"),
+    mutate(claim_id = str_glue("s1_ratio_{sample_name}_{str_remove(endpoint_name, 'conf_')}") |>
+             as.character(),
+           range = map2(str_to_title(sample_name), endpoint_name,
+                        ~ endpoint_range(if_else(.x == "Mturk", "MTurk", .x), .y, 10))),
+  tibble(claim_id = c("s1_ratio_pooled", "s1_ratio_pooled_low", "s1_ratio_pooled_high"),
          range = map(c("estimate", "conf_low", "conf_high"), ~ pooled_range(.x, 10)))
 ) |>
-  select(claim, range) |>
-  left_join(select(gt, claim, value_paper, value_script), by = "claim") |>
+  select(claim_id, range) |>
+  left_join(select(gt, claim_id, value_paper, value_script), by = "claim_id") |>
   mutate(
     published = paper_number(value_paper),
     inside = as.numeric(published >= map_dbl(range, "low") & published <= map_dbl(range, "high"))
@@ -696,37 +1007,98 @@ stopifnot(nrow(stochastic) == 9, !any(is.na(stochastic$value_paper)))
 
 gt <- gt |>
   rows_update(
-    transmute(stochastic, claim,
+    transmute(stochastic, claim_id,
               match = if_else(is.na(value_script), NA_real_, inside),
               match_rewrite = inside),
-    by = "claim"
+    by = "claim_id"
   )
 
-# Where the fault lies on every row the rewrite does not match ----
-# Each pattern names one failure and why it is where it is. A row that matches no
-# pattern stops the build: an unexplained zero reads as a failure of this code,
-# and across this paper it never has been.
+# The pooled ratio is restated in the discussion, where the same number is wrong
+# in the same way, so the discussion row takes the same verdict as the results
+# row rather than being compared to printed precision a second time.
+gt <- gt |>
+  rows_update(
+    tibble(claim_id = "disc_spillover_ratio",
+           match_rewrite = gt$match_rewrite[gt$claim_id == "s1_ratio_pooled" &
+                                              !is.na(gt$claim_id)]),
+    by = "claim_id"
+  )
+
+# What the article prints, stored as the article prints it ----
+# The comparison above needs a number; the committed file needs the string. Both
+# requirements are met in sequence: compare numerically, then render value_paper
+# back at the digit count each row already records, then write. The render is the
+# stricter of the two checks, because a row whose digits is right about the value
+# and wrong about the precision passes numeric equality and fails here.
+normalize_paper <- function(x) {
+  stripped <- str_remove_all(x, "[,%]")
+  if_else(str_starts(stripped, fixed(".")), str_c("0", stripped),
+          if_else(str_starts(stripped, fixed("-.")), str_replace(stripped, fixed("-."), "-0."),
+                  stripped))
+}
+
+render_paper <- function(x, digits) {
+  rendered <- sprintf(paste0("%.", digits, "f"), paper_number(x))
+  if_else(str_starts(normalize_paper(x), fixed("-")) & !str_starts(rendered, fixed("-")),
+          str_c("-", rendered), rendered)
+}
+
+precision <- gt |>
+  filter(!is.na(claim_id), !is.na(value_paper), comparable) |>
+  mutate(rendered = render_paper(value_paper, digits),
+         normalized = normalize_paper(value_paper)) |>
+  filter(rendered != normalized)
+
+if (nrow(precision) > 0) {
+  print(precision |> select(claim_id, value_paper, rendered), n = nrow(precision))
+  stop(str_glue("{nrow(precision)} rows record a digit count the published string does not have."))
+}
+
+# Where the fault lies on every row that carries an adverse verdict ----
+# A locus is required whenever either verdict is zero, not only when the rewrite
+# fails. match == 0 with match_rewrite == 1 is the signature of a deposit that no
+# longer reproduces its own published table, and it needs naming as much as the
+# other direction does. A descriptive claim carries its verdict in holds, so that
+# column is read too. Each pattern names one failure; a row matching none stops
+# the build.
 locus_patterns <- tribble(
   ~pattern, ~defect_locus,
-  "^MTurk average within-domain correlation", "paper_internal",
-  "^Pooled ", "paper_internal",
-  " ratio, 95% interval ", "paper_internal"
+  "^ideology: ", "archive",
+  "^s1_mturk_within_text$", "paper_internal",
+  "^s1_graduate_", "paper_internal",
+  "^s3_esj_replication_se$", "paper_internal",
+  "^s2_nontarget_measures_text$", "paper_internal",
+  "^disc_spillover_ratio$", "paper_internal",
+  "_sample_label$", "paper_internal",
+  "^s1_ratio_pooled", "paper_internal",
+  "^s1_ratio_(mturk|elite|lucid)_(low|high)$", "paper_internal"
 )
 
-locus_for <- function(claim) {
-  hit <- locus_patterns$defect_locus[map_lgl(locus_patterns$pattern, ~ str_detect(claim, .x))]
+locus_for <- function(key) {
+  hit <- locus_patterns$defect_locus[map_lgl(locus_patterns$pattern, ~ str_detect(key, .x))]
   if (length(hit) == 0) NA_character_ else hit[1]
 }
 
-gt <- gt |>
-  mutate(defect_locus = if_else(!is.na(match_rewrite) & match_rewrite == 0,
-                                map_chr(claim, locus_for), NA_character_))
+adverse <- function(x) !is.na(x) & x == 0
 
-unexplained <- gt |> filter(!is.na(match_rewrite), match_rewrite == 0, is.na(defect_locus))
+gt <- gt |>
+  mutate(
+    locus_key = coalesce(claim_id, claim),
+    defect_locus = if_else(adverse(match) | adverse(match_rewrite) | adverse(holds),
+                           map_chr(locus_key, locus_for), NA_character_)
+  )
+
+unexplained <- gt |>
+  filter(adverse(match) | adverse(match_rewrite) | adverse(holds), is.na(defect_locus))
 if (nrow(unexplained) > 0) {
-  print(unexplained |> select(table_figure, claim, value_paper, value_rewrite), n = nrow(unexplained))
-  stop(str_glue("{nrow(unexplained)} rows the rewrite does not match have no recorded defect locus."))
+  print(unexplained |> select(claim_id, table_figure, claim, value_paper, value_rewrite,
+                              match, match_rewrite, holds),
+        n = nrow(unexplained))
+  stop(str_glue("{nrow(unexplained)} rows carrying an adverse verdict have no recorded defect locus."))
 }
+
+stopifnot(all(is.na(gt$defect_locus[!adverse(gt$match) & !adverse(gt$match_rewrite) &
+                                      !adverse(gt$holds)])))
 
 # A note may not contradict its own verdict ----
 # Generating value_rewrite closes one drift channel and leaves this one open: a
@@ -740,20 +1112,106 @@ if (nrow(contradiction) > 0) {
   stop("A row scored as matching carries a note saying it does not.")
 }
 
+# Coverage, checked against the extraction and against the second instrument ----
+# published_claims.csv is the hand-reviewed extraction of every numeric token in
+# the article and the published appendix. value_paper is forced to character in
+# every reader, here included: a column whose entries all look numeric is guessed
+# as double, and that silently turns the article's 0.020 into 0.02 and destroys
+# the printed precision every comparison here depends on.
+claims <- read_csv(here::here("ground_truth", "published_claims.csv"),
+                   col_types = cols(.default = col_character(),
+                                    value_paper = col_character())) |>
+  mutate(needs_block = needs_block == "TRUE")
+
+stopifnot(!any(duplicated(claims$claim_id)), !any(duplicated(na.omit(gt$claim_id))))
+
+# Every pipeline and descriptive claim needs a ground truth row, and every
+# claim_id in the ground truth must name a claim the article actually makes.
+required_rows <- claims$claim_id[claims$claim_type %in% c("pipeline", "descriptive")]
+missing_gt_rows <- setdiff(required_rows, gt$claim_id)
+unknown_gt_ids <- setdiff(na.omit(gt$claim_id), claims$claim_id)
+if (length(missing_gt_rows) > 0) print(missing_gt_rows)
+if (length(unknown_gt_ids) > 0) print(unknown_gt_ids)
+stopifnot(length(missing_gt_rows) == 0, length(unknown_gt_ids) == 0)
+
+# The extraction and the ground truth are two hand transcriptions of the same
+# pages, and nothing else compares them.
+transcription <- claims |>
+  select(claim_id, extracted = value_paper) |>
+  inner_join(select(gt, claim_id, value_paper), by = "claim_id") |>
+  filter(!identical(TRUE, NA), xor(is.na(extracted), is.na(value_paper)) |
+           (!is.na(extracted) & !is.na(value_paper) &
+              normalize_paper(extracted) != normalize_paper(value_paper)))
+
+if (nrow(transcription) > 0) {
+  print(transcription, n = nrow(transcription))
+  stop(str_glue("{nrow(transcription)} claims are transcribed differently in the extraction and the ground truth."))
+}
+
+# The second instrument is read as a program, not as text: a block that errors at
+# runtime, or that ends in a bare expression and therefore prints nothing under
+# source(), would satisfy any check that merely looked for its claim id in the
+# file. It is sourced into its own environment because the two files necessarily
+# read the same outputs and name objects for what they hold, so a bare source()
+# would replace this script's own objects with the claims file's and the gate
+# would then run against the wrong ones.
+claims_log <- capture.output(
+  source(here::here("maintained", "in_text_claims.R"), local = new.env())
+)
+
+printed <- str_match(claims_log, "^CLAIM (\\S+) = (\\S+) \\|\\| (.*)$")
+printed <- tibble(claim_id = printed[, 2], printed_value = printed[, 3],
+                  label = printed[, 4]) |>
+  filter(!is.na(claim_id))
+
+declared <- claims$claim_id[claims$needs_block]
+if (!setequal(declared, printed$claim_id)) {
+  print(list(declared_not_printed = setdiff(declared, printed$claim_id),
+             printed_not_declared = setdiff(printed$claim_id, declared)))
+}
+stopifnot(
+  !any(duplicated(printed$claim_id)),
+  nrow(printed) == length(declared),
+  length(setdiff(declared, printed$claim_id)) == 0,
+  length(setdiff(printed$claim_id, declared)) == 0
+)
+
+# Two instruments, compared value by value. build_ground_truth.R and
+# in_text_claims.R reach each number by separate paths from the same outputs, so
+# a disagreement between them is a finding in its own right.
+cross_check <- printed |>
+  inner_join(select(gt, claim_id, value_rewrite, digits), by = "claim_id") |>
+  mutate(
+    gt_printed = if_else(is.na(value_rewrite), "NA",
+                         sprintf(paste0("%.", digits, "f"), value_rewrite)),
+    agrees = printed_value == gt_printed
+  )
+
+if (any(!cross_check$agrees)) print(cross_check |> filter(!agrees), n = Inf, width = 200)
+stopifnot(length(setdiff(required_rows, cross_check$claim_id)) == 0,
+          all(cross_check$agrees))
+
 gt <- gt |>
-  select(paper_id, table_figure, claim, value_script, value_paper, match,
-         value_rewrite, match_rewrite, defect_locus, notes)
+  select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
+         value_rewrite, match_rewrite, holds, defect_locus, notes)
 
 write_csv(gt, here::here("ground_truth", "coppock_green_2022_ground_truth.csv"))
 
-print(gt |> select(table_figure, claim, value_script, value_paper, match, value_rewrite,
-                   match_rewrite, defect_locus),
+print(gt |> select(claim_id, table_figure, claim, value_script, value_paper, match,
+                   value_rewrite, match_rewrite, holds, defect_locus),
       n = nrow(gt), width = 250)
 
-print(str_glue(
-  "rows: {nrow(gt)}; archive match=1: {sum(gt$match == 1, na.rm = TRUE)}, ",
-  "match=0: {sum(gt$match == 0, na.rm = TRUE)}, match=NA: {sum(is.na(gt$match))}; ",
-  "rewrite match=1: {sum(gt$match_rewrite == 1, na.rm = TRUE)}, ",
-  "match=0: {sum(gt$match_rewrite == 0, na.rm = TRUE)}, ",
-  "match=NA: {sum(is.na(gt$match_rewrite))}"
-))
+print(tibble(
+  quantity = c("rows", "archive comparable", "archive matching", "archive differing",
+               "rewrite comparable", "rewrite matching", "rewrite differing",
+               "descriptive claims judged", "descriptive claims holding",
+               "extraction rows", "extraction rows needing a block",
+               "claims printed by in_text_claims.R",
+               "claims compared across the two instruments"),
+  value = c(nrow(gt), sum(!is.na(gt$match)), sum(gt$match == 1, na.rm = TRUE),
+            sum(gt$match == 0, na.rm = TRUE),
+            sum(!is.na(gt$match_rewrite)), sum(gt$match_rewrite == 1, na.rm = TRUE),
+            sum(gt$match_rewrite == 0, na.rm = TRUE),
+            sum(!is.na(gt$holds)), sum(gt$holds == 1, na.rm = TRUE),
+            nrow(claims), length(declared), nrow(printed), nrow(cross_check))
+), n = Inf)

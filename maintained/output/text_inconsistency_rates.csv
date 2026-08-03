@@ -1,3 +1,3 @@
-sample,n_respondents,n_measured,n_inconsistent,share_inconsistent
-Original,1087,1087,327,0.30082796688132474
-Replication,2976,2952,720,0.24390243902439024
+sample,n_respondents,n_measured,n_inconsistent,share_inconsistent,n_assigned_query,n_spending_items
+Original,1087,1087,327,0.30082796688132474,154,5
+Replication,2976,2952,720,0.24390243902439024,350,5
