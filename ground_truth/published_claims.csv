@@ -1,133 +1,133 @@
 claim_id,location,claim_type,value_paper,needs_block,claim,notes
-intro_freeder_low,"Introduction, p. 2",transcribed,20,FALSE,Lower end of the share of the US mass public holding statically constrained opinions,"Attributed to Freeder, Lenz and Turney (2019); a property of that article, not of this one"
-intro_freeder_high,"Introduction, p. 2",transcribed,40,FALSE,Upper end of the same share,"Attributed to Freeder, Lenz and Turney (2019)"
-theory_variables,"Formalizing the empirical implications, p. 3",definitional,4,FALSE,Variables posited in the causal model,"I, YA, YB and ZA; a stipulation of the theory section, nothing in the deposit records it"
-theory_assumptions,"Formalizing the empirical implications, p. 4",structural,3,FALSE,Assumptions imposed on the causal model,"Covers every reference to assumptions 1-3 and to assumptions 1, 2 and 3 individually"
-theory_direct_paths,"Figure 1 discussion, p. 4",definitional,6,FALSE,Direct paths relating the four variables in figure 1,No counterpart in the deposit; verified against figure 1
-theory_path_indices,"Figure 1 discussion, p. 4",structural,5,FALSE,Highest path index named in the text,"Covers the references to paths 4, 5 and 6, which are labels on figure 1"
-theory_configurations,"Figure 1 discussion, p. 4",definitional,32,FALSE,Configurations of paths consistent with assumptions 1-3,Enumerated in appendix table A.1; the deposit has no code for that table
-theory_other_graphs,"Figure 1 discussion, p. 4",definitional,31,FALSE,Graphs other than figure 1 among those 32,32 minus the one figure 1 draws
-theory_exponent,"Figure 1 discussion, p. 4",definitional,32,FALSE,Two to the fifth power,"The article writes 2^5 = 32; the exponent is 6 paths less the one that assumption 2 ties to another"
-theory_outcomes,"Identification strategy, p. 5",definitional,4,FALSE,Ways a study can turn out,"ZA affects YA, YB, both, or neither"
-theory_figure_2_models,"Figure 2 discussion, p. 5",definitional,3,FALSE,Models consistent with effects on attitude A only,"Models 1, 2 and 3 of appendix table A.1"
-theory_moderators,"Identification strategy, p. 5",definitional,2,FALSE,Potential sources of effect heterogeneity the article follows Converse in considering,Elites versus nonelites and the salience of the connection between issues
-theory_model_indices,"Footnotes 3 and 4, pp. 4-5",structural,10,FALSE,Highest model index named in the footnotes,"Covers the references to models 1, 2, 3 and 10 of appendix table A.1"
-s1_n_mturk,"Study 1, p. 6",pipeline,"3,001",TRUE,MTurk sample size stated in prose,Also printed as the MTurk column of appendix table B.2's N row
-s1_n_elite,"Study 1, p. 6",pipeline,"2,181",TRUE,Elite sample size stated in prose,Also printed as the Elites column of appendix table B.2's N row
-s1_n_lucid,"Study 1, p. 6",pipeline,"2,524",TRUE,Lucid sample size stated in prose,Also printed as the Lucid column of appendix table B.2's N row
-s1_college_elite,"Study 1, p. 6",pipeline,96%,TRUE,Share of the elite sample holding a college degree,"College and Graduate School together; appendix table B.2 prints the two categories separately and never their sum"
-s1_college_mturk,"Study 1, p. 6",pipeline,51%,TRUE,Share of the MTurk sample holding a college degree,
-s1_college_lucid,"Study 1, p. 6",pipeline,44%,TRUE,Share of the Lucid sample holding a college degree,
-s1_graduate_elite,"Study 1, p. 6",pipeline,71%,TRUE,Share of the elite sample holding a graduate degree,Appendix table B.2 prints 71.6% for the same category
-s1_graduate_mturk,"Study 1, p. 6",pipeline,13%,TRUE,Share of the MTurk sample holding a graduate degree,Appendix table B.2 prints 12.4% for the same category
-s1_graduate_lucid,"Study 1, p. 6",pipeline,15%,TRUE,Share of the Lucid sample holding a graduate degree,Appendix table B.2 prints 15.1% for the same category
-s1_strong_partisan_elite,"Study 1, p. 6",pipeline,44%,TRUE,Share of the elite sample describing themselves as strong partisans,The two endpoints of the seven-point party identification scale
-s1_strong_partisan_mturk,"Study 1, p. 6",descriptive,25,TRUE,Share of the MTurk sample describing themselves as strong partisans,"The article says ""only a quarter"", so the comparison is against 25% rather than to printed precision"
-s1_strong_partisan_lucid,"Study 1, p. 6",pipeline,46%,TRUE,Share of the Lucid sample describing themselves as strong partisans,
-s1_news_daily,"Study 1, p. 6",pipeline,97%,TRUE,Share of the elite sample reading the news at least daily,"The deposited elite clean file stores this item as a recode specification string; the block rebuilds it from the deposit's own wave 1 raw file"
-s1_talk_politics_daily,"Study 1, p. 6",pipeline,64%,TRUE,Share of the elite sample talking politics at least once a day,Same rebuild as the news item
-s1_conditions,"Study 1, p. 6",structural,5,TRUE,Experimental conditions respondents were assigned to,Four op-eds and a control condition
-s1_opeds,"Study 1, p. 6",structural,4,TRUE,Op-eds used as treatments,The climate change arm is set aside by the article and by every script here
-s1_outlets,"Study 1, p. 6",definitional,4,FALSE,National outlets the op-eds were published in,"The New York Times, the Wall Street Journal, USA Today and Newsweek; a property of the stimuli"
-s1_questions_per_attitude,"Study 1, p. 6",structural,4,TRUE,Outcome questions measuring each target attitude,
-s1_outcomes,"Study 1, p. 6",pipeline,16,TRUE,Outcome questions in total,Four attitudes measured with four questions each
-s1_veterans_waiting,"Study 1, p. 6",transcribed,"57,000",FALSE,Veterans waiting at least three months for an appointment,Quoted from the reproduced veterans op-ed
-s1_veterans_no_list,"Study 1, p. 6",transcribed,"64,000",FALSE,Veterans who never made it onto a waiting list,Quoted from the reproduced veterans op-ed
-s1_veterans_months,"Study 1, p. 6",transcribed,3,FALSE,Months veterans had been waiting,"Quoted from the reproduced veterans op-ed, where the article spells the number out"
-s1_fifth_oped,"Footnote 7, p. 6",structural,5,FALSE,Index of the climate change op-ed among the treatment arms,A description of the design the rewrite drops the same way the article does
-t1_mturk_across,"Table 1, p. 7",pipeline,.06,TRUE,"Table 1, MTurk sample, average across-outcome-family correlation",
-t1_mturk_within,"Table 1, p. 7",pipeline,.30,TRUE,"Table 1, MTurk sample, average within-outcome-family correlation",
-t1_elite_across,"Table 1, p. 7",pipeline,.22,TRUE,"Table 1, Elite sample, average across-outcome-family correlation",
-t1_elite_within,"Table 1, p. 7",pipeline,.39,TRUE,"Table 1, Elite sample, average within-outcome-family correlation",
-t1_lucid_across,"Table 1, p. 7",pipeline,.00,TRUE,"Table 1, Lucid sample, average across-outcome-family correlation",
-t1_lucid_within,"Table 1, p. 7",pipeline,.12,TRUE,"Table 1, Lucid sample, average within-outcome-family correlation",
-s1_panels,"Figure 4 discussion, p. 7",structural,16,TRUE,Panels in figure 4,Four treatments by four outcome families
-s1_attitudes,"Figure 4 discussion, p. 7",structural,4,TRUE,Attitudes the rows of panels correspond to,
-s1_ci_level,"Figure 4 discussion, p. 7",definitional,95,TRUE,Confidence level of the intervals figure 4 draws,"Not stated anywhere in the deposit's code; recoverable from the plotted half widths, which are 1.96 standard errors"
-s1_illustration_estimate,"Figure 4 discussion, p. 7",definitional,0.25,FALSE,Illustrative estimate used to explain the standardized scale,"A worked example, not an estimate the study produces; the sentence names the same number twice"
-s1_pairs_choose,"Static constraint, p. 7",structural,16,TRUE,Outcome questions entering the pairwise correlations,
-s1_pairs_total,"Static constraint, p. 7",pipeline,120,TRUE,Unordered pairs of outcome questions,16 choose 2
-s1_elite_within_text,"Static constraint, p. 7",pipeline,0.39,TRUE,Elite average within-domain correlation restated in prose,
-s1_elite_across_text,"Static constraint, p. 7",pipeline,0.22,TRUE,Elite average across-domain correlation restated in prose,
-s1_mturk_within_text,"Static constraint, p. 7",pipeline,0.29,TRUE,MTurk average within-domain correlation restated in prose,Table 1 prints .30 for the same quantity
-s1_mturk_across_text,"Static constraint, p. 7",pipeline,0.06,TRUE,MTurk average across-domain correlation restated in prose,
-s1_lucid_within_text,"Static constraint, p. 7",pipeline,0.12,TRUE,Lucid average within-domain correlation restated in prose,
-s1_lucid_across_text,"Static constraint, p. 7",pipeline,0.00,TRUE,Lucid average across-domain correlation restated in prose,
-s1_wallstreet_largest,"Dynamic constraint, p. 7",descriptive,,TRUE,The Wall Street treatment had the largest effect on its target issue of any treatment,A claim about the ordering of four target-cell averages within each sample
-s1_wallstreet_magnitude,"Dynamic constraint, p. 7",descriptive,0.5,TRUE,The Wall Street target effects average nearly 0.5 standard deviations in all three samples,Hedged by the article; the block prints all three averages
-s1_amtrak_magnitude,"Dynamic constraint, p. 7",descriptive,0.33,TRUE,The Amtrak target effects hover around one-third of a standard deviation among elites and on MTurk,The block prints both averages
-s1_amtrak_question_index,"Dynamic constraint, p. 7",structural,3,TRUE,Index of the Amtrak question with the largest effects,"The third Amtrak outcome, on how respondents expect new taxes to be spent"
-s1_amtrak_elite,"Dynamic constraint, p. 7",pipeline,0.52,TRUE,Effect of the Amtrak treatment on the third Amtrak outcome among elites,
-s1_amtrak_mturk,"Dynamic constraint, p. 7",pipeline,0.73,TRUE,Effect of the Amtrak treatment on the third Amtrak outcome on MTurk,
-s1_target_estimates,"Dynamic constraint, p. 7",pipeline,48,TRUE,Estimated treatment effects on target issues,
-s1_target_significant,"Dynamic constraint, p. 7",pipeline,39,TRUE,Target-issue effects significant at p < .05,
-s1_alpha,"Dynamic constraint, p. 7",definitional,.05,FALSE,Significance threshold,Visible at the comparison in text_significance_counts.R
-s1_target_significant_bh,"Dynamic constraint, p. 7",pipeline,35,TRUE,Target-issue effects still significant after the Benjamini-Hochberg correction,
-s1_nontarget_estimates,"Dynamic constraint, p. 8",pipeline,144,TRUE,Estimated treatment effects on nontarget issues,
-s1_nontarget_significant,"Dynamic constraint, p. 8",pipeline,9,TRUE,Nontarget-issue effects significant at p < .05,"The article spells the number out as ""nine"""
-s1_nontarget_significant_bh,"Dynamic constraint, p. 8",pipeline,0,TRUE,Nontarget-issue effects still significant after the Benjamini-Hochberg correction,"The article writes ""none of these estimates is deemed significant"""
-s1_nontarget_near_zero,"Dynamic constraint, p. 8",descriptive,,TRUE,In nearly every case the nontarget estimates are very close to zero,The block prints the distribution of the 144 nontarget estimates
-s1_followup_10,"Dynamic constraint, p. 8",structural,10,FALSE,Days after treatment of the first follow-up interview,"A design fact; appendix figures B.2 and B.3 are labelled with it, and nothing in output/ records the interval"
-s1_followup_30,"Footnote 10, p. 8",structural,30,FALSE,Days after treatment of the second follow-up interview,Same
-s1_pwa_target_mturk,"Dynamic constraint, p. 8",pipeline,0.42,TRUE,Precision-weighted average effect on target issues on MTurk,
-s1_pwa_target_elite,"Dynamic constraint, p. 8",pipeline,0.22,TRUE,Precision-weighted average effect on target issues in the elite sample,
-s1_pwa_target_lucid,"Dynamic constraint, p. 8",pipeline,0.245,TRUE,Precision-weighted average effect on target issues on Lucid,
-s1_pwa_nontarget_mturk,"Dynamic constraint, p. 8",pipeline,0.004,TRUE,Precision-weighted average effect on nontarget issues on MTurk,
-s1_pwa_nontarget_elite,"Dynamic constraint, p. 8",pipeline,0.01,TRUE,Precision-weighted average effect on nontarget issues in the elite sample,
-s1_pwa_nontarget_lucid,"Dynamic constraint, p. 8",pipeline,-0.02,TRUE,Precision-weighted average effect on nontarget issues on Lucid,
-s1_ratio_mturk,"Dynamic constraint, p. 8",pipeline,0.8%,TRUE,MTurk indirect-to-direct effect ratio,
-s1_ratio_mturk_low,"Dynamic constraint, p. 8",pipeline,-8.1%,TRUE,"MTurk ratio, lower endpoint of the 95% interval",An unseeded bootstrap quantile; scored against its own resampling range
-s1_ratio_mturk_high,"Dynamic constraint, p. 8",pipeline,8.7%,TRUE,"MTurk ratio, upper endpoint of the 95% interval",Same
-s1_ratio_elite,"Dynamic constraint, p. 8",pipeline,6.4%,TRUE,Elite indirect-to-direct effect ratio,
-s1_ratio_elite_low,"Dynamic constraint, p. 8",pipeline,-25.7%,TRUE,"Elite ratio, lower endpoint of the 95% interval",Same
-s1_ratio_elite_high,"Dynamic constraint, p. 8",pipeline,26.2%,TRUE,"Elite ratio, upper endpoint of the 95% interval",Same
-s1_ratio_lucid,"Dynamic constraint, p. 8",pipeline,-9.4%,TRUE,Lucid indirect-to-direct effect ratio,
-s1_ratio_lucid_low,"Dynamic constraint, p. 8",pipeline,-24%,TRUE,"Lucid ratio, lower endpoint of the 95% interval",Same
-s1_ratio_lucid_high,"Dynamic constraint, p. 8",pipeline,15%,TRUE,"Lucid ratio, upper endpoint of the 95% interval",Same
-s1_ratio_pooled,"Dynamic constraint, p. 8",pipeline,1.4%,TRUE,Pooled indirect-to-direct effect ratio across the three samples,
-s1_ratio_pooled_level,"Dynamic constraint, p. 8",definitional,95,FALSE,Confidence level of the pooled interval,Fixed by the meta-analysis call
-s1_ratio_pooled_low,"Dynamic constraint, p. 8",pipeline,-8%,TRUE,"Pooled ratio, lower endpoint of the 95% interval",
-s1_ratio_pooled_high,"Dynamic constraint, p. 8",pipeline,6%,TRUE,"Pooled ratio, upper endpoint of the 95% interval",
-s1_power_low,"Dynamic constraint, p. 8",descriptive,10,TRUE,Lower end of the indirect-effect size the study describes itself as powered to detect,The block prints the three sample intervals the claim is made against
-s1_power_high,"Dynamic constraint, p. 8",descriptive,20,TRUE,Upper end of the same range,Same
-s2_n_original,"Study 2, p. 9",pipeline,"1,087",TRUE,Study 2 original sample size,
-s2_scale_endpoints,"Study 2, p. 9",definitional,7,FALSE,Top of the seven-point agreement scales the study 2 questions use,"Covers every [1: ..., 7: ...] endpoint pair in the four quoted question wordings"
-s2_binary_coding,"Study 2, p. 9",definitional,1,FALSE,Coding of the local officials outcome,"[Binary: excused = 1]"
-s2_correlation_low,"Study 2, p. 9",descriptive,0.3,TRUE,Lower end of the correlations among the five study 2 outcomes,The article states a range rather than a value
-s2_correlation_high,"Study 2, p. 9",descriptive,0.7,TRUE,Upper end of the same range,Same
-s2_columns,"Study 2, p. 9",structural,5,FALSE,Highest column index named in the text,"""as shown in columns 2-5"", a reference to table 2's own layout"
-s2_effect_original,"Study 2, p. 9",pipeline,0.44,TRUE,Effect of the religious exemption wording in the original sample restated in prose,
-s2_effect_replication,"Study 2, p. 9",pipeline,0.41,TRUE,Effect of the religious exemption wording in the replication restated in prose,
-s2_sign_split_original,"Study 2, p. 9",descriptive,,TRUE,Two of the four nontarget estimates are positive and two negative in the original sample,
-s2_sign_split_replication,"Study 2, p. 9",descriptive,,TRUE,The same split in the replication sample,
-s3_belief_effect_original,"Study 3, p. 10",descriptive,25,TRUE,Effect on belief that income inequality increased in the original study,"Hedged: ""approximately 25 percentage points in both samples"""
-s3_belief_effect_replication,"Study 3, p. 10",descriptive,25,TRUE,The same effect in the replication,Same sentence
-s3_se_bound,"Study 3, p. 10",descriptive,4,TRUE,Standard errors of that effect are smaller than 4 percentage points,A threshold claim; the block prints both standard errors
-s3_scale_low,"Study 3, p. 10",definitional,0,FALSE,Bottom of the control condition's vertical axis,A description of the treatment image reproduced in appendix figure D.4
-s3_scale_high,"Study 3, p. 10",definitional,100,FALSE,Top of the same axis,Same
-s3_esj_original,"Study 3, p. 10",pipeline,-0.18,TRUE,Effect on economic system justification in the original study restated in prose,
-s3_esj_original_se,"Study 3, p. 10",pipeline,0.10,TRUE,Its standard error restated in prose,
-s3_esj_replication,"Study 3, p. 10",pipeline,-0.07,TRUE,Effect on economic system justification in the replication restated in prose,
-s3_esj_replication_se,"Study 3, p. 10",pipeline,0.06,TRUE,Its standard error restated in prose,
-disc_target_significant,"Discussion, p. 11",pipeline,39,TRUE,Target-issue effects that were significant restated in the discussion,
-disc_target_estimates,"Discussion, p. 11",pipeline,48,TRUE,Target-issue opportunities restated in the discussion,
-disc_nontarget_significant,"Discussion, p. 11",pipeline,9,TRUE,Nontarget-issue effects that were significant restated in the discussion,"Spelled out as ""nine"""
-disc_nontarget_estimates,"Discussion, p. 11",pipeline,144,TRUE,Nontarget-issue opportunities restated in the discussion,
-disc_spillover_ratio,"Discussion, p. 11",pipeline,1.4%,TRUE,Average spillover effect as a share of the first-stage direct effect restated in the discussion,The same pooled quantity the results section reports
-disc_inconsistent_original,"Discussion, p. 12",pipeline,30%,TRUE,Share of the study 2 original sample holding inconsistent preferences,"The article attributes it to ""the MTurk sample"""
-disc_inconsistent_replication,"Discussion, p. 12",pipeline,24%,TRUE,Share of the study 2 replication sample holding inconsistent preferences,
-disc_inconsistent_sample_label,"Discussion, p. 12",descriptive,,TRUE,The inconsistency rates are attributed to the MTurk sample and to Lucid,"Both rates are computed in study 2 samples, which the body text and appendix table C.3 identify as Lucid"
-disc_correction_sample_label,"Table 4 and Discussion, pp. 12-13",descriptive,,TRUE,Table 4's top panel and the effects quoted from it are attributed to MTurk,Same mislabel as the row above
-disc_spending_categories,"Discussion, p. 12",structural,5,TRUE,Spending categories averaged into the study 4 outcome,"Social Security, Medicare, health care for low-income families, national defense and foreign aid"
-disc_scale_low,"Discussion, p. 12",definitional,-1,FALSE,Bottom of the averaged spending preference scale,A preference for decreasing spending in all five categories
-disc_scale_high,"Discussion, p. 12",definitional,1,FALSE,Top of the same scale,A preference for increases in all five categories
-disc_correction_small,"Discussion, p. 13",pipeline,-0.172,TRUE,Correction treatment effect among small-government respondents in the original sample,"The article attributes it to MTurk; table 4 labels the same panel ""N (MTurk)"""
-disc_correction_small_replication,"Discussion, p. 13",pipeline,-0.153,TRUE,Correction treatment effect among small-government respondents in the replication,
-disc_large_gov_imprecise,"Discussion, p. 13",descriptive,,TRUE,Effect estimates are less precise among respondents preferring larger government,A claim about the four standard errors table 4 prints
+intro_freeder_low,"Introduction, p. 726",transcribed,20,FALSE,Lower end of the share of the US mass public holding statically constrained opinions,"Attributed to Freeder, Lenz and Turney (2019); a property of that article, not of this one"
+intro_freeder_high,"Introduction, p. 726",transcribed,40,FALSE,Upper end of the same share,"Attributed to Freeder, Lenz and Turney (2019)"
+theory_variables,"Formalizing the empirical implications, p. 727",definitional,4,FALSE,Variables posited in the causal model,"I, YA, YB and ZA; a stipulation of the theory section, nothing in the deposit records it"
+theory_assumptions,"Formalizing the empirical implications, p. 728",structural,3,FALSE,Assumptions imposed on the causal model,"Covers every reference to assumptions 1-3 and to assumptions 1, 2 and 3 individually"
+theory_direct_paths,"Figure 1 discussion, p. 728",definitional,6,FALSE,Direct paths relating the four variables in figure 1,No counterpart in the deposit; verified against figure 1
+theory_path_indices,"Figure 1 discussion, p. 728",structural,5,FALSE,Highest path index named in the text,"Covers the references to paths 4, 5 and 6, which are labels on figure 1"
+theory_configurations,"Figure 1 discussion, p. 728",definitional,32,FALSE,Configurations of paths consistent with assumptions 1-3,Enumerated in appendix table A.1; the deposit has no code for that table
+theory_other_graphs,"Figure 1 discussion, p. 728",definitional,31,FALSE,Graphs other than figure 1 among those 32,32 minus the one figure 1 draws
+theory_exponent,"Figure 1 discussion, p. 728",definitional,32,FALSE,Two to the fifth power,The article writes 2^5 = 32; the exponent is 6 paths less the one that assumption 2 ties to another
+theory_outcomes,"Identification strategy, p. 729",definitional,4,FALSE,Ways a study can turn out,"ZA affects YA, YB, both, or neither"
+theory_figure_2_models,"Figure 2 discussion, p. 729",definitional,3,FALSE,Models consistent with effects on attitude A only,"Models 1, 2 and 3 of appendix table A.1"
+theory_moderators,"Identification strategy, p. 729",definitional,2,FALSE,Potential sources of effect heterogeneity the article follows Converse in considering,Elites versus nonelites and the salience of the connection between issues
+theory_model_indices,"Footnotes 3 and 4, pp. 728-729",structural,10,FALSE,Highest model index named in the footnotes,"Covers the references to models 1, 2, 3 and 10 of appendix table A.1"
+s1_n_mturk,"Study 1, p. 730",pipeline,"3,001",TRUE,MTurk sample size stated in prose,Also printed as the MTurk column of appendix table B.2's N row
+s1_n_elite,"Study 1, p. 730",pipeline,"2,181",TRUE,Elite sample size stated in prose,Also printed as the Elites column of appendix table B.2's N row
+s1_n_lucid,"Study 1, p. 730",pipeline,"2,524",TRUE,Lucid sample size stated in prose,Also printed as the Lucid column of appendix table B.2's N row
+s1_college_elite,"Study 1, p. 730",pipeline,96%,TRUE,Share of the elite sample holding a college degree,College and Graduate School together; appendix table B.2 prints the two categories separately and never their sum
+s1_college_mturk,"Study 1, p. 730",pipeline,51%,TRUE,Share of the MTurk sample holding a college degree,NA
+s1_college_lucid,"Study 1, p. 730",pipeline,44%,TRUE,Share of the Lucid sample holding a college degree,NA
+s1_graduate_elite,"Study 1, p. 730",pipeline,71%,TRUE,Share of the elite sample holding a graduate degree,Appendix table B.2 prints 71.6% for the same category
+s1_graduate_mturk,"Study 1, p. 730",pipeline,13%,TRUE,Share of the MTurk sample holding a graduate degree,Appendix table B.2 prints 12.4% for the same category
+s1_graduate_lucid,"Study 1, p. 730",pipeline,15%,TRUE,Share of the Lucid sample holding a graduate degree,Appendix table B.2 prints 15.1% for the same category
+s1_strong_partisan_elite,"Study 1, p. 730",pipeline,44%,TRUE,Share of the elite sample describing themselves as strong partisans,The two endpoints of the seven-point party identification scale
+s1_strong_partisan_mturk,"Study 1, p. 730",descriptive,25,TRUE,Share of the MTurk sample describing themselves as strong partisans,"The article says ""only a quarter"", so the comparison is against 25% rather than to printed precision"
+s1_strong_partisan_lucid,"Study 1, p. 730",pipeline,46%,TRUE,Share of the Lucid sample describing themselves as strong partisans,NA
+s1_news_daily,"Study 1, p. 730",pipeline,97%,TRUE,Share of the elite sample reading the news at least daily,The deposited elite clean file stores this item as a recode specification string; the block rebuilds it from the deposit's own wave 1 raw file
+s1_talk_politics_daily,"Study 1, p. 730",pipeline,64%,TRUE,Share of the elite sample talking politics at least once a day,Same rebuild as the news item
+s1_conditions,"Study 1, p. 730",structural,5,TRUE,Experimental conditions respondents were assigned to,Four op-eds and a control condition
+s1_opeds,"Study 1, p. 730",structural,4,TRUE,Op-eds used as treatments,The climate change arm is set aside by the article and by every script here
+s1_outlets,"Study 1, p. 730",definitional,4,FALSE,National outlets the op-eds were published in,"The New York Times, the Wall Street Journal, USA Today and Newsweek; a property of the stimuli"
+s1_questions_per_attitude,"Study 1, p. 730",structural,4,TRUE,Outcome questions measuring each target attitude,NA
+s1_outcomes,"Study 1, p. 730",pipeline,16,TRUE,Outcome questions in total,Four attitudes measured with four questions each
+s1_veterans_waiting,"Study 1, p. 730",transcribed,"57,000",FALSE,Veterans waiting at least three months for an appointment,Quoted from the reproduced veterans op-ed
+s1_veterans_no_list,"Study 1, p. 730",transcribed,"64,000",FALSE,Veterans who never made it onto a waiting list,Quoted from the reproduced veterans op-ed
+s1_veterans_months,"Study 1, p. 730",transcribed,3,FALSE,Months veterans had been waiting,"Quoted from the reproduced veterans op-ed, where the article spells the number out"
+s1_fifth_oped,"Footnote 7, p. 730",structural,5,FALSE,Index of the climate change op-ed among the treatment arms,A description of the design the rewrite drops the same way the article does
+t1_mturk_across,"Table 1, p. 731",pipeline,.06,TRUE,"Table 1, MTurk sample, average across-outcome-family correlation",NA
+t1_mturk_within,"Table 1, p. 731",pipeline,.30,TRUE,"Table 1, MTurk sample, average within-outcome-family correlation",NA
+t1_elite_across,"Table 1, p. 731",pipeline,.22,TRUE,"Table 1, Elite sample, average across-outcome-family correlation",NA
+t1_elite_within,"Table 1, p. 731",pipeline,.39,TRUE,"Table 1, Elite sample, average within-outcome-family correlation",NA
+t1_lucid_across,"Table 1, p. 731",pipeline,.00,TRUE,"Table 1, Lucid sample, average across-outcome-family correlation",NA
+t1_lucid_within,"Table 1, p. 731",pipeline,.12,TRUE,"Table 1, Lucid sample, average within-outcome-family correlation",NA
+s1_panels,"Figure 4 discussion, p. 731",structural,16,TRUE,Panels in figure 4,Four treatments by four outcome families
+s1_attitudes,"Figure 4 discussion, p. 731",structural,4,TRUE,Attitudes the rows of panels correspond to,NA
+s1_ci_level,"Figure 4 discussion, p. 731",definitional,95,TRUE,Confidence level of the intervals figure 4 draws,"Not stated anywhere in the deposit's code; recoverable from the plotted half widths, which are 1.96 standard errors"
+s1_illustration_estimate,"Figure 4 discussion, p. 731",definitional,0.25,FALSE,Illustrative estimate used to explain the standardized scale,"A worked example, not an estimate the study produces; the sentence names the same number twice"
+s1_pairs_choose,"Static constraint, p. 731",structural,16,TRUE,Outcome questions entering the pairwise correlations,NA
+s1_pairs_total,"Static constraint, p. 731",pipeline,120,TRUE,Unordered pairs of outcome questions,16 choose 2
+s1_elite_within_text,"Static constraint, p. 731",pipeline,0.39,TRUE,Elite average within-domain correlation restated in prose,NA
+s1_elite_across_text,"Static constraint, p. 731",pipeline,0.22,TRUE,Elite average across-domain correlation restated in prose,NA
+s1_mturk_within_text,"Static constraint, p. 731",pipeline,0.29,TRUE,MTurk average within-domain correlation restated in prose,Table 1 prints .30 for the same quantity
+s1_mturk_across_text,"Static constraint, p. 731",pipeline,0.06,TRUE,MTurk average across-domain correlation restated in prose,NA
+s1_lucid_within_text,"Static constraint, p. 731",pipeline,0.12,TRUE,Lucid average within-domain correlation restated in prose,NA
+s1_lucid_across_text,"Static constraint, p. 731",pipeline,0.00,TRUE,Lucid average across-domain correlation restated in prose,NA
+s1_wallstreet_largest,"Dynamic constraint, p. 731",descriptive,NA,TRUE,The Wall Street treatment had the largest effect on its target issue of any treatment,A claim about the ordering of four target-cell averages within each sample
+s1_wallstreet_magnitude,"Dynamic constraint, p. 731",descriptive,0.5,TRUE,The Wall Street target effects average nearly 0.5 standard deviations in all three samples,Hedged by the article; the block prints all three averages
+s1_amtrak_magnitude,"Dynamic constraint, p. 731",descriptive,0.33,TRUE,The Amtrak target effects hover around one-third of a standard deviation among elites and on MTurk,The block prints both averages
+s1_amtrak_question_index,"Dynamic constraint, p. 731",structural,3,TRUE,Index of the Amtrak question with the largest effects,"The third Amtrak outcome, on how respondents expect new taxes to be spent"
+s1_amtrak_elite,"Dynamic constraint, p. 731",pipeline,0.52,TRUE,Effect of the Amtrak treatment on the third Amtrak outcome among elites,NA
+s1_amtrak_mturk,"Dynamic constraint, p. 731",pipeline,0.73,TRUE,Effect of the Amtrak treatment on the third Amtrak outcome on MTurk,NA
+s1_target_estimates,"Dynamic constraint, p. 731",pipeline,48,TRUE,Estimated treatment effects on target issues,NA
+s1_target_significant,"Dynamic constraint, p. 731",pipeline,39,TRUE,Target-issue effects significant at p < .05,NA
+s1_alpha,"Dynamic constraint, p. 731",definitional,.05,FALSE,Significance threshold,Visible at the comparison in text_significance_counts.R
+s1_target_significant_bh,"Dynamic constraint, p. 731",pipeline,35,TRUE,Target-issue effects still significant after the Benjamini-Hochberg correction,NA
+s1_nontarget_estimates,"Dynamic constraint, p. 732",pipeline,144,TRUE,Estimated treatment effects on nontarget issues,NA
+s1_nontarget_significant,"Dynamic constraint, p. 732",pipeline,9,TRUE,Nontarget-issue effects significant at p < .05,"The article spells the number out as ""nine"""
+s1_nontarget_significant_bh,"Dynamic constraint, p. 732",pipeline,0,TRUE,Nontarget-issue effects still significant after the Benjamini-Hochberg correction,"The article writes ""none of these estimates is deemed significant"""
+s1_nontarget_near_zero,"Dynamic constraint, p. 732",descriptive,NA,TRUE,In nearly every case the nontarget estimates are very close to zero,The block prints the distribution of the 144 nontarget estimates
+s1_followup_10,"Dynamic constraint, p. 732",structural,10,FALSE,Days after treatment of the first follow-up interview,"A design fact; appendix figures B.2 and B.3 are labelled with it, and nothing in output/ records the interval"
+s1_followup_30,"Footnote 10, p. 732",structural,30,FALSE,Days after treatment of the second follow-up interview,Same
+s1_pwa_target_mturk,"Dynamic constraint, p. 732",pipeline,0.42,TRUE,Precision-weighted average effect on target issues on MTurk,NA
+s1_pwa_target_elite,"Dynamic constraint, p. 732",pipeline,0.22,TRUE,Precision-weighted average effect on target issues in the elite sample,NA
+s1_pwa_target_lucid,"Dynamic constraint, p. 732",pipeline,0.245,TRUE,Precision-weighted average effect on target issues on Lucid,NA
+s1_pwa_nontarget_mturk,"Dynamic constraint, p. 732",pipeline,0.004,TRUE,Precision-weighted average effect on nontarget issues on MTurk,NA
+s1_pwa_nontarget_elite,"Dynamic constraint, p. 732",pipeline,0.01,TRUE,Precision-weighted average effect on nontarget issues in the elite sample,NA
+s1_pwa_nontarget_lucid,"Dynamic constraint, p. 732",pipeline,-0.02,TRUE,Precision-weighted average effect on nontarget issues on Lucid,NA
+s1_ratio_mturk,"Dynamic constraint, p. 732",pipeline,0.8%,TRUE,MTurk indirect-to-direct effect ratio,NA
+s1_ratio_mturk_low,"Dynamic constraint, p. 732",pipeline,-8.1%,TRUE,"MTurk ratio, lower endpoint of the 95% interval",An unseeded bootstrap quantile; scored against its own resampling range
+s1_ratio_mturk_high,"Dynamic constraint, p. 732",pipeline,8.7%,TRUE,"MTurk ratio, upper endpoint of the 95% interval",Same
+s1_ratio_elite,"Dynamic constraint, p. 732",pipeline,6.4%,TRUE,Elite indirect-to-direct effect ratio,NA
+s1_ratio_elite_low,"Dynamic constraint, p. 732",pipeline,-25.7%,TRUE,"Elite ratio, lower endpoint of the 95% interval",Same
+s1_ratio_elite_high,"Dynamic constraint, p. 732",pipeline,26.2%,TRUE,"Elite ratio, upper endpoint of the 95% interval",Same
+s1_ratio_lucid,"Dynamic constraint, p. 732",pipeline,-9.4%,TRUE,Lucid indirect-to-direct effect ratio,NA
+s1_ratio_lucid_low,"Dynamic constraint, p. 732",pipeline,-24%,TRUE,"Lucid ratio, lower endpoint of the 95% interval",Same
+s1_ratio_lucid_high,"Dynamic constraint, p. 732",pipeline,15%,TRUE,"Lucid ratio, upper endpoint of the 95% interval",Same
+s1_ratio_pooled,"Dynamic constraint, p. 732",pipeline,1.4%,TRUE,Pooled indirect-to-direct effect ratio across the three samples,NA
+s1_ratio_pooled_level,"Dynamic constraint, p. 732",definitional,95,FALSE,Confidence level of the pooled interval,Fixed by the meta-analysis call
+s1_ratio_pooled_low,"Dynamic constraint, p. 732",pipeline,-8%,TRUE,"Pooled ratio, lower endpoint of the 95% interval",NA
+s1_ratio_pooled_high,"Dynamic constraint, p. 732",pipeline,6%,TRUE,"Pooled ratio, upper endpoint of the 95% interval",NA
+s1_power_low,"Dynamic constraint, p. 732",descriptive,10,TRUE,Lower end of the indirect-effect size the study describes itself as powered to detect,The block prints the three sample intervals the claim is made against
+s1_power_high,"Dynamic constraint, p. 732",descriptive,20,TRUE,Upper end of the same range,Same
+s2_n_original,"Study 2, p. 733",pipeline,"1,087",TRUE,Study 2 original sample size,NA
+s2_scale_endpoints,"Study 2, p. 733",definitional,7,FALSE,Top of the seven-point agreement scales the study 2 questions use,"Covers every [1: ..., 7: ...] endpoint pair in the four quoted question wordings"
+s2_binary_coding,"Study 2, p. 733",definitional,1,FALSE,Coding of the local officials outcome,[Binary: excused = 1]
+s2_correlation_low,"Study 2, p. 733",descriptive,0.3,TRUE,Lower end of the correlations among the five study 2 outcomes,The article states a range rather than a value
+s2_correlation_high,"Study 2, p. 733",descriptive,0.7,TRUE,Upper end of the same range,Same
+s2_columns,"Study 2, p. 733",structural,5,FALSE,Highest column index named in the text,"""as shown in columns 2-5"", a reference to table 2's own layout"
+s2_effect_original,"Study 2, p. 733",pipeline,0.44,TRUE,Effect of the religious exemption wording in the original sample restated in prose,NA
+s2_effect_replication,"Study 2, p. 733",pipeline,0.41,TRUE,Effect of the religious exemption wording in the replication restated in prose,NA
+s2_sign_split_original,"Study 2, p. 733",descriptive,NA,TRUE,Two of the four nontarget estimates are positive and two negative in the original sample,NA
+s2_sign_split_replication,"Study 2, p. 733",descriptive,NA,TRUE,The same split in the replication sample,NA
+s3_belief_effect_original,"Study 3, p. 734",descriptive,25,TRUE,Effect on belief that income inequality increased in the original study,"Hedged: ""approximately 25 percentage points in both samples"""
+s3_belief_effect_replication,"Study 3, p. 734",descriptive,25,TRUE,The same effect in the replication,Same sentence
+s3_se_bound,"Study 3, p. 734",descriptive,4,TRUE,Standard errors of that effect are smaller than 4 percentage points,A threshold claim; the block prints both standard errors
+s3_scale_low,"Study 3, p. 734",definitional,0,FALSE,Bottom of the control condition's vertical axis,A description of the treatment image reproduced in appendix figure D.4
+s3_scale_high,"Study 3, p. 734",definitional,100,FALSE,Top of the same axis,Same
+s3_esj_original,"Study 3, p. 734",pipeline,-0.18,TRUE,Effect on economic system justification in the original study restated in prose,NA
+s3_esj_original_se,"Study 3, p. 734",pipeline,0.10,TRUE,Its standard error restated in prose,NA
+s3_esj_replication,"Study 3, p. 734",pipeline,-0.07,TRUE,Effect on economic system justification in the replication restated in prose,NA
+s3_esj_replication_se,"Study 3, p. 734",pipeline,0.06,TRUE,Its standard error restated in prose,NA
+disc_target_significant,"Discussion, p. 735",pipeline,39,TRUE,Target-issue effects that were significant restated in the discussion,NA
+disc_target_estimates,"Discussion, p. 735",pipeline,48,TRUE,Target-issue opportunities restated in the discussion,NA
+disc_nontarget_significant,"Discussion, p. 735",pipeline,9,TRUE,Nontarget-issue effects that were significant restated in the discussion,"Spelled out as ""nine"""
+disc_nontarget_estimates,"Discussion, p. 735",pipeline,144,TRUE,Nontarget-issue opportunities restated in the discussion,NA
+disc_spillover_ratio,"Discussion, p. 735",pipeline,1.4%,TRUE,Average spillover effect as a share of the first-stage direct effect restated in the discussion,The same pooled quantity the results section reports
+disc_inconsistent_original,"Discussion, p. 736",pipeline,30%,TRUE,Share of the study 2 original sample holding inconsistent preferences,"The article attributes it to ""the MTurk sample"""
+disc_inconsistent_replication,"Discussion, p. 736",pipeline,24%,TRUE,Share of the study 2 replication sample holding inconsistent preferences,NA
+disc_inconsistent_sample_label,"Discussion, p. 736",descriptive,NA,TRUE,The inconsistency rates are attributed to the MTurk sample and to Lucid,"Both rates are computed in study 2 samples, which the body text and appendix table C.3 identify as Lucid"
+disc_correction_sample_label,"Table 4 and Discussion, pp. 736-737",descriptive,NA,TRUE,Table 4's top panel and the effects quoted from it are attributed to MTurk,Same mislabel as the row above
+disc_spending_categories,"Discussion, p. 736",structural,5,TRUE,Spending categories averaged into the study 4 outcome,"Social Security, Medicare, health care for low-income families, national defense and foreign aid"
+disc_scale_low,"Discussion, p. 736",definitional,-1,FALSE,Bottom of the averaged spending preference scale,A preference for decreasing spending in all five categories
+disc_scale_high,"Discussion, p. 736",definitional,1,FALSE,Top of the same scale,A preference for increases in all five categories
+disc_correction_small,"Discussion, p. 737",pipeline,-0.172,TRUE,Correction treatment effect among small-government respondents in the original sample,"The article attributes it to MTurk; table 4 labels the same panel ""N (MTurk)"""
+disc_correction_small_replication,"Discussion, p. 737",pipeline,-0.153,TRUE,Correction treatment effect among small-government respondents in the replication,NA
+disc_large_gov_imprecise,"Discussion, p. 737",descriptive,NA,TRUE,Effect estimates are less precise among respondents preferring larger government,A claim about the four standard errors table 4 prints
 app_a_first_three,"Appendix A.1, p. 2",structural,3,FALSE,Models generating evidence that ZA affects YA only,"Covers the references to models 1 through 3, 4 through 9, 10 through 26 and the last six"
 app_a_both_models,"Appendix A.1, p. 2",definitional,17,FALSE,Models consistent with effects on both YA and YB,Models 10 through 26 of appendix table A.1
 app_a_dynamic_models,"Appendix A.1, p. 2",definitional,8,FALSE,Of those 17 models the ones that feature dynamic constraint,"Counted from appendix table A.1: models 10, 11, 14, 15, 17, 18, 19, 20 carry both path 1 and paths 4 and 5"
-app_a_table_models,"Appendix table A.1 title, p. 3",definitional,32,FALSE,Models enumerated by appendix table A.1,
+app_a_table_models,"Appendix table A.1 title, p. 3",definitional,32,FALSE,Models enumerated by appendix table A.1,NA
 app_a_elaborated_graphs,"Appendix A.2, p. 4",definitional,256,FALSE,Possible graphs once the elaborated model adds three edges,"32 times 2 to the third; the article cites the 32 as coming from ""Table 1"", which is appendix table A.1"
 app_a_time_indices,"Appendix A.2, p. 4",structural,2,FALSE,Time indices on the belief system in the elaborated model,I1 and I2
 app_b_figure_breaks,"Appendix figures B.2 and B.3, pp. 18-19",structural,0.67,FALSE,Highest x axis break the coefficient plots label,"Breaks at 0.00, 0.33 and 0.67, set explicitly in constraint_plot() in helpers.R"
@@ -135,36 +135,36 @@ app_b_flat_tax_label,"Appendix figures B.2 and B.3, pp. 18-19",definitional,14.5
 app_b_waves,"Appendix B.4, p. 17",structural,30,FALSE,Days after treatment of the later follow-up wave,The earlier wave is at 10 days
 app_b_scale_endpoints,"Appendix B.3, pp. 16-17",definitional,100,FALSE,Top of the widest response scale in the study 1 questionnaire,"Covers every scale endpoint in the sixteen quoted outcome questions: 1, 4, 7 and the 0 to 100 sliders"
 app_b_flat_tax_threshold,"Appendix B.3, p. 16",definitional,"50,000",FALSE,Income threshold named in two flat tax questions,A property of the questionnaire
-app_b_oped_amtrak,"Appendix B.2, pp. 6-7",transcribed,,FALSE,Numeric tokens in the reproduced Amtrak op-ed,"21 tokens, all figures of Randal O'Toole's Newsweek piece; they cannot drift with this pipeline"
-app_b_oped_flat_tax,"Appendix B.2, pp. 8-11",transcribed,,FALSE,Numeric tokens in the reproduced flat tax op-ed,"27 tokens, all figures of Rand Paul's Wall Street Journal piece"
-app_b_oped_veterans,"Appendix B.2, pp. 12-13",transcribed,,FALSE,Numeric tokens in the reproduced veterans op-ed,"10 tokens, all figures of Cannon and Preble's New York Times piece"
-app_b_oped_wall_street,"Appendix B.2, pp. 14-15",transcribed,,FALSE,Numeric tokens in the reproduced Wall Street op-ed,"4 tokens, all in the byline of Thaya Knight's USA Today piece"
-app_c_n_study_1,"Appendix C, p. 20",pipeline,"2,524",TRUE,Study 1 Lucid sample size restated in the appendix,
+app_b_oped_amtrak,"Appendix B.2, pp. 6-7",transcribed,NA,FALSE,Numeric tokens in the reproduced Amtrak op-ed,"21 tokens, all figures of Randal O'Toole's Newsweek piece; they cannot drift with this pipeline"
+app_b_oped_flat_tax,"Appendix B.2, pp. 8-11",transcribed,NA,FALSE,Numeric tokens in the reproduced flat tax op-ed,"27 tokens, all figures of Rand Paul's Wall Street Journal piece"
+app_b_oped_veterans,"Appendix B.2, pp. 12-13",transcribed,NA,FALSE,Numeric tokens in the reproduced veterans op-ed,"10 tokens, all figures of Cannon and Preble's New York Times piece"
+app_b_oped_wall_street,"Appendix B.2, pp. 14-15",transcribed,NA,FALSE,Numeric tokens in the reproduced Wall Street op-ed,"4 tokens, all in the byline of Thaya Knight's USA Today piece"
+app_c_n_study_1,"Appendix C, p. 20",pipeline,"2,524",TRUE,Study 1 Lucid sample size restated in the appendix,NA
 app_c_n_study_2,"Appendix C, p. 20",pipeline,"2,976",TRUE,Study 2 replication sample size,The same respondents plus those assigned to the study 1 arm the article sets aside
 app_c_gss_years,"Appendix C.2, p. 21",transcribed,50,FALSE,Years over which the welfare wording experiment has been run,A claim about the General Social Survey literature
-app_c_welfare_original,"Appendix C.2, p. 21",pipeline,0.59,TRUE,Welfare wording effect in the original sample restated in prose,
-app_c_welfare_replication,"Appendix C.2, p. 21",pipeline,0.46,TRUE,Welfare wording effect in the replication restated in prose,
+app_c_welfare_original,"Appendix C.2, p. 21",pipeline,0.59,TRUE,Welfare wording effect in the original sample restated in prose,NA
+app_c_welfare_replication,"Appendix C.2, p. 21",pipeline,0.46,TRUE,Welfare wording effect in the replication restated in prose,NA
 app_c_alpha,"Appendix C.2, p. 21",definitional,0.05%,FALSE,Significance threshold named in the appendix,"Printed as a percentage; the article's tables mark significance at p < .05 throughout, so the percent sign is a slip"
 app_c_scale_low,"Appendix C.2, p. 21",definitional,1,FALSE,Bottom of the income differences scale,A property of the questionnaire
-app_c_scale_high,"Appendix C.2, p. 21",definitional,7,FALSE,Top of the same scale,
+app_c_scale_high,"Appendix C.2, p. 21",definitional,7,FALSE,Top of the same scale,NA
 app_d_esj_points,"Appendix D.3, p. 24",definitional,9,FALSE,Points on the economic system justification item scales,A property of the Trump and White (2018) instrument
 app_d_binary_coding,"Appendix D.3, p. 24",definitional,1,FALSE,Coding of the belief in inequality outcome,"1 = correct, 0 otherwise"
-float_table_1,"Table 1, p. 7",pipeline,6,TRUE,Cells printed by table 1,Each cell also has its own ground truth row
-float_table_2,"Table 2, p. 10",pipeline,50,TRUE,Cells printed by table 2,Each cell also has its own ground truth row
-float_table_3,"Table 3, p. 11",pipeline,24,TRUE,Cells printed by table 3,Each cell also has its own ground truth row
-float_table_4,"Table 4, p. 13",pipeline,20,TRUE,Cells printed by table 4,Each cell also has its own ground truth row
+float_table_1,"Table 1, p. 731",pipeline,6,TRUE,Cells printed by table 1,Each cell also has its own ground truth row
+float_table_2,"Table 2, p. 734",pipeline,50,TRUE,Cells printed by table 2,Each cell also has its own ground truth row
+float_table_3,"Table 3, p. 735",pipeline,24,TRUE,Cells printed by table 3,Each cell also has its own ground truth row
+float_table_4,"Table 4, p. 737",pipeline,20,TRUE,Cells printed by table 4,Each cell also has its own ground truth row
 float_table_b2,"Appendix table B.2, p. 5",pipeline,87,TRUE,Cells printed by appendix table B.2,Each cell also has its own ground truth row
 float_table_c3,"Appendix table C.3, p. 20",pipeline,40,TRUE,Cells printed by appendix table C.3,Each cell also has its own ground truth row
 float_table_c4,"Appendix table C.4, p. 21",pipeline,30,TRUE,Cells printed by appendix table C.4,Each cell also has its own ground truth row
 float_table_d5,"Appendix table D.5, p. 23",pipeline,48,TRUE,Cells printed by appendix table D.5,Each cell also has its own ground truth row
-float_figure_4,"Figure 4, p. 8",pipeline,192,TRUE,Treatment effect estimates plotted by figure 4,"The figure prints no numbers on its face, so what it asserts is a count of estimates"
+float_figure_4,"Figure 4, p. 732",pipeline,192,TRUE,Treatment effect estimates plotted by figure 4,"The figure prints no numbers on its face, so what it asserts is a count of estimates"
 float_figure_b2,"Appendix figure B.2, p. 18",pipeline,128,TRUE,Treatment effect estimates plotted by appendix figure B.2,Two samples at wave 2
 float_figure_b3,"Appendix figure B.3, p. 19",pipeline,64,TRUE,Treatment effect estimates plotted by appendix figure B.3,MTurk only at wave 3
-s1_times_conducted,"Study 1, p. 6",structural,3,TRUE,Times the study 1 experiment was conducted,"Once on MTurk, once with elites and once on Lucid"
-s2_nontarget_measures_text,"Study 2, p. 9",structural,3,TRUE,Further questions the article says the religious conviction consideration could be applied to,"Described as one measure plus ""the other two""; table 2 reports four nontarget measures"
-s2_nontarget_measures_table,"Study 2, p. 9",structural,4,TRUE,Additional outcome measures the article says did not change,"Two paragraphs after the sentence that says three"
-t3_note_third,"Table 3 note, p. 11",structural,3,TRUE,Fraction denominator in the table 3 note,"""A random third of original study respondents was asked the economic system justification outcome question"""
-disc_half_assigned,"Discussion, p. 12",structural,2,TRUE,Fraction denominator for assignment to the correction query,"""Half of these subjects were randomly assigned to receive a query"""
+s1_times_conducted,"Study 1, p. 730",structural,3,TRUE,Times the study 1 experiment was conducted,"Once on MTurk, once with elites and once on Lucid"
+s2_nontarget_measures_text,"Study 2, p. 733",structural,3,TRUE,Further questions the article says the religious conviction consideration could be applied to,"Described as one measure plus ""the other two""; table 2 reports four nontarget measures"
+s2_nontarget_measures_table,"Study 2, p. 733",structural,4,TRUE,Additional outcome measures the article says did not change,Two paragraphs after the sentence that says three
+t3_note_third,"Table 3 note, p. 735",structural,3,TRUE,Fraction denominator in the table 3 note,"""A random third of original study respondents was asked the economic system justification outcome question"""
+disc_half_assigned,"Discussion, p. 736",structural,2,TRUE,Fraction denominator for assignment to the correction query,"""Half of these subjects were randomly assigned to receive a query"""
 app_a_fifth_node,"Appendix A.2, p. 4",structural,5,FALSE,Index of the node added to the elaborated model,"I2, added to I1, YA, YB and ZA"
 app_a_added_edges,"Appendix A.2, p. 4",definitional,3,FALSE,Edges the elaboration adds,Two pointing to I2 and one from I2 to YB
 app_d_outcomes_used,"Appendix D.3, p. 24",structural,2,TRUE,Outcomes taken from the Trump and White (2018) study,Belief in income inequality and economic system justification
