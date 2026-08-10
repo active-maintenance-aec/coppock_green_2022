@@ -71,8 +71,13 @@ n_descriptive_hold <- sum(gt$holds == 1, na.rm = TRUE)
 n_descriptive_fail <- sum(gt$holds == 0, na.rm = TRUE)
 n_blocks <- sum(claims$needs_block)
 
-# Counted from the errata source rather than typed, so the two cannot drift.
-errata_entries <- sum(str_detect(read_lines(here::here("errata.qmd")), "^## [0-9]+[.]"))
+# The errata are defined once, in errata.qmd, which writes errata_entries.csv when it
+# renders. This report reads that file rather than keeping a second copy of the count or
+# the numbering, because a second copy is how the two would come to disagree.
+spine <- read_csv(here::here("errata_entries.csv"), show_col_types = FALSE)
+errata_entries <- nrow(spine)
+spell_errata <- function(n) c("one", "two", "three", "four", "five", "six", "seven",
+                              "eight", "nine", "ten")[n]
 ```
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
@@ -184,7 +189,7 @@ latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale
 
 Two kinds of correction, kept apart because they are different things.
 
-**Corrections this code makes to the deposited code** are below. **Sentences in the published article that its own data do not support** are in `coppock_green_2022_errata.pdf` at the root of this repository, which lists nine of them, computes every corrected value from `maintained/output/` when it is rendered, and changes no conclusion of the article.
+**Corrections this code makes to the deposited code** are below. **Sentences in the published article that its own data do not support** are in `coppock_green_2022_errata.pdf` at the root of this repository, which lists `r spell_errata(errata_entries)` of them, computes every corrected value from `maintained/output/` when it is rendered, and changes no conclusion of the article.
 
 ## The elite ideology column of appendix table B.2 is repaired
 

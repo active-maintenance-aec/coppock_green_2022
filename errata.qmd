@@ -108,98 +108,168 @@ inconsistent <- function(sample_name) {
 }
 ```
 
-This note lists nine misstated claims in "Do Belief Systems Exhibit Dynamic Constraint?", published in *The Journal of Politics* 84(2), 725--738, doi [10.1086/716294](https://doi.org/10.1086/716294). **None of them changes a conclusion of the article.** The finding that treatments which move a target attitude leave nontarget attitudes untouched is unaffected: the pooled indirect effect is small and statistically indistinguishable from zero on either the published figure or the corrected one, and every estimate in tables 1 through 4 reproduces exactly.
+```{r entries}
+# THE ERRATA SPINE. Every entry is defined once, here, and rendered from here: into this
+# document, and into whatever else needs it, which reads the errata_entries.csv written at
+# the bottom of this file rather than keeping a second hand-typed copy.
+#
+# [[...]] marks the span that changes, on both sides. Each renderer supplies its own markup
+# for it, and this document's convention is to bold the corrected side only, so the marks
+# on the published side are stripped rather than set. Nothing else in a field is markup.
+# Numbers that move without being at issue are recomputed and left unmarked, which is why
+# entries 4 and 5 carry corrected figures outside the marked spans.
+#
+# Numbering is the published note's and is APPEND-ONLY: an entry can already have been
+# cited, so a later finding is added at the end and never interleaved.
+entries <- tribble(
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note,
+
+  1, "quantity", "pipeline", "full",
+  "The sign of the pooled ratio",
+  "published, main text",
+  "If we pool the three studies together, our estimate is [[1.4%]] (95% CI: -8%, 6%).",
+  str_glue("If we pool the three studies together, our estimate is [[{r1(pooled_estimate)}%]] (95% CI: -8%, 6%)."),
+  str_glue(
+    "The three inputs are the sample-specific ratios of the precision-weighted average ",
+    "nontarget effect to the precision-weighted average target effect: ",
+    "{r1(ratio('MTurk', 'estimate'))}% on MTurk, {r1(ratio('Elite', 'estimate'))}% among ",
+    "elites and {r1(ratio('Lucid', 'estimate'))}% on Lucid. The deposited ",
+    "`in_text_numbers.R` pools them with `rmeta::meta.summaries`, which passes no `method` ",
+    "argument and is therefore an inverse-variance fixed-effect meta-analysis. Two of the ",
+    "three inputs are near zero and the third is negative with the second-smallest standard ",
+    "error, so no pooling at these weights can land above zero; running the deposited code ",
+    "today gives {r1(archive_pooled)}%. The published interval endpoints are left as printed ",
+    "because they fall inside the range the unseeded bootstrap produces, which the point ",
+    "estimate does not: over repeated runs at the resample count the deposit ships, the ",
+    "pooled estimate lies between {r1(pooled_estimate_10['low'])}% and ",
+    "{r1(pooled_estimate_10['high'])}%."),
+
+  2, "quantity", "pipeline", "full",
+  "The same ratio in the discussion",
+  "published, discussion",
+  "But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[1.4%]] of the first-stage direct effect.",
+  str_glue("But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[{r1(pooled_estimate)}%]] of the first-stage direct effect."),
+  "The same quantity as item 1, restated. The counts in the sentence are correct.",
+
+  3, "quantity", "pipeline", "full",
+  "The upper end of the Lucid interval",
+  "published, main text",
+  "On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to [[15%]].",
+  str_glue("On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to [[{r0(lucid_high)}%]]."),
+  str_glue(
+    "Neither the archive nor the article sets a seed, so no interval endpoint in this paper ",
+    "is a fixed quantity: each is one draw of a bootstrap quantile. Measured by resampling ",
+    "the draws, this endpoint runs from {r1(lucid_high_10['low'])}% to ",
+    "{r1(lucid_high_10['high'])}% at the ten resamples the deposit ships and from ",
+    "{r1(lucid_high_1000['low'])}% to {r1(lucid_high_1000['high'])}% at the thousand this ",
+    "repository uses. The published 15% lies outside both. The lower endpoint is left as ",
+    "printed: it falls inside its own range, which runs from {r1(lucid_low_10['low'])}% to ",
+    "{r1(lucid_low_10['high'])}% at ten resamples, as do the four endpoints the article ",
+    "gives for the MTurk and elite samples."),
+
+  4, "label", "pipeline", "full",
+  "The sample the inconsistency rates come from",
+  "published, main text",
+  "As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[MTurk]] sample, 30% of the respondents were inconsistent; this figure was 24% [[on Lucid]].",
+  str_glue("As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[study 2 original]] sample, {r0(inconsistent('Original'))}% of the respondents were inconsistent; this figure was {r0(inconsistent('Replication'))}% [[in the replication]]."),
+  str_glue(
+    "Both figures come from study 2, and both study 2 samples were recruited on Lucid: the ",
+    "body text says the 1,087 subjects for that experiment \"were also recruited via ",
+    "Lucid\", and appendix table C.3 heads its two columns \"Lucid Original\" and \"Lucid ",
+    "Replication\". The indicator that defines inconsistency appears in no MTurk data file ",
+    "in the deposit. Table 4 carries the same mislabel in its row heading \"N (MTurk)\"; its ",
+    "cells are correct and it is not reprinted here."),
+
+  5, "label", "pipeline", "full",
+  "The sample the correction effects come from",
+  "published, main text",
+  "The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (-0.172 scale points [[on MTurk]], -0.153 scale points [[on Lucid]]).",
+  str_glue("The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending ({r3(correction('Original'))} scale points [[in the original Lucid sample]], {r3(correction('Replication'))} scale points [[in the Lucid replication]])."),
+  str_glue(
+    "The same mislabel as item 4. Table 4's top panel is fitted on the study 2 original ",
+    "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
+    "C.3's first column describes."),
+
+  6, "quantity", "pipeline", "full",
+  "The number of nontarget questions in study 2",
+  "published, main text",
+  "Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the [[three]] further questions.",
+  str_glue("Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the [[{spell(n_nontarget_s2)}]] further questions."),
+  str_glue(
+    "Table 2 reports {spell(n_nontarget_s2)} nontarget outcomes, and the results paragraph ",
+    "two paragraphs later calls them \"the four additional outcome measures\". The design ",
+    "sentence before this one groups them into three topics rather than counting the ",
+    "questions, describing one measure that raises the religious objection in another domain ",
+    "and \"the other two outcome measures\" covering same-sex marriage and school prayer; ",
+    "school prayer is measured with two questions, not one. The stated correlation range is ",
+    "correct: the {spell(length(s2_original_cors))} pairwise correlations in the original ",
+    "sample run from {r2(min(s2_original_cors))} to {r2(max(s2_original_cors))}."),
+
+  7, "quantity", "pipeline", "full",
+  "The MTurk within-domain correlation",
+  "published, main text",
+  "On MTurk, the average correlation between attitudes in the same domain was smaller at [[0.29]], and the average correlation between attitudes in different domains was very small at 0.06.",
+  str_glue("On MTurk, the average correlation between attitudes in the same domain was smaller at [[{r2(mturk_within)}]], and the average correlation between attitudes in different domains was very small at 0.06."),
+  str_glue(
+    "The quantity is {sprintf('%.4f', mturk_within)}. Table 1 prints .30 for it, so the ",
+    "table rounds it correctly and the sentence does not."),
+
+  8, "quantity", "pipeline", "full",
+  "The graduate degree shares",
+  "published, main text",
+  "A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; [[71%]] of the elites hold a graduate degree, compared with [[13%]] for the MTurk sample and 15% for Lucid.",
+  str_glue("A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; [[{r0(share('Elite', 'Graduate degree'))}%]] of the elites hold a graduate degree, compared with [[{r0(share('MTurk', 'Graduate degree'))}%]] for the MTurk sample and 15% for Lucid."),
+  str_glue(
+    "Appendix table B.2 prints {sprintf('%.1f', share('Elite', 'Graduate degree'))}% and ",
+    "{sprintf('%.1f', share('MTurk', 'Graduate degree'))}% for the same two categories, so ",
+    "the sentence truncates the first and rounds the second the wrong way. The three ",
+    "college-degree shares, which appear in no table, are ",
+    "{r1(share('Elite', 'College degree or more'))}%, ",
+    "{r1(share('MTurk', 'College degree or more'))}% and ",
+    "{r1(share('Lucid', 'College degree or more'))}% and hold as printed."),
+
+  9, "quantity", "pipeline", "full",
+  "A standard error in study 3",
+  "published, main text",
+  "By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[0.06]]).",
+  str_glue("By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[{r2(esj_se)}]])."),
+  str_glue(
+    "Table 3 prints {r3(esj_se)} for the same standard error. As in item 8, the sentence ",
+    "truncates where the table rounds.")
+) |>
+  mutate(across(c(title, published, corrected, note), as.character))
+
+stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
+
+# The spine's markup, resolved for this document. Another renderer resolves it differently.
+bold <- function(x) str_replace_all(x, "\\[\\[(.*?)\\]\\]", "**\\1**")
+
+# This note bolds the corrected side only, so the published side is set with its marks
+# removed rather than resolved.
+plain <- function(x) str_remove_all(x, "\\[\\[|\\]\\]")
+
+# A heading is only a heading when a blank line precedes it, which is why every emitted
+# entry opens with one.
+emit <- function(n) {
+  e <- entries |> filter(entry == n)
+  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", plain(e$published),
+      "\n\nCorrected:\n\n> ", bold(e$corrected), "\n\n", e$note, "\n", sep = "")
+}
+```
+
+This note lists `r spell(nrow(entries))` misstated claims in "Do Belief Systems Exhibit Dynamic Constraint?", published in *The Journal of Politics* 84(2), 725--738, doi [10.1086/716294](https://doi.org/10.1086/716294). **None of them changes a conclusion of the article.** The finding that treatments which move a target attitude leave nontarget attitudes untouched is unaffected: the pooled indirect effect is small and statistically indistinguishable from zero on either the published figure or the corrected one, and every estimate in tables 1 through 4 reproduces exactly.
 
 The first three concern the same bootstrap, whose resample count and random seed the deposited code never fixes. The next two attach real estimates to the wrong sample. The last four are counts and roundings that disagree with the article's own tables.
 
 Every corrected value below is computed from the deposited data at the time this document is rendered; bold marks the tokens that change. Quantities the article states at whole percentage points and which come out of the unseeded bootstrap are left at that precision, because rendering a draw to one decimal would be precise about a number the procedure does not pin down. The code and output supporting each correction are at [github.com/active-maintenance-aec/coppock_green_2022](https://github.com/active-maintenance-aec/coppock_green_2022).
 
-## 1. The sign of the pooled ratio
+```{r rendered-entries, results="asis"}
+walk(entries$entry, emit)
+```
 
-> If we pool the three studies together, our estimate is 1.4% (95% CI: -8%, 6%).
-
-Corrected:
-
-> If we pool the three studies together, our estimate is **`r r1(pooled_estimate)`%** (95% CI: -8%, 6%).
-
-The three inputs are the sample-specific ratios of the precision-weighted average nontarget effect to the precision-weighted average target effect: `r r1(ratio("MTurk", "estimate"))`% on MTurk, `r r1(ratio("Elite", "estimate"))`% among elites and `r r1(ratio("Lucid", "estimate"))`% on Lucid. The deposited `in_text_numbers.R` pools them with `rmeta::meta.summaries`, which passes no `method` argument and is therefore an inverse-variance fixed-effect meta-analysis. Two of the three inputs are near zero and the third is negative with the second-smallest standard error, so no pooling at these weights can land above zero; running the deposited code today gives `r r1(archive_pooled)`%. The published interval endpoints are left as printed because they fall inside the range the unseeded bootstrap produces, which the point estimate does not: over repeated runs at the resample count the deposit ships, the pooled estimate lies between `r r1(pooled_estimate_10["low"])`% and `r r1(pooled_estimate_10["high"])`%.
-
-## 2. The same ratio in the discussion
-
-> But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just 1.4% of the first-stage direct effect.
-
-Corrected:
-
-> But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just **`r r1(pooled_estimate)`%** of the first-stage direct effect.
-
-The same quantity as item 1, restated. The counts in the sentence are correct.
-
-## 3. The upper end of the Lucid interval
-
-> On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to 15%.
-
-Corrected:
-
-> On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to **`r r0(lucid_high)`%**.
-
-Neither the archive nor the article sets a seed, so no interval endpoint in this paper is a fixed quantity: each is one draw of a bootstrap quantile. Measured by resampling the draws, this endpoint runs from `r r1(lucid_high_10["low"])`% to `r r1(lucid_high_10["high"])`% at the ten resamples the deposit ships and from `r r1(lucid_high_1000["low"])`% to `r r1(lucid_high_1000["high"])`% at the thousand this repository uses. The published 15% lies outside both. The lower endpoint is left as printed: it falls inside its own range, which runs from `r r1(lucid_low_10["low"])`% to `r r1(lucid_low_10["high"])`% at ten resamples, as do the four endpoints the article gives for the MTurk and elite samples.
-
-## 4. The sample the inconsistency rates come from
-
-> As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the MTurk sample, 30% of the respondents were inconsistent; this figure was 24% on Lucid.
-
-Corrected:
-
-> As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the **study 2 original** sample, `r r0(inconsistent("Original"))`% of the respondents were inconsistent; this figure was `r r0(inconsistent("Replication"))`% **in the replication**.
-
-Both figures come from study 2, and both study 2 samples were recruited on Lucid: the body text says the 1,087 subjects for that experiment "were also recruited via Lucid", and appendix table C.3 heads its two columns "Lucid Original" and "Lucid Replication". The indicator that defines inconsistency appears in no MTurk data file in the deposit. Table 4 carries the same mislabel in its row heading "N (MTurk)"; its cells are correct and it is not reprinted here.
-
-## 5. The sample the correction effects come from
-
-> The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (-0.172 scale points on MTurk, -0.153 scale points on Lucid).
-
-Corrected:
-
-> The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (`r r3(correction("Original"))` scale points **in the original Lucid sample**, `r r3(correction("Replication"))` scale points **in the Lucid replication**).
-
-The same mislabel as item 4. Table 4's top panel is fitted on the study 2 original sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table C.3's first column describes.
-
-## 6. The number of nontarget questions in study 2
-
-> Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the three further questions.
-
-Corrected:
-
-> Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the **`r spell(n_nontarget_s2)`** further questions.
-
-Table 2 reports `r spell(n_nontarget_s2)` nontarget outcomes, and the results paragraph two paragraphs later calls them "the four additional outcome measures". The design sentence before this one groups them into three topics rather than counting the questions, describing one measure that raises the religious objection in another domain and "the other two outcome measures" covering same-sex marriage and school prayer; school prayer is measured with two questions, not one. The stated correlation range is correct: the `r spell(length(s2_original_cors))` pairwise correlations in the original sample run from `r r2(min(s2_original_cors))` to `r r2(max(s2_original_cors))`.
-
-## 7. The MTurk within-domain correlation
-
-> On MTurk, the average correlation between attitudes in the same domain was smaller at 0.29, and the average correlation between attitudes in different domains was very small at 0.06.
-
-Corrected:
-
-> On MTurk, the average correlation between attitudes in the same domain was smaller at **`r r2(mturk_within)`**, and the average correlation between attitudes in different domains was very small at 0.06.
-
-The quantity is `r sprintf("%.4f", mturk_within)`. Table 1 prints .30 for it, so the table rounds it correctly and the sentence does not.
-
-## 8. The graduate degree shares
-
-> A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; 71% of the elites hold a graduate degree, compared with 13% for the MTurk sample and 15% for Lucid.
-
-Corrected:
-
-> A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; **`r r0(share("Elite", "Graduate degree"))`%** of the elites hold a graduate degree, compared with **`r r0(share("MTurk", "Graduate degree"))`%** for the MTurk sample and 15% for Lucid.
-
-Appendix table B.2 prints `r sprintf("%.1f", share("Elite", "Graduate degree"))`% and `r sprintf("%.1f", share("MTurk", "Graduate degree"))`% for the same two categories, so the sentence truncates the first and rounds the second the wrong way. The three college-degree shares, which appear in no table, are `r r1(share("Elite", "College degree or more"))`%, `r r1(share("MTurk", "College degree or more"))`% and `r r1(share("Lucid", "College degree or more"))`% and hold as printed.
-
-## 9. A standard error in study 3
-
-> By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: 0.06).
-
-Corrected:
-
-> By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: **`r r2(esj_se)`**).
-
-Table 3 prints `r r3(esj_se)` for the same standard error. As in item 8, the sentence truncates where the table rounds.
+```{r emit-spine}
+# The machine-readable spine, written wherever this document is rendered. Anything else
+# that needs these entries reads it rather than keeping its own copy, so the two cannot
+# drift.
+write_csv(entries, here("errata_entries.csv"))
+```
