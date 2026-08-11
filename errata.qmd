@@ -121,8 +121,14 @@ inconsistent <- function(sample_name) {
 #
 # Numbering is the published note's and is APPEND-ONLY: an entry can already have been
 # cited, so a later finding is added at the end and never interleaved.
+#
+# claim_ids names the ground-truth rows an entry corrects, semicolon-separated, so that
+# "is this finding published?" is a query rather than a judgment. It lists only the rows
+# whose values the entry actually changes: entries 1, 3 and 4 restate figures that are
+# right and are left as printed, and those rows are not cited here. Every id listed is
+# checked against the ground truth by build_ground_truth.R.
 entries <- tribble(
-  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note,
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
 
   1, "quantity", "pipeline", "full",
   "The sign of the pooled ratio",
@@ -143,6 +149,7 @@ entries <- tribble(
     "estimate does not: over repeated runs at the resample count the deposit ships, the ",
     "pooled estimate lies between {r1(pooled_estimate_10['low'])}% and ",
     "{r1(pooled_estimate_10['high'])}%."),
+  "s1_ratio_pooled",
 
   2, "quantity", "pipeline", "full",
   "The same ratio in the discussion",
@@ -150,6 +157,7 @@ entries <- tribble(
   "But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[1.4%]] of the first-stage direct effect.",
   str_glue("But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[{r1(pooled_estimate)}%]] of the first-stage direct effect."),
   "The same quantity as item 1, restated. The counts in the sentence are correct.",
+  "disc_spillover_ratio",
 
   3, "quantity", "pipeline", "full",
   "The upper end of the Lucid interval",
@@ -166,6 +174,7 @@ entries <- tribble(
     "printed: it falls inside its own range, which runs from {r1(lucid_low_10['low'])}% to ",
     "{r1(lucid_low_10['high'])}% at ten resamples, as do the four endpoints the article ",
     "gives for the MTurk and elite samples."),
+  "s1_ratio_lucid_high",
 
   4, "label", "pipeline", "full",
   "The sample the inconsistency rates come from",
@@ -179,6 +188,7 @@ entries <- tribble(
     "Replication\". The indicator that defines inconsistency appears in no MTurk data file ",
     "in the deposit. Table 4 carries the same mislabel in its row heading \"N (MTurk)\"; its ",
     "cells are correct and it is not reprinted here."),
+  "disc_inconsistent_sample_label",
 
   5, "label", "pipeline", "full",
   "The sample the correction effects come from",
@@ -189,6 +199,7 @@ entries <- tribble(
     "The same mislabel as item 4. Table 4's top panel is fitted on the study 2 original ",
     "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
     "C.3's first column describes."),
+  "disc_correction_sample_label",
 
   6, "quantity", "pipeline", "full",
   "The number of nontarget questions in study 2",
@@ -204,6 +215,7 @@ entries <- tribble(
     "school prayer is measured with two questions, not one. The stated correlation range is ",
     "correct: the {spell(length(s2_original_cors))} pairwise correlations in the original ",
     "sample run from {r2(min(s2_original_cors))} to {r2(max(s2_original_cors))}."),
+  "s2_nontarget_measures_text",
 
   7, "quantity", "pipeline", "full",
   "The MTurk within-domain correlation",
@@ -213,6 +225,7 @@ entries <- tribble(
   str_glue(
     "The quantity is {sprintf('%.4f', mturk_within)}. Table 1 prints .30 for it, so the ",
     "table rounds it correctly and the sentence does not."),
+  "s1_mturk_within_text",
 
   8, "quantity", "pipeline", "full",
   "The graduate degree shares",
@@ -227,6 +240,7 @@ entries <- tribble(
     "{r1(share('Elite', 'College degree or more'))}%, ",
     "{r1(share('MTurk', 'College degree or more'))}% and ",
     "{r1(share('Lucid', 'College degree or more'))}% and hold as printed."),
+  "s1_graduate_elite;s1_graduate_mturk",
 
   9, "quantity", "pipeline", "full",
   "A standard error in study 3",
@@ -235,9 +249,10 @@ entries <- tribble(
   str_glue("By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[{r2(esj_se)}]])."),
   str_glue(
     "Table 3 prints {r3(esj_se)} for the same standard error. As in item 8, the sentence ",
-    "truncates where the table rounds.")
+    "truncates where the table rounds."),
+  "s3_esj_replication_se"
 ) |>
-  mutate(across(c(title, published, corrected, note), as.character))
+  mutate(across(c(title, published, corrected, note, claim_ids), as.character))
 
 stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
 
