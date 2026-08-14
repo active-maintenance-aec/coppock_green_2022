@@ -12,8 +12,8 @@
     repaired](#the-elite-ideology-column-of-appendix-table-b2-is-repaired)
   - [The pooled ratio, and what the unseeded bootstrap does to
     it](#the-pooled-ratio-and-what-the-unseeded-bootstrap-does-to-it)
-  - [Two findings that are not
-    errata](#two-findings-that-are-not-errata)
+  - [Two findings the note does not yet
+    carry](#two-findings-the-note-does-not-yet-carry)
 - [Ground truth](#ground-truth)
 - [The extraction, and the two instruments that read
   it](#the-extraction-and-the-two-instruments-that-read-it)
@@ -110,35 +110,35 @@ passes only because it ships the outputs of code that no longer runs.
 
 ## Does the maintained rewrite reproduce the paper?
 
-Yes, with 8 exceptions, none of which is a defect in this code.
+Yes, with 7 exceptions, none of which is a defect in this code.
 
 Of 417 published quantities recorded in the ground truth, the rewrite
-reproduces 392 to the precision the article prints and fails to
-reproduce 8. A further 12 claims are about shape, sign, count or order
+reproduces 393 to the precision the article prints and fails to
+reproduce 7. A further 12 claims are about shape, sign, count or order
 rather than about a value, and 10 of those hold. Every cell of tables 1
 through 4 and of appendix tables B.2, C.3, C.4 and D.5 reproduces,
 including all 24 sample sizes those four regression tables report.
 
-The 8 failures are all the article disagreeing with itself, and every
+The 7 failures are all the article disagreeing with itself, and every
 one of them is a sentence rather than a table cell. The pooled
 indirect-to-direct effect ratio is printed with the wrong sign, in the
-results section and again in the discussion. One endpoint of one
-bootstrap confidence interval cannot be produced by the procedure the
-deposit uses. The body text gives an average correlation of .29 where
-table 1 gives .30 for the same underlying 0.2966. Two graduate degree
-shares and one standard error are stated at a rounding their own tables
-contradict. And study 2’s design paragraph counts three nontarget
-outcome measures where the table and the results paragraph both have
-four.
+results section and again in the discussion. The body text gives an
+average correlation of .29 where table 1 gives .30 for the same
+underlying 0.2966. Two graduate degree shares and one standard error are
+stated at a rounding their own tables contradict. And study 2’s design
+paragraph counts three nontarget outcome measures where the table and
+the results paragraph both have four.
 
 2 of the descriptive claims also fail, and they are the same mislabel
 twice: the inconsistency rates behind study 4 and the top panel of table
 4 are both attributed to MTurk, and both come from the study 2 original
 sample that the body text and appendix table C.3 identify as Lucid. The
 numbers themselves are right, which is why no value comparison could
-have found them. All 10 are set out as 9 entries in
+have found them. All 9 are set out as 8 entries in
 `coppock_green_2022_errata.pdf` at the root of this repository, one
-entry per published sentence.
+entry per published sentence. The note carries 9 entries in all: the
+last supplies two figure cross-references the appendix omits, which no
+value comparison could have found either.
 
 The deposited archive does worse. On the 309 quantities a deposited
 script produces at all, it reproduces 302 and fails 7. The extra
@@ -289,11 +289,14 @@ asserted.
 Two kinds of correction, kept apart because they are different things.
 
 **Corrections this code makes to the deposited code** are below.
-**Sentences in the published article that its own data do not support**
-are in `coppock_green_2022_errata.pdf` at the root of this repository,
-which lists nine of them, computes every corrected value from
+**Sentences in the published article that its own data do not support**,
+together with one that refers to figures it never names, are in
+`coppock_green_2022_errata.pdf` at the root of this repository, which
+lists nine of them, computes every corrected value from
 `maintained/output/` when it is rendered, and changes no conclusion of
-the article.
+the article. It carried a tenth until 2026-08-14: an endpoint it
+corrected turned out to be a misreading of the published page rather
+than an error in it, the entry was removed, and the reason is below.
 
 ## The elite ideology column of appendix table B.2 is repaired
 
@@ -357,27 +360,43 @@ the saved draws and recomputing the endpoint.
 
 | Resamples | Endpoint runs from | to   | Published |
 |:----------|:-------------------|:-----|:----------|
-| 10        | -6.3%              | 6.9% | 15%       |
-| 1,000     | 1.1%               | 3.6% | 15%       |
+| 10        | -6.3%              | 6.9% | +5%       |
+| 1,000     | 1.1%               | 3.6% | +5%       |
 
 The Lucid interval’s upper endpoint over repeated unseeded runs, at the
 resample count the deposit ships and the one the rewrite uses.
 
 The 2.2% this repository computes for the Lucid interval’s upper
-endpoint sits inside the range; the published 15% sits outside it at
-both resample counts. The other five endpoints the article prints all
-fall inside their own ranges. What produced the published figure is not
-established, so the ground truth records the disagreement without naming
-a cause beyond the article.
+endpoint sits inside that range, and so does the +5% the article prints.
+All six endpoints the article gives fall inside their own ranges and the
+pooled point estimate falls outside its own, which is why the errata
+note corrects the estimate and leaves every interval as published.
 
-## Two findings that are not errata
+**That endpoint was misread here, not misprinted there.** Until
+2026-08-14 this report and the errata note both gave the published
+endpoint as 15% and recorded it as an interval bound the deposit’s
+procedure cannot produce. The article prints +5%. Both signs in the
+sentence are set in a symbol font that the text extraction behind the
+ground truth mangles: the minus of -24% comes off the page as a 2 and
+the plus of +5% as a 1, so `-24% to +5%` extracts as `224% to 15%` and
+was transcribed as fifteen per cent. What found it was an audit of the
+published PDF by font name: a glyph the extractor mangles comes from a
+face the body text does not use, and this article sets its plus, minus
+and equals signs in one of those. The entry that corrected it is gone
+from the errata note, and the ground truth now records the endpoint as
+agreeing.
+
+## Two findings the note does not yet carry
+
+Neither changes a quantity, which is why the errata note was written
+without them. Entry 9 now corrects a cross-reference of exactly this
+kind, so both stand as candidates for the same treatment.
 
 **A cross-reference in the appendix.** Appendix section A.2 says the
 elaboration “blow\[s\] up the possible number of graphs from the 32 in
 Table 1 to 256”. The 32 are enumerated in appendix table A.1; table 1 of
 the main text reports levels of static constraint. The count itself is
-right. No quantity changes, so it is recorded here rather than in the
-errata note.
+right, and the reference points at the wrong table.
 
 **A stray percent sign.** Appendix section C.2 says an estimate “is not
 significant at the 0.05% level in either sample”. The article’s tables
@@ -405,7 +424,7 @@ only by reading the article or the appendix.
 |:---|---:|---:|---:|---:|---:|---:|---:|
 | Appendix tables | 209 | 200 | 5 | 4 | 0 | 209 | 0 |
 | Figures | 5 | 0 | 0 | 5 | 0 | 5 | 0 |
-| In-text quantities | 99 | 2 | 2 | 95 | 7 | 74 | 8 |
+| In-text quantities | 99 | 2 | 2 | 95 | 7 | 75 | 7 |
 | Main text tables | 104 | 100 | 0 | 4 | 0 | 104 | 0 |
 
 Ground truth claims by section of the paper.
@@ -441,7 +460,6 @@ unverifiable.
 | Table B.2 | ideology: Moderate (Elites) | 32.0% | 0 | 32.00% | archive |
 | Table B.2 | ideology: Other (Elites) | 3.7% | 75.4 | 3.70% | archive |
 | Text | MTurk average within-domain correlation, as given in the body text | .29 | 0.3 | 0.297 | paper_internal |
-| Text | Lucid ratio, 95% interval upper bound | 15% |  | 2.24% | paper_internal |
 | Text | Pooled indirect-to-direct ratio | 1.4% | -2.77 | -1.68% | paper_internal |
 | Text | Elite sample holding a graduate degree | 71% |  | 71.57% | paper_internal |
 | Text | MTurk sample holding a graduate degree | 13% |  | 12.40% | paper_internal |
@@ -451,7 +469,7 @@ unverifiable.
 
 Every claim the archive or the rewrite does not match.
 
-The 8 rows the rewrite does not match, and the 2 descriptive claims that
+The 7 rows the rewrite does not match, and the 2 descriptive claims that
 do not hold, are set out in `coppock_green_2022_errata.pdf`. The 7 the
 archive does not match are the elite ideology column, described above.
 `defect_locus` is required on every row carrying an adverse verdict, in
@@ -521,7 +539,7 @@ and it reaches each quantity by a different route from the one
 Running it prints the whole audit trail, which is the last thing
 `run_all.R` does.
 
-The article’s 10 misstatements are collected as 9 entries in
+The article’s 9 misstatements are collected as 8 entries in
 `coppock_green_2022_errata.pdf` at the root of this repository. Each
 entry quotes the published sentence, gives the corrected sentence with
 the changed token in bold, and computes every value in it from
@@ -657,8 +675,8 @@ section counts.
 | Deposited files ingested into a derived tabular representation | 9        |
 | Scripts in the maintained rewrite                              | 20       |
 | Ground truth claims                                            | 417      |
-| Claims the rewrite reproduces                                  | 392      |
-| Claims the rewrite does not reproduce                          | 8        |
+| Claims the rewrite reproduces                                  | 393      |
+| Claims the rewrite does not reproduce                          | 7        |
 | Claims with no published value to check against                | 17       |
 
 Verification summary.

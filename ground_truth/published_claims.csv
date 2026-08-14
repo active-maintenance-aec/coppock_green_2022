@@ -83,7 +83,7 @@ s1_ratio_elite_low,"Dynamic constraint, p. 732",pipeline,-25.7%,TRUE,"Elite rati
 s1_ratio_elite_high,"Dynamic constraint, p. 732",pipeline,26.2%,TRUE,"Elite ratio, upper endpoint of the 95% interval",Same
 s1_ratio_lucid,"Dynamic constraint, p. 732",pipeline,-9.4%,TRUE,Lucid indirect-to-direct effect ratio,NA
 s1_ratio_lucid_low,"Dynamic constraint, p. 732",pipeline,-24%,TRUE,"Lucid ratio, lower endpoint of the 95% interval",Same
-s1_ratio_lucid_high,"Dynamic constraint, p. 732",pipeline,15%,TRUE,"Lucid ratio, upper endpoint of the 95% interval",Same
+s1_ratio_lucid_high,"Dynamic constraint, p. 732",pipeline,+5%,TRUE,"Lucid ratio, upper endpoint of the 95% interval",Same
 s1_ratio_pooled,"Dynamic constraint, p. 732",pipeline,1.4%,TRUE,Pooled indirect-to-direct effect ratio across the three samples,NA
 s1_ratio_pooled_level,"Dynamic constraint, p. 732",definitional,95,FALSE,Confidence level of the pooled interval,Fixed by the meta-analysis call
 s1_ratio_pooled_low,"Dynamic constraint, p. 732",pipeline,-8%,TRUE,"Pooled ratio, lower endpoint of the 95% interval",NA

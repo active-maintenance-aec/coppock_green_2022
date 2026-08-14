@@ -336,7 +336,7 @@ claim("s1_pwa_nontarget_lucid", pwa_value("Lucid", "Across Domain", "estimate"),
 #  8.7%. On the elite sample, we estimate that indirect effects are 6.4% the size
 #  of the direct effects on average, with a wider confidence interval extending
 #  from -25.7% to 26.2%. On Lucid, the fraction is in fact negative, at -9.4%,
-#  with a confidence interval from -24% to 15%."
+#  with a confidence interval from -24% to +5%."
 claim("s1_ratio_mturk", 100 * pwa_value("MTurk", "ratio", "estimate"),
       "MTurk indirect-to-direct ratio, per cent", 1)
 claim("s1_ratio_mturk_low", 100 * pwa_value("MTurk", "ratio", "conf_low"),

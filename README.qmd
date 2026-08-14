@@ -76,6 +76,7 @@ n_blocks <- sum(claims$needs_block)
 # the numbering, because a second copy is how the two would come to disagree.
 spine <- read_csv(here::here("errata_entries.csv"), show_col_types = FALSE)
 errata_entries <- nrow(spine)
+errata_value <- sum(spine$class != "cross-reference")
 spell_errata <- function(n) c("one", "two", "three", "four", "five", "six", "seven",
                               "eight", "nine", "ten")[n]
 ```
@@ -123,9 +124,9 @@ Yes, with `r n_rewrite_fail` exceptions, none of which is a defect in this code.
 
 Of `r n_claims` published quantities recorded in the ground truth, the rewrite reproduces `r n_rewrite_match` to the precision the article prints and fails to reproduce `r n_rewrite_fail`. A further `r n_descriptive_judged` claims are about shape, sign, count or order rather than about a value, and `r n_descriptive_hold` of those hold. Every cell of tables 1 through 4 and of appendix tables B.2, C.3, C.4 and D.5 reproduces, including all `r sum(str_detect(gt$claim, ": n$"))` sample sizes those four regression tables report.
 
-The `r n_rewrite_fail` failures are all the article disagreeing with itself, and every one of them is a sentence rather than a table cell. The pooled indirect-to-direct effect ratio is printed with the wrong sign, in the results section and again in the discussion. One endpoint of one bootstrap confidence interval cannot be produced by the procedure the deposit uses. The body text gives an average correlation of .29 where table 1 gives .30 for the same underlying `r sprintf("%.4f", t1$within_domain[t1$sample == "MTurk sample"])`. Two graduate degree shares and one standard error are stated at a rounding their own tables contradict. And study 2's design paragraph counts three nontarget outcome measures where the table and the results paragraph both have four.
+The `r n_rewrite_fail` failures are all the article disagreeing with itself, and every one of them is a sentence rather than a table cell. The pooled indirect-to-direct effect ratio is printed with the wrong sign, in the results section and again in the discussion. The body text gives an average correlation of .29 where table 1 gives .30 for the same underlying `r sprintf("%.4f", t1$within_domain[t1$sample == "MTurk sample"])`. Two graduate degree shares and one standard error are stated at a rounding their own tables contradict. And study 2's design paragraph counts three nontarget outcome measures where the table and the results paragraph both have four.
 
-`r n_descriptive_fail` of the descriptive claims also fail, and they are the same mislabel twice: the inconsistency rates behind study 4 and the top panel of table 4 are both attributed to MTurk, and both come from the study 2 original sample that the body text and appendix table C.3 identify as Lucid. The numbers themselves are right, which is why no value comparison could have found them. All `r n_rewrite_fail + n_descriptive_fail` are set out as `r errata_entries` entries in `coppock_green_2022_errata.pdf` at the root of this repository, one entry per published sentence.
+`r n_descriptive_fail` of the descriptive claims also fail, and they are the same mislabel twice: the inconsistency rates behind study 4 and the top panel of table 4 are both attributed to MTurk, and both come from the study 2 original sample that the body text and appendix table C.3 identify as Lucid. The numbers themselves are right, which is why no value comparison could have found them. All `r n_rewrite_fail + n_descriptive_fail` are set out as `r errata_value` entries in `coppock_green_2022_errata.pdf` at the root of this repository, one entry per published sentence. The note carries `r errata_entries` entries in all: the last supplies two figure cross-references the appendix omits, which no value comparison could have found either.
 
 The deposited archive does worse. On the `r n_archive_verifiable` quantities a deposited script produces at all, it reproduces `r n_archive_match` and fails `r n_archive_fail`. The extra failures are one appendix table column that the deposit's own clean data destroys before any analysis script sees it, described below.
 
@@ -189,7 +190,7 @@ latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale
 
 Two kinds of correction, kept apart because they are different things.
 
-**Corrections this code makes to the deposited code** are below. **Sentences in the published article that its own data do not support** are in `coppock_green_2022_errata.pdf` at the root of this repository, which lists `r spell_errata(errata_entries)` of them, computes every corrected value from `maintained/output/` when it is rendered, and changes no conclusion of the article.
+**Corrections this code makes to the deposited code** are below. **Sentences in the published article that its own data do not support**, together with one that refers to figures it never names, are in `coppock_green_2022_errata.pdf` at the root of this repository, which lists `r spell_errata(errata_entries)` of them, computes every corrected value from `maintained/output/` when it is rendered, and changes no conclusion of the article. It carried a tenth until 2026-08-14: an endpoint it corrected turned out to be a misreading of the published page rather than an error in it, the entry was removed, and the reason is below.
 
 ## The elite ideology column of appendix table B.2 is repaired
 
@@ -234,18 +235,22 @@ kbl <- ranges |>
     `Resamples` = format(sims_setting, big.mark = ","),
     `Endpoint runs from` = sprintf("%.1f%%", 100 * mc_low),
     `to` = sprintf("%.1f%%", 100 * mc_high),
-    `Published` = "15%"
+    `Published` = "+5%"
   ) |>
   kable(booktabs = TRUE,
         caption = "The Lucid interval's upper endpoint over repeated unseeded runs, at the resample count the deposit ships and the one the rewrite uses.")
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "hold_position")))
 ```
 
-The `r sprintf("%.1f%%", 100 * ratios$conf_high[ratios$sample == "Lucid"])` this repository computes for the Lucid interval's upper endpoint sits inside the range; the published 15% sits outside it at both resample counts. The other five endpoints the article prints all fall inside their own ranges. What produced the published figure is not established, so the ground truth records the disagreement without naming a cause beyond the article.
+The `r sprintf("%.1f%%", 100 * ratios$conf_high[ratios$sample == "Lucid"])` this repository computes for the Lucid interval's upper endpoint sits inside that range, and so does the +5% the article prints. All six endpoints the article gives fall inside their own ranges and the pooled point estimate falls outside its own, which is why the errata note corrects the estimate and leaves every interval as published.
 
-## Two findings that are not errata
+**That endpoint was misread here, not misprinted there.** Until 2026-08-14 this report and the errata note both gave the published endpoint as 15% and recorded it as an interval bound the deposit's procedure cannot produce. The article prints +5%. Both signs in the sentence are set in a symbol font that the text extraction behind the ground truth mangles: the minus of -24% comes off the page as a 2 and the plus of +5% as a 1, so `-24% to +5%` extracts as `224% to 15%` and was transcribed as fifteen per cent. What found it was an audit of the published PDF by font name: a glyph the extractor mangles comes from a face the body text does not use, and this article sets its plus, minus and equals signs in one of those. The entry that corrected it is gone from the errata note, and the ground truth now records the endpoint as agreeing.
 
-**A cross-reference in the appendix.** Appendix section A.2 says the elaboration "blow[s] up the possible number of graphs from the 32 in Table 1 to 256". The 32 are enumerated in appendix table A.1; table 1 of the main text reports levels of static constraint. The count itself is right. No quantity changes, so it is recorded here rather than in the errata note.
+## Two findings the note does not yet carry
+
+Neither changes a quantity, which is why the errata note was written without them. Entry `r max(spine$entry)` now corrects a cross-reference of exactly this kind, so both stand as candidates for the same treatment.
+
+**A cross-reference in the appendix.** Appendix section A.2 says the elaboration "blow[s] up the possible number of graphs from the 32 in Table 1 to 256". The 32 are enumerated in appendix table A.1; table 1 of the main text reports levels of static constraint. The count itself is right, and the reference points at the wrong table.
 
 **A stray percent sign.** Appendix section C.2 says an estimate "is not significant at the 0.05% level in either sample". The article's tables mark significance at `p < .05` throughout, and both estimates are indeed insignificant at that level, at `r sprintf("p = %.3f", output_file("table_c4_welfare_experiment.csv") |> filter(sample == "Original", outcome == "Gov Should Reduce Ineq", term == "Welfare wording") |> pull(p.value))` and `r sprintf("p = %.3f", output_file("table_c4_welfare_experiment.csv") |> filter(sample == "Replication", outcome == "Gov Should Reduce Ineq", term == "Welfare wording") |> pull(p.value))`. The claim the sentence makes holds; only the unit on the threshold is wrong.
 
@@ -333,7 +338,7 @@ The extraction covers digits and spelled-out numbers alike; "the experiment was 
 
 **The second instrument.** `maintained/in_text_claims.R` carries the article's own sentence verbatim in a block comment and then recomputes the number underneath it from `maintained/output/`, in the article's units and at the article's precision. It never reads the ground truth, and it reaches each quantity by a different route from the one `build_ground_truth.R` takes, so the two can disagree; every one of the `r n_blocks` values is compared across them and a disagreement stops the build. Running it prints the whole audit trail, which is the last thing `run_all.R` does.
 
-The article's `r n_rewrite_fail + n_descriptive_fail` misstatements are collected as `r errata_entries` entries in `coppock_green_2022_errata.pdf` at the root of this repository. Each entry quotes the published sentence, gives the corrected sentence with the changed token in bold, and computes every value in it from `maintained/output/` when the document is rendered, so the note cannot go stale in the way the article did.
+The article's `r n_rewrite_fail + n_descriptive_fail` misstatements are collected as `r errata_value` entries in `coppock_green_2022_errata.pdf` at the root of this repository. Each entry quotes the published sentence, gives the corrected sentence with the changed token in bold, and computes every value in it from `maintained/output/` when the document is rendered, so the note cannot go stale in the way the article did.
 
 # Maintained rewrite
 

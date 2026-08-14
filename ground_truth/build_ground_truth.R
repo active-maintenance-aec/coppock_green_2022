@@ -621,8 +621,15 @@ text_rows <- tribble(
     as_percent(pwa_value("Elite", "ratio", "conf_high")), 1L, endpoint_note("Elite", "conf_high", "26.2%"),
   "s1_ratio_lucid_low", "Text", "Lucid ratio, 95% interval lower bound", NA, "-24%",
     as_percent(pwa_value("Lucid", "ratio", "conf_low")), 0L, endpoint_note("Lucid", "conf_low", "-24%"),
-  "s1_ratio_lucid_high", "Text", "Lucid ratio, 95% interval upper bound", NA, "15%",
-    as_percent(pwa_value("Lucid", "ratio", "conf_high")), 0L, endpoint_note("Lucid", "conf_high", "15%"),
+  # +5%, not 15%. The article sets this endpoint's plus sign in a symbol font
+  # that the text extraction this repository was built against mangles: the
+  # minus of -24% comes off the page as a 2 and the plus of +5% as a 1. The
+  # first transcription read "1 5%" as fifteen per cent, and the disagreement
+  # that produced was published as entry 3 of the errata note, which is
+  # removed. What found it was an audit of the published PDF by font name: a
+  # glyph the extractor mangles comes from a face the body text does not use.
+  "s1_ratio_lucid_high", "Text", "Lucid ratio, 95% interval upper bound", NA, "+5%",
+    as_percent(pwa_value("Lucid", "ratio", "conf_high")), 0L, endpoint_note("Lucid", "conf_high", "+5%"),
   "s1_ratio_pooled", "Text", "Pooled indirect-to-direct ratio",
     as_percent(archive_value("Pooled indirect-to-direct ratio")), "1.4%",
     as_percent(pooled$estimate[pooled$model == "Fixed effects"]), 1L,
@@ -1037,10 +1044,13 @@ normalize_paper <- function(x) {
                   stripped))
 }
 
+# A sign the article prints and sprintf does not reproduce is restored: a minus
+# on a value that rounds to zero, and the plus the Lucid interval's upper
+# endpoint carries on p. 732.
 render_paper <- function(x, digits) {
   rendered <- sprintf(paste0("%.", digits, "f"), paper_number(x))
-  if_else(str_starts(normalize_paper(x), fixed("-")) & !str_starts(rendered, fixed("-")),
-          str_c("-", rendered), rendered)
+  sign <- replace_na(str_extract(normalize_paper(x), "^[-+]"), "")
+  if_else(sign != "" & !str_starts(rendered, fixed(sign)), str_c(sign, rendered), rendered)
 }
 
 precision <- gt |>

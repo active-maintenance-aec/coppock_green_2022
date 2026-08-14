@@ -119,14 +119,18 @@ inconsistent <- function(sample_name) {
 # Numbers that move without being at issue are recomputed and left unmarked, which is why
 # entries 4 and 5 carry corrected figures outside the marked spans.
 #
-# Numbering is the published note's and is APPEND-ONLY: an entry can already have been
-# cited, so a later finding is added at the end and never interleaved.
+# Numbering is positional and these entries may be renumbered. Alex, 2026-08-14, asked
+# whether an entry that turned out to be wrong should be withdrawn at its number or simply
+# removed: "dont worry about the numbering, nobody's citing this yet, we're just working in
+# public." So a wrong entry is deleted and the rest close up. An entry that corrected an
+# endpoint the article never printed was removed on that instruction, and the finding behind
+# it is in the README under "That endpoint was misread here, not misprinted there" and in
+# notes.md. When these notes start being cited, appending becomes the only safe order again.
 #
 # claim_ids names the ground-truth rows an entry corrects, semicolon-separated, so that
 # "is this finding published?" is a query rather than a judgment. It lists only the rows
-# whose values the entry actually changes: entries 1, 3 and 4 restate figures that are
-# right and are left as printed, and those rows are not cited here. Every id listed is
-# checked against the ground truth by build_ground_truth.R.
+# whose values the entry actually changes: entries 3 and 9 change no recorded quantity and
+# name none. Every id listed is checked against the ground truth by build_ground_truth.R.
 entries <- tribble(
   ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
 
@@ -159,24 +163,7 @@ entries <- tribble(
   "The same quantity as item 1, restated. The counts in the sentence are correct.",
   "disc_spillover_ratio",
 
-  3, "quantity", "pipeline", "full",
-  "The upper end of the Lucid interval",
-  "published, main text",
-  "On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to [[15%]].",
-  str_glue("On Lucid, the fraction is in fact negative, at -9.4%, with a confidence interval from -24% to [[{r0(lucid_high)}%]]."),
-  str_glue(
-    "Neither the archive nor the article sets a seed, so no interval endpoint in this paper ",
-    "is a fixed quantity: each is one draw of a bootstrap quantile. Measured by resampling ",
-    "the draws, this endpoint runs from {r1(lucid_high_10['low'])}% to ",
-    "{r1(lucid_high_10['high'])}% at the ten resamples the deposit ships and from ",
-    "{r1(lucid_high_1000['low'])}% to {r1(lucid_high_1000['high'])}% at the thousand this ",
-    "repository uses. The published 15% lies outside both. The lower endpoint is left as ",
-    "printed: it falls inside its own range, which runs from {r1(lucid_low_10['low'])}% to ",
-    "{r1(lucid_low_10['high'])}% at ten resamples, as do the four endpoints the article ",
-    "gives for the MTurk and elite samples."),
-  "s1_ratio_lucid_high",
-
-  4, "label", "pipeline", "full",
+  3, "label", "pipeline", "full",
   "The sample the inconsistency rates come from",
   "published, main text",
   "As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[MTurk]] sample, 30% of the respondents were inconsistent; this figure was 24% [[on Lucid]].",
@@ -190,18 +177,18 @@ entries <- tribble(
     "cells are correct and it is not reprinted here."),
   "disc_inconsistent_sample_label",
 
-  5, "label", "pipeline", "full",
+  4, "label", "pipeline", "full",
   "The sample the correction effects come from",
   "published, main text",
   "The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (-0.172 scale points [[on MTurk]], -0.153 scale points [[on Lucid]]).",
   str_glue("The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending ({r3(correction('Original'))} scale points [[in the original Lucid sample]], {r3(correction('Replication'))} scale points [[in the Lucid replication]])."),
   str_glue(
-    "The same mislabel as item 4. Table 4's top panel is fitted on the study 2 original ",
+    "The same mislabel as item 3. Table 4's top panel is fitted on the study 2 original ",
     "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
     "C.3's first column describes."),
   "disc_correction_sample_label",
 
-  6, "quantity", "pipeline", "full",
+  5, "quantity", "pipeline", "full",
   "The number of nontarget questions in study 2",
   "published, main text",
   "Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the [[three]] further questions.",
@@ -217,7 +204,7 @@ entries <- tribble(
     "sample run from {r2(min(s2_original_cors))} to {r2(max(s2_original_cors))}."),
   "s2_nontarget_measures_text",
 
-  7, "quantity", "pipeline", "full",
+  6, "quantity", "pipeline", "full",
   "The MTurk within-domain correlation",
   "published, main text",
   "On MTurk, the average correlation between attitudes in the same domain was smaller at [[0.29]], and the average correlation between attitudes in different domains was very small at 0.06.",
@@ -227,7 +214,7 @@ entries <- tribble(
     "table rounds it correctly and the sentence does not."),
   "s1_mturk_within_text",
 
-  8, "quantity", "pipeline", "full",
+  7, "quantity", "pipeline", "full",
   "The graduate degree shares",
   "published, main text",
   "A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; [[71%]] of the elites hold a graduate degree, compared with [[13%]] for the MTurk sample and 15% for Lucid.",
@@ -242,19 +229,33 @@ entries <- tribble(
     "{r1(share('Lucid', 'College degree or more'))}% and hold as printed."),
   "s1_graduate_elite;s1_graduate_mturk",
 
-  9, "quantity", "pipeline", "full",
+  8, "quantity", "pipeline", "full",
   "A standard error in study 3",
   "published, main text",
   "By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[0.06]]).",
   str_glue("By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[{r2(esj_se)}]])."),
   str_glue(
-    "Table 3 prints {r3(esj_se)} for the same standard error. As in item 8, the sentence ",
+    "Table 3 prints {r3(esj_se)} for the same standard error. As in item 7, the sentence ",
     "truncates where the table rounds."),
-  "s3_esj_replication_se"
+  "s3_esj_replication_se",
+
+  9, "cross-reference", "reading", "full",
+  "The figures section B.4 does not name",
+  "published, online appendix, section B.4",
+  "[[Figures]] show that while the treatment effects on target issues remain significant even a full month after treatment, the effects on nontarget issues remain very close to zero over time.",
+  "[[Figures B.2 and B.3]] show that while the treatment effects on target issues remain significant even a full month after treatment, the effects on nontarget issues remain very close to zero over time.",
+  str_glue(
+    "The sentence refers to figures and names none. Section B.4 has exactly two, and they are ",
+    "the two the sentence describes: Figure B.2 gives the estimates ten days after treatment ",
+    "and Figure B.3 the estimates thirty days after, which is the full month the sentence ",
+    "appeals to. The omission is in the authors' own appendix source as well as on the ",
+    "published page, and the two numbers are the only words this adds."),
+  NA_character_
 ) |>
   mutate(across(c(title, published, corrected, note, claim_ids), as.character))
 
-stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
+stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry),
+          entries$entry == seq_len(nrow(entries)))
 
 # The spine's markup, resolved for this document. Another renderer resolves it differently.
 bold <- function(x) str_replace_all(x, "\\[\\[(.*?)\\]\\]", "**\\1**")
@@ -272,11 +273,11 @@ emit <- function(n) {
 }
 ```
 
-This note lists `r spell(nrow(entries))` misstated claims in "Do Belief Systems Exhibit Dynamic Constraint?", published in *The Journal of Politics* 84(2), 725--738, doi [10.1086/716294](https://doi.org/10.1086/716294). **None of them changes a conclusion of the article.** The finding that treatments which move a target attitude leave nontarget attitudes untouched is unaffected: the pooled indirect effect is small and statistically indistinguishable from zero on either the published figure or the corrected one, and every estimate in tables 1 through 4 reproduces exactly.
+This note lists `r spell(nrow(entries))` misstatements in "Do Belief Systems Exhibit Dynamic Constraint?", published in *The Journal of Politics* 84(2), 725--738, doi [10.1086/716294](https://doi.org/10.1086/716294). **None of them changes a conclusion of the article.** The finding that treatments which move a target attitude leave nontarget attitudes untouched is unaffected: the pooled indirect effect is small and statistically indistinguishable from zero on either the published figure or the corrected one, and every estimate in tables 1 through 4 reproduces exactly.
 
-The first three concern the same bootstrap, whose resample count and random seed the deposited code never fixes. The next two attach real estimates to the wrong sample. The last four are counts and roundings that disagree with the article's own tables.
+The first two are the same pooled ratio, printed with the wrong sign in the results section and again in the discussion. The next two attach real estimates to the wrong sample. Four more are counts and roundings that disagree with the article's own tables. The last supplies two cross-references the appendix omits.
 
-Every corrected value below is computed from the deposited data at the time this document is rendered; bold marks the tokens that change. Quantities the article states at whole percentage points and which come out of the unseeded bootstrap are left at that precision, because rendering a draw to one decimal would be precise about a number the procedure does not pin down. The code and output supporting each correction are at [github.com/active-maintenance-aec/coppock_green_2022](https://github.com/active-maintenance-aec/coppock_green_2022).
+Every corrected value below is computed from the deposited data at the time this document is rendered; bold marks the tokens that change. The interval endpoints quoted alongside a corrected point estimate are left exactly as the article prints them, because each is one draw of an unseeded bootstrap and every one of them falls inside the range that bootstrap produces. The code and output supporting each correction are at [github.com/active-maintenance-aec/coppock_green_2022](https://github.com/active-maintenance-aec/coppock_green_2022).
 
 ```{r rendered-entries, results="asis"}
 walk(entries$entry, emit)
@@ -286,5 +287,8 @@ walk(entries$entry, emit)
 # The machine-readable spine, written wherever this document is rendered. Anything else
 # that needs these entries reads it rather than keeping its own copy, so the two cannot
 # drift.
-write_csv(entries, here("errata_entries.csv"))
+# na = "": a withdrawn entry has no corrected text and an entry that corrects no recorded
+# quantity has no claim id, and an empty field says that in every reader. The default writes
+# the two letters NA, which a reader outside R takes for text.
+write_csv(entries, here("errata_entries.csv"), na = "")
 ```
