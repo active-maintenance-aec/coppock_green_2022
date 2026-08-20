@@ -1158,6 +1158,54 @@ if (nrow(transcription) > 0) {
   stop(str_glue("{nrow(transcription)} claims are transcribed differently in the extraction and the ground truth."))
 }
 
+# Errata spine gate ----
+# Every claim id an errata entry names has to exist here. A missing one is a typo or a
+# claim that has since been renamed, and a published correction pointing at a row that is
+# not in the table is a dangling reference the build should refuse to carry.
+#
+# The spine is read before the second instrument rather than after it, because the
+# verdict check below needs to know which claims the published note corrects. Only an
+# entry of class quantity changes a number; the rest correct a label, a cross-reference
+# or a word and leave every value where the article put it.
+errata_spine <- read_csv(here::here("errata_entries.csv"), show_col_types = FALSE,
+                         col_types = cols(.default = col_character()))
+
+spine_ids <- function(rows) {
+  ids <- rows$claim_ids |> str_split(";") |> unlist() |> str_trim()
+  ids[!is.na(ids) & ids != ""]
+}
+
+cited_claim_ids <- spine_ids(errata_spine)
+published_corrections <- spine_ids(filter(errata_spine, class == "quantity"))
+
+if (length(setdiff(cited_claim_ids, gt$claim_id)) > 0) {
+  print(setdiff(cited_claim_ids, gt$claim_id))
+}
+stopifnot(length(setdiff(cited_claim_ids, gt$claim_id)) == 0)
+
+# Every quantity the note corrects has to be a quantity that differs. The claims file
+# asserts the same property from the other side, on the value it computes itself; this
+# asserts it on the value recorded here, which is reached by a different path.
+uncorrected <- gt |> filter(claim_id %in% published_corrections, match_rewrite != 0)
+if (nrow(uncorrected) > 0) {
+  print(uncorrected |> select(claim_id, claim, value_paper, value_rewrite, match_rewrite),
+        n = nrow(uncorrected))
+  stop("The errata note corrects claims that reproduce as published.")
+}
+
+# And every quantity that differs because the article is wrong has to be one the note
+# corrects. This is the direction that says the published note is COMPLETE, and it is
+# the reason defect_locus is read here: a difference whose fault lies with the deposit or
+# the environment is not something an erratum about the article could report.
+unpublished <- gt |>
+  filter(!is.na(claim_id), defect_locus == "paper_internal", adverse(match_rewrite),
+         !claim_id %in% cited_claim_ids)
+if (nrow(unpublished) > 0) {
+  print(unpublished |> select(claim_id, table_figure, claim, value_paper, value_rewrite),
+        n = nrow(unpublished))
+  stop("Claims differ from the article through the article's own fault and no errata entry says so.")
+}
+
 # The second instrument is read as a program, not as text: a block that errors at
 # runtime, or that ends in a bare expression and therefore prints nothing under
 # source(), would satisfy any check that merely looked for its claim id in the
@@ -1169,9 +1217,9 @@ claims_log <- capture.output(
   source(here::here("maintained", "in_text_claims.R"), local = new.env())
 )
 
-printed <- str_match(claims_log, "^CLAIM (\\S+) = (\\S+) \\|\\| (.*)$")
+printed <- str_match(claims_log, "^CLAIM (\\S+) = (\\S+) \\|\\| \\[(\\w+)\\] (.*)$")
 printed <- tibble(claim_id = printed[, 2], printed_value = printed[, 3],
-                  label = printed[, 4]) |>
+                  verdict = printed[, 4], label = printed[, 5]) |>
   filter(!is.na(claim_id))
 
 declared <- claims$claim_id[claims$needs_block]
@@ -1201,27 +1249,60 @@ if (any(!cross_check$agrees)) print(cross_check |> filter(!agrees), n = Inf, wid
 stopifnot(length(setdiff(required_rows, cross_check$claim_id)) == 0,
           all(cross_check$agrees))
 
+# Two instruments, compared verdict by verdict ----
+# The cross-check above puts the two files on the same number. This puts them on the
+# same STATEMENT ABOUT that number, which is the half that used to live only here.
+# in_text_claims.R decides what to expect of a claim from the extraction and the errata
+# spine; this script decides it from its own descriptive and approximate flags, its
+# stochastic list and the comparison it performs itself. Neither can see the other's
+# reasoning, so a claim the two classify differently is a finding of the same kind as a
+# value they compute differently.
+#
+# The claims file's five unasserted verdicts collapse to two questions here: is the claim
+# comparable to a printed digit at all, and is it one of the nine whose value is a
+# bootstrap draw scored against a range instead.
+expected_verdict <- gt |>
+  filter(!is.na(claim_id), claim_id %in% printed$claim_id) |>
+  mutate(
+    corrected = claim_id %in% published_corrections,
+    expected = case_when(
+      claim_id %in% stochastic$claim_id & !corrected ~ "range",
+      !comparable ~ "unasserted",
+      corrected ~ "corrected",
+      match_rewrite == 1 ~ "match",
+      TRUE ~ "MISMATCH"
+    )
+  ) |>
+  select(claim_id, table_figure, claim, value_paper, value_rewrite, comparable,
+         match_rewrite, expected)
+
+verdict_check <- printed |>
+  select(claim_id, printed_value, verdict) |>
+  inner_join(expected_verdict, by = "claim_id") |>
+  mutate(
+    # The claims file distinguishes three reasons for not asserting; this script has one
+    # flag for all three, so the comparison is made at the coarser of the two grains.
+    verdict_here = if_else(verdict %in% c("hedged", "shape", "derived", "absent"),
+                           "unasserted", verdict),
+    # The second instrument may assert where this script declines to compare, but never the
+    # reverse. A descriptive claim that prints a truth value, or one whose hedge the
+    # pipeline happens to hit exactly, is comparable there and not here, and an assertion
+    # this script cannot make is a strengthening rather than a disagreement. A claim this
+    # script DOES compare and the claims file declines to assert is the direction that
+    # loses coverage, and it still fails.
+    agrees = verdict_here == expected | (expected == "unasserted" & verdict == "match")
+  )
+
+if (any(!verdict_check$agrees)) {
+  print(verdict_check |> filter(!agrees), n = Inf, width = 250)
+  stop(str_glue("{sum(!verdict_check$agrees)} claims are classified differently by the ",
+                "two instruments."))
+}
+stopifnot(nrow(verdict_check) == nrow(printed))
+
 gt <- gt |>
   select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
          value_rewrite, match_rewrite, holds, defect_locus, notes)
-
-# Errata spine gate ----
-# Every claim id an errata entry names has to exist here. A missing one is a typo or a
-# claim that has since been renamed, and a published correction pointing at a row that is
-# not in the table is a dangling reference the build should refuse to carry.
-errata_path <- here::here("errata_entries.csv")
-if (file.exists(errata_path)) {
-  errata_spine <- read_csv(errata_path, show_col_types = FALSE)
-  cited_claim_ids <- errata_spine$claim_ids |>
-    str_split(";") |>
-    unlist() |>
-    str_trim()
-  cited_claim_ids <- cited_claim_ids[!is.na(cited_claim_ids) & cited_claim_ids != ""]
-  if (length(setdiff(cited_claim_ids, gt$claim_id)) > 0) {
-    print(setdiff(cited_claim_ids, gt$claim_id))
-  }
-  stopifnot(length(setdiff(cited_claim_ids, gt$claim_id)) == 0)
-}
 
 write_csv(gt, here::here("ground_truth", "coppock_green_2022_ground_truth.csv"))
 
@@ -1235,11 +1316,19 @@ print(tibble(
                "descriptive claims judged", "descriptive claims holding",
                "extraction rows", "extraction rows needing a block",
                "claims printed by in_text_claims.R",
-               "claims compared across the two instruments"),
+               "claims compared across the two instruments",
+               "claims classified across the two instruments",
+               "claims the second instrument asserts",
+               "claims the second instrument declines to assert",
+               "quantities the errata note corrects"),
   value = c(nrow(gt), sum(!is.na(gt$match)), sum(gt$match == 1, na.rm = TRUE),
             sum(gt$match == 0, na.rm = TRUE),
             sum(!is.na(gt$match_rewrite)), sum(gt$match_rewrite == 1, na.rm = TRUE),
             sum(gt$match_rewrite == 0, na.rm = TRUE),
             sum(!is.na(gt$holds)), sum(gt$holds == 1, na.rm = TRUE),
-            nrow(claims), length(declared), nrow(printed), nrow(cross_check))
+            nrow(claims), length(declared), nrow(printed), nrow(cross_check),
+            nrow(verdict_check),
+            sum(verdict_check$verdict %in% c("match", "corrected")),
+            sum(!verdict_check$verdict %in% c("match", "corrected")),
+            length(published_corrections))
 ), n = Inf)

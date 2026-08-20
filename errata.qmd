@@ -131,8 +131,18 @@ inconsistent <- function(sample_name) {
 # "is this finding published?" is a query rather than a judgment. It lists only the rows
 # whose values the entry actually changes: entries 3 and 9 change no recorded quantity and
 # name none. Every id listed is checked against the ground truth by build_ground_truth.R.
+#
+# corrected_values runs parallel to claim_ids, one value per id in the same order, carrying
+# the corrected quantity as a number rather than as a sentence. The sentence already holds
+# it, but only inside prose a reader has to parse: entry 5's marked span reads "four" and
+# entry 7's reads "72%". in_text_claims.R asserts that the value it computes for a corrected
+# claim is this one, which is the check that the correction this note publishes is the
+# correction the pipeline currently supports. Each value comes from the same expression that
+# glues the sentence, so the two cannot be written apart, and the gate below re-checks that
+# each one is still inside the span it belongs to. A class that changes no quantity carries
+# NA here, and so does an entry that names no claim.
 entries <- tribble(
-  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids, ~corrected_values,
 
   1, "quantity", "pipeline", "full",
   "The sign of the pooled ratio",
@@ -153,7 +163,7 @@ entries <- tribble(
     "estimate does not: over repeated runs at the resample count the deposit ships, the ",
     "pooled estimate lies between {r1(pooled_estimate_10['low'])}% and ",
     "{r1(pooled_estimate_10['high'])}%."),
-  "s1_ratio_pooled",
+  "s1_ratio_pooled", r1(pooled_estimate),
 
   2, "quantity", "pipeline", "full",
   "The same ratio in the discussion",
@@ -161,7 +171,7 @@ entries <- tribble(
   "But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[1.4%]] of the first-stage direct effect.",
   str_glue("But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[{r1(pooled_estimate)}%]] of the first-stage direct effect."),
   "The same quantity as item 1, restated. The counts in the sentence are correct.",
-  "disc_spillover_ratio",
+  "disc_spillover_ratio", r1(pooled_estimate),
 
   3, "label", "pipeline", "full",
   "The sample the inconsistency rates come from",
@@ -175,7 +185,7 @@ entries <- tribble(
     "Replication\". The indicator that defines inconsistency appears in no MTurk data file ",
     "in the deposit. Table 4 carries the same mislabel in its row heading \"N (MTurk)\"; its ",
     "cells are correct and it is not reprinted here."),
-  "disc_inconsistent_sample_label",
+  "disc_inconsistent_sample_label", NA_character_,
 
   4, "label", "pipeline", "full",
   "The sample the correction effects come from",
@@ -186,7 +196,7 @@ entries <- tribble(
     "The same mislabel as item 3. Table 4's top panel is fitted on the study 2 original ",
     "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
     "C.3's first column describes."),
-  "disc_correction_sample_label",
+  "disc_correction_sample_label", NA_character_,
 
   5, "quantity", "pipeline", "full",
   "The number of nontarget questions in study 2",
@@ -202,7 +212,7 @@ entries <- tribble(
     "school prayer is measured with two questions, not one. The stated correlation range is ",
     "correct: the {spell(length(s2_original_cors))} pairwise correlations in the original ",
     "sample run from {r2(min(s2_original_cors))} to {r2(max(s2_original_cors))}."),
-  "s2_nontarget_measures_text",
+  "s2_nontarget_measures_text", as.character(n_nontarget_s2),
 
   6, "quantity", "pipeline", "full",
   "The MTurk within-domain correlation",
@@ -212,7 +222,7 @@ entries <- tribble(
   str_glue(
     "The quantity is {sprintf('%.4f', mturk_within)}. Table 1 prints .30 for it, so the ",
     "table rounds it correctly and the sentence does not."),
-  "s1_mturk_within_text",
+  "s1_mturk_within_text", r2(mturk_within),
 
   7, "quantity", "pipeline", "full",
   "The graduate degree shares",
@@ -228,6 +238,7 @@ entries <- tribble(
     "{r1(share('MTurk', 'College degree or more'))}% and ",
     "{r1(share('Lucid', 'College degree or more'))}% and hold as printed."),
   "s1_graduate_elite;s1_graduate_mturk",
+  str_c(r0(share("Elite", "Graduate degree")), ";", r0(share("MTurk", "Graduate degree"))),
 
   8, "quantity", "pipeline", "full",
   "A standard error in study 3",
@@ -237,7 +248,7 @@ entries <- tribble(
   str_glue(
     "Table 3 prints {r3(esj_se)} for the same standard error. As in item 7, the sentence ",
     "truncates where the table rounds."),
-  "s3_esj_replication_se",
+  "s3_esj_replication_se", r2(esj_se),
 
   9, "cross-reference", "reading", "full",
   "The figures section B.4 does not name",
@@ -250,12 +261,60 @@ entries <- tribble(
     "and Figure B.3 the estimates thirty days after, which is the full month the sentence ",
     "appeals to. The omission is in the authors' own appendix source as well as on the ",
     "published page, and the two numbers are the only words this adds."),
-  NA_character_
+  NA_character_, NA_character_
 ) |>
-  mutate(across(c(title, published, corrected, note, claim_ids), as.character))
+  mutate(across(c(title, published, corrected, note, claim_ids, corrected_values), as.character))
 
 stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry),
           entries$entry == seq_len(nrow(entries)))
+
+# Gate: corrected_values agrees with the sentence it was glued into ----
+# The column and the sentence are written from one expression, so they begin in agreement
+# and this gate exists for the edit that separates them: a value moved from one marked span
+# to another, a span reworded to carry a second number, a claim id appended without its
+# value. Each value has to be inside the span it belongs to, matched by position where the
+# counts line up, and the spelled form counts as the numeral because entry 5 sets "four".
+marked_spans <- function(x) str_match_all(x, "\\[\\[(.*?)\\]\\]")[[1]][, 2]
+
+inside_span <- function(value, span) {
+  numeral <- str_detect(span, fixed(value))
+  spelled <- !is.na(suppressWarnings(as.numeric(value))) &&
+    as.numeric(value) %in% seq_len(12) &&
+    str_detect(span, fixed(spell(as.numeric(value))))
+  numeral || spelled
+}
+
+quantified <- entries |>
+  filter(!is.na(corrected_values)) |>
+  mutate(ids = str_split(claim_ids, ";"), values = str_split(corrected_values, ";"),
+         spans = map(corrected, marked_spans))
+
+stopifnot(all(lengths(quantified$ids) == lengths(quantified$values)))
+
+# Where a span carries two numbers at once the pairing by position is not available, so the
+# value is required to be inside some span instead. No entry here is of that shape; the
+# branch is what keeps the gate usable on a paper that has one.
+value_placed <- pmap_lgl(quantified, function(...) {
+  e <- list(...)
+  if (length(e$values) == length(e$spans)) {
+    all(map2_lgl(e$values, e$spans, inside_span))
+  } else {
+    all(map_lgl(e$values, \(v) any(map_lgl(e$spans, \(s) inside_span(v, s)))))
+  }
+})
+
+if (!all(value_placed)) {
+  print(quantified |> filter(!value_placed) |> select(entry, title, corrected_values, corrected))
+  stop("An entry's corrected_values are not in the spans of its corrected sentence.")
+}
+
+# An entry that changes a quantity has to say which one, and an entry that changes none
+# may not carry a value. The class is the declaration and this is where it binds.
+stopifnot(
+  all(!is.na(entries$corrected_values[entries$class == "quantity"])),
+  all(is.na(entries$corrected_values[entries$class != "quantity"])),
+  all(is.na(entries$corrected_values) | !is.na(entries$claim_ids))
+)
 
 # The spine's markup, resolved for this document. Another renderer resolves it differently.
 bold <- function(x) str_replace_all(x, "\\[\\[(.*?)\\]\\]", "**\\1**")
