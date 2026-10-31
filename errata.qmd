@@ -29,6 +29,12 @@ t4 <- out("table_4_correction_experiment.csv")
 b2 <- out("table_b2_sample_demographics.csv")
 inconsistency <- out("text_inconsistency_rates.csv")
 descriptions <- out("text_sample_descriptions.csv")
+# Entry 11's two p-values, read from Table C.4's own output so the note cannot
+# assert a threshold the table does not support.
+c4_ineq <- out("table_c4_welfare_experiment.csv") |>
+  filter(outcome == "Gov Should Reduce Ineq", term == "Welfare wording")
+stopifnot(nrow(c4_ineq) == 2, all(c4_ineq$p.value > 0.05))
+c4_ineq_p <- set_names(c4_ineq$p.value, c4_ineq$sample)
 
 archive <- read_csv(here("ground_truth", "archive_values.csv"), show_col_types = FALSE)
 
@@ -261,6 +267,30 @@ entries <- tribble(
     "and Figure B.3 the estimates thirty days after, which is the full month the sentence ",
     "appeals to. The omission is in the authors' own appendix source as well as on the ",
     "published page, and the two numbers are the only words this adds."),
+  NA_character_, NA_character_,
+
+  10, "cross-reference", "reading", "full",
+  "The table section A.2 cites for the 32 graphs",
+  "published, online appendix, section A.2",
+  "These three edges blow up the possible number of graphs from the 32 in [[Table 1]] to 256.",
+  "These three edges blow up the possible number of graphs from the 32 in [[Table A.1]] to 256.",
+  str_glue(
+    "The 32 graphs are enumerated in appendix Table A.1. Table 1 of the article reports levels ",
+    "of static constraint and enumerates nothing. The count is right and the reference points ",
+    "at the wrong table; as with entry 9, the slip is in the authors' own appendix source as ",
+    "well as on the published page."),
+  NA_character_, NA_character_,
+
+  11, "wording", "reading", "full",
+  "A significance threshold stated as a percentage",
+  "published, online appendix, section C.2",
+  "The effect of the prime on subsequent support for government reducing income gaps is slightly negative and is not significant at the [[0.05%]] level in either sample.",
+  "The effect of the prime on subsequent support for government reducing income gaps is slightly negative and is not significant at the [[0.05]] level in either sample.",
+  str_glue(
+    "The article's tables mark significance at p < .05 throughout, and a 0.05% level would be ",
+    "p < .0005, a threshold the article uses nowhere. The claim the sentence makes holds at the ",
+    "0.05 level: Table C.4 gives p = {r3(c4_ineq_p['Original'])} in the original sample and ",
+    "p = {r3(c4_ineq_p['Replication'])} in the replication. Only the unit on the threshold is wrong."),
   NA_character_, NA_character_
 ) |>
   mutate(across(c(title, published, corrected, note, claim_ids, corrected_values), as.character))

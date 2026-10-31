@@ -12,8 +12,8 @@
     repaired](#the-elite-ideology-column-of-appendix-table-b2-is-repaired)
   - [The pooled ratio, and what the unseeded bootstrap does to
     it](#the-pooled-ratio-and-what-the-unseeded-bootstrap-does-to-it)
-  - [Two findings the note does not yet
-    carry](#two-findings-the-note-does-not-yet-carry)
+  - [Two appendix findings filed
+    late](#two-appendix-findings-filed-late)
 - [Ground truth](#ground-truth)
 - [The extraction, and the two instruments that read
   it](#the-extraction-and-the-two-instruments-that-read-it)
@@ -136,9 +136,11 @@ sample that the body text and appendix table C.3 identify as Lucid. The
 numbers themselves are right, which is why no value comparison could
 have found them. All 9 are set out as 8 entries in
 `coppock_green_2022_errata.pdf` at the root of this repository, one
-entry per published sentence. The note carries 9 entries in all: the
-last supplies two figure cross-references the appendix omits, which no
-value comparison could have found either.
+entry per published sentence. The note carries 11 entries in all: entry
+9 supplies two figure cross-references the appendix omits, entry 10
+corrects the table a cross-reference names, and entry 11 the unit on a
+significance threshold, none of which a value comparison could have
+found either.
 
 The deposited archive does worse. On the 309 quantities a deposited
 script produces at all, it reproduces 302 and fails 7. The extra
@@ -292,11 +294,12 @@ Two kinds of correction, kept apart because they are different things.
 **Sentences in the published article that its own data do not support**,
 together with one that refers to figures it never names, are in
 `coppock_green_2022_errata.pdf` at the root of this repository, which
-lists nine of them, computes every corrected value from
+lists eleven of them, computes every corrected value from
 `maintained/output/` when it is rendered, and changes no conclusion of
-the article. It carried a tenth until 2026-08-14: an endpoint it
-corrected turned out to be a misreading of the published page rather
-than an error in it, the entry was removed, and the reason is below.
+the article. An entry it carried until 2026-08-14 was removed: an
+endpoint it corrected turned out to be a misreading of the published
+page rather than an error in it, the entry was removed, and the reason
+is below.
 
 ## The elite ideology column of appendix table B.2 is repaired
 
@@ -386,23 +389,24 @@ and equals signs in one of those. The entry that corrected it is gone
 from the errata note, and the ground truth now records the endpoint as
 agreeing.
 
-## Two findings the note does not yet carry
+## Two appendix findings filed late
 
-Neither changes a quantity, which is why the errata note was written
-without them. Entry 9 now corrects a cross-reference of exactly this
-kind, so both stand as candidates for the same treatment.
+Neither changes a quantity, which is why the errata note was first
+written without them. Both were filed on 2026-10-31 as entries 10 and
+11, on the same footing as entry 9’s cross-reference.
 
-**A cross-reference in the appendix.** Appendix section A.2 says the
-elaboration “blow\[s\] up the possible number of graphs from the 32 in
-Table 1 to 256”. The 32 are enumerated in appendix table A.1; table 1 of
-the main text reports levels of static constraint. The count itself is
-right, and the reference points at the wrong table.
+**A cross-reference in the appendix (entry 10).** Appendix section A.2
+says the elaboration “blow\[s\] up the possible number of graphs from
+the 32 in Table 1 to 256”. The 32 are enumerated in appendix table A.1;
+table 1 of the main text reports levels of static constraint. The count
+itself is right, and the reference points at the wrong table.
 
-**A stray percent sign.** Appendix section C.2 says an estimate “is not
-significant at the 0.05% level in either sample”. The article’s tables
-mark significance at `p < .05` throughout, and both estimates are indeed
-insignificant at that level, at p = 0.064 and p = 0.097. The claim the
-sentence makes holds; only the unit on the threshold is wrong.
+**A stray percent sign (entry 11).** Appendix section C.2 says an
+estimate “is not significant at the 0.05% level in either sample”. The
+article’s tables mark significance at `p < .05` throughout, and both
+estimates are indeed insignificant at that level, at p = 0.064 and p =
+0.097. The claim the sentence makes holds; only the unit on the
+threshold is wrong.
 
 **One sample label is right and reads as though it were not.** Appendix
 table D.5 reports N = 1,187 for the study 3 replication, which is the
@@ -706,17 +710,17 @@ recorded value is reproducible even though the deposit’s own run is not.
 
 # R environment
 
-| Component  | Version |
-|:-----------|:--------|
-| R          | 4.6.0   |
-| tidyverse  | 2.0.0   |
-| estimatr   | 1.0.6   |
-| rsample    | 1.3.2   |
-| metafor    | 5.0.1   |
-| janitor    | 2.2.1   |
-| kableExtra | 1.4.0   |
-| knitr      | 1.51    |
-| here       | 1.0.2   |
+| Component  | Version    |
+|:-----------|:-----------|
+| R          | 4.6.1      |
+| tidyverse  | 2.0.0      |
+| estimatr   | 2.0.1.9000 |
+| rsample    | 1.3.2      |
+| metafor    | 5.0.1      |
+| janitor    | 2.2.1      |
+| kableExtra | 1.4.0      |
+| knitr      | 1.51       |
+| here       | 1.0.2      |
 
 Versions this report was built against.
 
