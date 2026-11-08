@@ -625,7 +625,7 @@ text_rows <- tribble(
   # that the text extraction this repository was built against mangles: the
   # minus of -24% comes off the page as a 2 and the plus of +5% as a 1. The
   # first transcription read "1 5%" as fifteen per cent, and the disagreement
-  # that produced was published as entry 3 of the errata note, which is
+  # that produced was published as entry 7 of the errata note, which is
   # removed. What found it was an audit of the published PDF by font name: a
   # glyph the extractor mangles comes from a face the body text does not use.
   "s1_ratio_lucid_high", "Text", "Lucid ratio, 95% interval upper bound", NA, "+5%",

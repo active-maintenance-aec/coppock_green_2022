@@ -123,9 +123,9 @@ inconsistent <- function(sample_name) {
 # for it, and this document's convention is to bold the corrected side only, so the marks
 # on the published side are stripped rather than set. Nothing else in a field is markup.
 # Numbers that move without being at issue are recomputed and left unmarked, which is why
-# entries 4 and 5 carry corrected figures outside the marked spans.
+# entries 3 and 8 carry corrected figures outside the marked spans.
 #
-# Numbering is positional and these entries may be renumbered. Alex, 2026-08-14, asked
+# Numbering is positional (severity blocks, PROCEDURES.md Stage 4b; renumbered 2026-11-07) and these entries may be renumbered. Alex, 2026-08-14, asked
 # whether an entry that turned out to be wrong should be withdrawn at its number or simply
 # removed: "dont worry about the numbering, nobody's citing this yet, we're just working in
 # public." So a wrong entry is deleted and the rest close up. An entry that corrected an
@@ -135,13 +135,13 @@ inconsistent <- function(sample_name) {
 #
 # claim_ids names the ground-truth rows an entry corrects, semicolon-separated, so that
 # "is this finding published?" is a query rather than a judgment. It lists only the rows
-# whose values the entry actually changes: entries 3 and 9 change no recorded quantity and
+# whose values the entry actually changes: entries 7 and 9 change no recorded quantity and
 # name none. Every id listed is checked against the ground truth by build_ground_truth.R.
 #
 # corrected_values runs parallel to claim_ids, one value per id in the same order, carrying
 # the corrected quantity as a number rather than as a sentence. The sentence already holds
-# it, but only inside prose a reader has to parse: entry 5's marked span reads "four" and
-# entry 7's reads "72%". in_text_claims.R asserts that the value it computes for a corrected
+# it, but only inside prose a reader has to parse: entry 3's marked span reads "four" and
+# entry 5's reads "72%". in_text_claims.R asserts that the value it computes for a corrected
 # claim is this one, which is the check that the correction this note publishes is the
 # correction the pipeline currently supports. Each value comes from the same expression that
 # glues the sentence, so the two cannot be written apart, and the gate below re-checks that
@@ -152,7 +152,7 @@ entries <- tribble(
 
   1, "quantity", "pipeline", "full",
   "The sign of the pooled ratio",
-  "published, main text",
+  "main text",
   "If we pool the three studies together, our estimate is [[1.4%]] (95% CI: -8%, 6%).",
   str_glue("If we pool the three studies together, our estimate is [[{r1(pooled_estimate)}%]] (95% CI: -8%, 6%)."),
   str_glue(
@@ -173,40 +173,15 @@ entries <- tribble(
 
   2, "quantity", "pipeline", "full",
   "The same ratio in the discussion",
-  "published, discussion",
+  "discussion",
   "But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[1.4%]] of the first-stage direct effect.",
   str_glue("But in only nine of 144 opportunities did it induce significant changes on nontarget issues, and the average spillover effect is just [[{r1(pooled_estimate)}%]] of the first-stage direct effect."),
   "The same quantity as item 1, restated. The counts in the sentence are correct.",
   "disc_spillover_ratio", r1(pooled_estimate),
 
-  3, "label", "pipeline", "full",
-  "The sample the inconsistency rates come from",
-  "published, main text",
-  "As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[MTurk]] sample, 30% of the respondents were inconsistent; this figure was 24% [[on Lucid]].",
-  str_glue("As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[study 2 original]] sample, {r0(inconsistent('Original'))}% of the respondents were inconsistent; this figure was {r0(inconsistent('Replication'))}% [[in the replication]]."),
-  str_glue(
-    "Both figures come from study 2, and both study 2 samples were recruited on Lucid: the ",
-    "body text says the 1,087 subjects for that experiment \"were also recruited via ",
-    "Lucid\", and appendix table C.3 heads its two columns \"Lucid Original\" and \"Lucid ",
-    "Replication\". The indicator that defines inconsistency appears in no MTurk data file ",
-    "in the deposit. Table 4 carries the same mislabel in its row heading \"N (MTurk)\"; its ",
-    "cells are correct and it is not reprinted here."),
-  "disc_inconsistent_sample_label", NA_character_,
-
-  4, "label", "pipeline", "full",
-  "The sample the correction effects come from",
-  "published, main text",
-  "The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (-0.172 scale points [[on MTurk]], -0.153 scale points [[on Lucid]]).",
-  str_glue("The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending ({r3(correction('Original'))} scale points [[in the original Lucid sample]], {r3(correction('Replication'))} scale points [[in the Lucid replication]])."),
-  str_glue(
-    "The same mislabel as item 3. Table 4's top panel is fitted on the study 2 original ",
-    "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
-    "C.3's first column describes."),
-  "disc_correction_sample_label", NA_character_,
-
-  5, "quantity", "pipeline", "full",
+  3, "quantity", "pipeline", "full",
   "The number of nontarget questions in study 2",
-  "published, main text",
+  "main text",
   "Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the [[three]] further questions.",
   str_glue("Responses to these nontarget outcomes are positively correlated among each other and with the target outcome of the manipulation (correlations range from 0.3 to 0.7), so it is reasonable to imagine that subjects would apply the religious conviction consideration when answering the [[{spell(n_nontarget_s2)}]] further questions."),
   str_glue(
@@ -220,9 +195,9 @@ entries <- tribble(
     "sample run from {r2(min(s2_original_cors))} to {r2(max(s2_original_cors))}."),
   "s2_nontarget_measures_text", as.character(n_nontarget_s2),
 
-  6, "quantity", "pipeline", "full",
+  4, "quantity", "pipeline", "full",
   "The MTurk within-domain correlation",
-  "published, main text",
+  "main text",
   "On MTurk, the average correlation between attitudes in the same domain was smaller at [[0.29]], and the average correlation between attitudes in different domains was very small at 0.06.",
   str_glue("On MTurk, the average correlation between attitudes in the same domain was smaller at [[{r2(mturk_within)}]], and the average correlation between attitudes in different domains was very small at 0.06."),
   str_glue(
@@ -230,9 +205,9 @@ entries <- tribble(
     "table rounds it correctly and the sentence does not."),
   "s1_mturk_within_text", r2(mturk_within),
 
-  7, "quantity", "pipeline", "full",
+  5, "quantity", "pipeline", "full",
   "The graduate degree shares",
-  "published, main text",
+  "main text",
   "A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; [[71%]] of the elites hold a graduate degree, compared with [[13%]] for the MTurk sample and 15% for Lucid.",
   str_glue("A full 96% of the elite sample hold a college degree, compared with 51% of the MTurk sample and 44% of the Lucid sample; [[{r0(share('Elite', 'Graduate degree'))}%]] of the elites hold a graduate degree, compared with [[{r0(share('MTurk', 'Graduate degree'))}%]] for the MTurk sample and 15% for Lucid."),
   str_glue(
@@ -246,19 +221,44 @@ entries <- tribble(
   "s1_graduate_elite;s1_graduate_mturk",
   str_c(r0(share("Elite", "Graduate degree")), ";", r0(share("MTurk", "Graduate degree"))),
 
-  8, "quantity", "pipeline", "full",
+  6, "quantity", "pipeline", "full",
   "A standard error in study 3",
-  "published, main text",
+  "main text",
   "By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[0.06]]).",
   str_glue("By contrast, the effects on economic system justification are small and close to zero: -0.18 standard units in the original study (SE: 0.10) and -0.07 units in the replication (SE: [[{r2(esj_se)}]])."),
   str_glue(
-    "Table 3 prints {r3(esj_se)} for the same standard error. As in item 7, the sentence ",
+    "Table 3 prints {r3(esj_se)} for the same standard error. As in item 5, the sentence ",
     "truncates where the table rounds."),
   "s3_esj_replication_se", r2(esj_se),
 
-  9, "cross-reference", "reading", "full",
+  7, "label", "pipeline", "full",
+  "The sample the inconsistency rates come from",
+  "main text",
+  "As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[MTurk]] sample, 30% of the respondents were inconsistent; this figure was 24% [[on Lucid]].",
+  str_glue("As is well documented (Ahler and Broockman 2018; Sears and Citrin 1982), inconsistency between preferences for smaller government and increased social spending is common. Among the [[study 2 original]] sample, {r0(inconsistent('Original'))}% of the respondents were inconsistent; this figure was {r0(inconsistent('Replication'))}% [[in the replication]]."),
+  str_glue(
+    "Both figures come from study 2, and both study 2 samples were recruited on Lucid: the ",
+    "body text says the 1,087 subjects for that experiment \"were also recruited via ",
+    "Lucid\", and appendix table C.3 heads its two columns \"Lucid Original\" and \"Lucid ",
+    "Replication\". The indicator that defines inconsistency appears in no MTurk data file ",
+    "in the deposit. Table 4 carries the same mislabel in its row heading \"N (MTurk)\"; its ",
+    "cells are correct and it is not reprinted here."),
+  "disc_inconsistent_sample_label", NA_character_,
+
+  8, "label", "pipeline", "full",
+  "The sample the correction effects come from",
+  "main text",
+  "The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending (-0.172 scale points [[on MTurk]], -0.153 scale points [[on Lucid]]).",
+  str_glue("The results are shown in table 4. When induced to become more consistent, people who prefer smaller government prefer less spending ({r3(correction('Original'))} scale points [[in the original Lucid sample]], {r3(correction('Replication'))} scale points [[in the Lucid replication]])."),
+  str_glue(
+    "The same mislabel as item 7. Table 4's top panel is fitted on the study 2 original ",
+    "sample, the same 1,087 Lucid respondents table 2's top panel uses and appendix table ",
+    "C.3's first column describes."),
+  "disc_correction_sample_label", NA_character_,
+
+  9, "cross_reference", "reading", "full",
   "The figures section B.4 does not name",
-  "published, online appendix, section B.4",
+  "app. Section B.4",
   "[[Figures]] show that while the treatment effects on target issues remain significant even a full month after treatment, the effects on nontarget issues remain very close to zero over time.",
   "[[Figures B.2 and B.3]] show that while the treatment effects on target issues remain significant even a full month after treatment, the effects on nontarget issues remain very close to zero over time.",
   str_glue(
@@ -269,9 +269,9 @@ entries <- tribble(
     "published page, and the two numbers are the only words this adds."),
   NA_character_, NA_character_,
 
-  10, "cross-reference", "reading", "full",
+  10, "cross_reference", "reading", "full",
   "The table section A.2 cites for the 32 graphs",
-  "published, online appendix, section A.2",
+  "app. Section A.2",
   "These three edges blow up the possible number of graphs from the 32 in [[Table 1]] to 256.",
   "These three edges blow up the possible number of graphs from the 32 in [[Table A.1]] to 256.",
   str_glue(
@@ -283,7 +283,7 @@ entries <- tribble(
 
   11, "wording", "reading", "full",
   "A significance threshold stated as a percentage",
-  "published, online appendix, section C.2",
+  "app. Section C.2",
   "The effect of the prime on subsequent support for government reducing income gaps is slightly negative and is not significant at the [[0.05%]] level in either sample.",
   "The effect of the prime on subsequent support for government reducing income gaps is slightly negative and is not significant at the [[0.05]] level in either sample.",
   str_glue(
@@ -303,7 +303,7 @@ stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry),
 # and this gate exists for the edit that separates them: a value moved from one marked span
 # to another, a span reworded to carry a second number, a claim id appended without its
 # value. Each value has to be inside the span it belongs to, matched by position where the
-# counts line up, and the spelled form counts as the numeral because entry 5 sets "four".
+# counts line up, and the spelled form counts as the numeral because entry 3 sets "four".
 marked_spans <- function(x) str_match_all(x, "\\[\\[(.*?)\\]\\]")[[1]][, 2]
 
 inside_span <- function(value, span) {
@@ -379,5 +379,12 @@ walk(entries$entry, emit)
 # na = "": a withdrawn entry has no corrected text and an entry that corrects no recorded
 # quantity has no claim id, and an empty field says that in every reader. The default writes
 # the two letters NA, which a reader outside R takes for text.
+# The spine's vocabularies are closed (cleanup of 2026-11-07): a value outside them is a
+# typo, and the edition builders read these columns to shape every entry.
+stopifnot(
+  all(entries$class %in% c("quantity", "description", "interpretation", "definition", "label", "float", "cross_reference", "wording", "spelling", "typography", "bibliographic")),
+  all(entries$form %in% c("full", "brief", "note")),
+  all(entries$source %in% c("pipeline", "reading", "reference_audit", "publisher_record", "authors_archive", "proof"))
+)
 write_csv(entries, here("errata_entries.csv"), na = "")
 ```

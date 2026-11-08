@@ -76,7 +76,7 @@ n_blocks <- sum(claims$needs_block)
 # the numbering, because a second copy is how the two would come to disagree.
 spine <- read_csv(here::here("errata_entries.csv"), show_col_types = FALSE)
 errata_entries <- nrow(spine)
-errata_value <- sum(!spine$class %in% c("cross-reference", "wording"))
+errata_value <- sum(!spine$class %in% c("cross_reference", "wording"))
 spell_errata <- function(n) {
   words <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
              "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
