@@ -326,14 +326,26 @@ stopifnot(all(lengths(quantified$ids) == lengths(quantified$values)))
 # Where a span carries two numbers at once the pairing by position is not available, so the
 # value is required to be inside some span instead. No entry here is of that shape; the
 # branch is what keeps the gate usable on a paper that has one.
-value_placed <- pmap_lgl(quantified, function(...) {
-  e <- list(...)
-  if (length(e$values) == length(e$spans)) {
-    all(map2_lgl(e$values, e$spans, inside_span))
+placement <- function(values, spans) {
+  if (length(values) == length(spans)) {
+    map2_lgl(values, spans, inside_span)
   } else {
-    all(map_lgl(e$values, \(v) any(map_lgl(e$spans, \(s) inside_span(v, s)))))
+    map_lgl(values, \(v) any(map_lgl(spans, \(s) inside_span(v, s))))
   }
-})
+}
+
+quantified <- quantified |>
+  mutate(placed = map2(values, spans, placement))
+value_placed <- map_lgl(quantified$placed, all)
+
+# The placement is written to the spine as values_in_spans, one logical per corrected
+# value in the same order, so a reader can see it without rerunning this gate.
+entries <- entries |>
+  left_join(
+    quantified |>
+      transmute(entry, values_in_spans = map_chr(placed, \(p) str_c(p, collapse = ";"))),
+    by = "entry"
+  )
 
 if (!all(value_placed)) {
   print(quantified |> filter(!value_placed) |> select(entry, title, corrected_values, corrected))

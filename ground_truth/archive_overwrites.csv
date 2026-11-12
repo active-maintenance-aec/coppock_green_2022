@@ -1,0 +1,6 @@
+pass,file,effect,matches_deposit
+stripped,study_2_lucid_clean.rds,rebuilt,TRUE
+stripped,factor_analysis_models.rdata,rebuilt,FALSE
+as_shipped,study_2_lucid_clean.rds,overwritten,TRUE
+as_shipped,replication_trump_white_clean.rds,overwritten,TRUE
+as_shipped,factor_analysis_models.rdata,overwritten,FALSE

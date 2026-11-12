@@ -1,8 +1,0 @@
-file,stripped_rebuilt,stripped_matches_deposit,deposited_overwritten,deposited_matches_deposit
-study_1_mturk_cleaned.rds,FALSE,NA,FALSE,TRUE
-study_1_elite_cleaned.rds,FALSE,NA,FALSE,TRUE
-study_2_lucid_clean.rds,TRUE,TRUE,TRUE,TRUE
-original_trump_white_clean.rds,FALSE,NA,FALSE,TRUE
-replication_trump_white_clean.rds,FALSE,NA,TRUE,TRUE
-studies_1_2_replications_lucid_cleaned.rds,FALSE,NA,FALSE,TRUE
-factor_analysis_models.rdata,TRUE,FALSE,TRUE,FALSE

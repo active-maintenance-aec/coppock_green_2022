@@ -23,7 +23,10 @@
 - [Rewrite verification](#rewrite-verification)
 - [R environment](#r-environment)
 
-**Archived at Zenodo:** [doi:10.5281/zenodo.24168344](https://doi.org/10.5281/zenodo.24168344). This DOI always resolves to the latest release of the maintained version.
+**Archived at Zenodo:**
+[doi:10.5281/zenodo.24168344](https://doi.org/10.5281/zenodo.24168344).
+This DOI always resolves to the latest release of the maintained
+version.
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
 
@@ -236,17 +239,17 @@ where the deposited data live. Three deposited files are written over by
 a single run of the deposit as it stands, one of which comes back with
 different contents.
 
-| File | Rebuilt when stripped | Rebuilt copy matches deposit | Written over by a run as deposited | Contents unchanged after that run |
-|:---|:---|:---|:---|:---|
-| study_1_mturk_cleaned.rds | No |  | No | Yes |
-| study_1_elite_cleaned.rds | No |  | No | Yes |
-| study_2_lucid_clean.rds | Yes | Yes | Yes | Yes |
-| original_trump_white_clean.rds | No |  | No | Yes |
-| replication_trump_white_clean.rds | No |  | Yes | Yes |
-| studies_1_2_replications_lucid_cleaned.rds | No |  | No | Yes |
-| factor_analysis_models.rdata | Yes | No | Yes | No |
+| Pass | File | Effect | Contents match the deposit |
+|:---|:---|:---|:---|
+| Stripped to data and code | study_2_lucid_clean.rds | Rebuilt | Yes |
+| Stripped to data and code | factor_analysis_models.rdata | Rebuilt | No |
+| As deposited | study_2_lucid_clean.rds | Written over | Yes |
+| As deposited | replication_trump_white_clean.rds | Written over | Yes |
+| As deposited | factor_analysis_models.rdata | Written over | No |
 
-The seven deposited files that deposited code also writes.
+Deposited files that deposited code writes, by pass. The stripped pass
+withholds the seven analysis-ready files the deposit ships, so a file
+appears under it only if the deposit’s own code rebuilds it.
 
 **One published column cannot be recovered from the deposit’s clean
 data.** `study_1_elite_cleaning.R` builds the elite ideology variable
@@ -712,17 +715,17 @@ recorded value is reproducible even though the deposit’s own run is not.
 
 # R environment
 
-| Component  | Version    |
-|:-----------|:-----------|
-| R          | 4.6.1      |
-| tidyverse  | 2.0.0      |
-| estimatr   | 2.0.1.9000 |
-| rsample    | 1.3.2      |
-| metafor    | 5.0.1      |
-| janitor    | 2.2.1      |
-| kableExtra | 1.4.0      |
-| knitr      | 1.51       |
-| here       | 1.0.2      |
+| Component  | Version |
+|:-----------|:--------|
+| R          | 4.6.2   |
+| tidyverse  | 2.0.0   |
+| estimatr   | 2.0.1   |
+| rsample    | 1.3.2   |
+| metafor    | 5.2.1   |
+| janitor    | 2.2.1   |
+| kableExtra | 1.4.1   |
+| knitr      | 1.52    |
+| here       | 1.0.2   |
 
 Versions this report was built against.
 

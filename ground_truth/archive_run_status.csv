@@ -1,0 +1,37 @@
+pass,script,role,exit_status,outcome,stopped_at
+stripped,study_1_mturk_cleaning.R,cleaning,1,error,"Error in file(file, ...) : argument ""file"" is missing, with no default Calls: source -> withVisible -> eval -> eval -> write_rds"
+stripped,study_1_elite_cleaning.R,cleaning,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_2_lucid_cleaning.R,cleaning,0,clean,NA
+stripped,study_3_original_cleaning.R,cleaning,1,error,Error: Failed to parse <archive>/data/raw/Trump605/TESS3 174 - Trump_Client.sav: Unknown error.
+stripped,study_3_lucid_cleaning.R,cleaning,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,studies_1_2_replications_lucid_cleaning.R,cleaning,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,in_text_numbers.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_1_figure_4.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_1_table_1.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_2_table_2.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_3_table_3.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,study_4_table_4.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_figure_B2.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_figure_B3.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_table_B2.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_table_C3.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_table_C4.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+stripped,appendix_table_D5.R,analysis,1,error,"Error in readRDS(con, refhook = refhook) : cannot open the connection Calls: source -> withVisible -> eval -> eval -> read_rds -> readRDS In addition: Warning message: In readRDS(con, refhook = refhook) :"
+as_shipped,study_1_mturk_cleaning.R,cleaning,1,error,"Error in file(file, ...) : argument ""file"" is missing, with no default Calls: source -> withVisible -> eval -> eval -> write_rds"
+as_shipped,study_1_elite_cleaning.R,cleaning,1,error,"Error in file(file, ...) : argument ""file"" is missing, with no default Calls: source -> withVisible -> eval -> eval -> write_rds In addition: Warning messages: 1: Unreplaced values treated as NA as `.x` is not compati..."
+as_shipped,study_2_lucid_cleaning.R,cleaning,0,clean,NA
+as_shipped,study_3_original_cleaning.R,cleaning,1,error,Error: Failed to parse <archive>/data/raw/Trump605/TESS3 174 - Trump_Client.sav: Unknown error.
+as_shipped,study_3_lucid_cleaning.R,cleaning,0,clean,NA
+as_shipped,studies_1_2_replications_lucid_cleaning.R,cleaning,1,error,Error in `mutate()`: ℹ In argument: `lucid_age = as.numeric(age_1)`. Caused by error: ! object 'age_1' not found
+as_shipped,in_text_numbers.R,analysis,0,clean,NA
+as_shipped,study_1_figure_4.R,analysis,0,clean,NA
+as_shipped,study_1_table_1.R,analysis,0,clean,NA
+as_shipped,study_2_table_2.R,analysis,0,clean,NA
+as_shipped,study_3_table_3.R,analysis,0,clean,NA
+as_shipped,study_4_table_4.R,analysis,0,clean,NA
+as_shipped,appendix_figure_B2.R,analysis,0,clean,NA
+as_shipped,appendix_figure_B3.R,analysis,0,clean,NA
+as_shipped,appendix_table_B2.R,analysis,0,clean,NA
+as_shipped,appendix_table_C3.R,analysis,0,clean,NA
+as_shipped,appendix_table_C4.R,analysis,0,clean,NA
+as_shipped,appendix_table_D5.R,analysis,0,clean,NA

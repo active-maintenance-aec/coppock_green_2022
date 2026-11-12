@@ -1,5 +1,6 @@
 # coppock_green_2022/ground_truth/build_ground_truth.R
-# Output: ground_truth/coppock_green_2022_ground_truth.csv
+# Output: ground_truth/coppock_green_2022_ground_truth.csv,
+#   ground_truth/float_coverage.csv
 # Depends on: maintained/output/ (run run_all.R first), ground_truth/archive_values.csv
 # Description: Assemble the ground truth table. value_paper is typed from the
 #   article and the online appendix and is only ever compared against.
@@ -1300,14 +1301,151 @@ if (any(!verdict_check$agrees)) {
 }
 stopifnot(nrow(verdict_check) == nrow(printed))
 
+# Claim type and printed precision, carried from the extraction ----
+# A row with a claim id takes both from published_claims.csv. A float cell has no
+# extraction row of its own (the extraction summarises each float in one coverage
+# row), so it is a pipeline quantity and its precision is read off the string the
+# article prints, unless the row above already carries a digit count of its own.
 gt <- gt |>
-  select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
-         value_rewrite, match_rewrite, holds, defect_locus, notes)
+  left_join(select(claims, claim_id, claim_type, extracted_digits = digits),
+            by = "claim_id") |>
+  mutate(
+    extracted_digits = as.integer(extracted_digits),
+    digits = as.integer(digits)
+  )
+
+# The two transcriptions of a claim's precision have to agree wherever both exist.
+digit_disagreement <- gt |>
+  filter(!is.na(claim_id), !is.na(digits), !is.na(extracted_digits),
+         digits != extracted_digits)
+if (nrow(digit_disagreement) > 0) {
+  print(digit_disagreement |> select(claim_id, value_paper, digits, extracted_digits))
+  stop(str_glue("{nrow(digit_disagreement)} claims carry a digit count the extraction does not."))
+}
+
+gt <- gt |>
+  mutate(
+    digits = if_else(is.na(claim_id), digits, extracted_digits),
+    digits = if_else(is.na(digits), excheckr::claim_digits(value_paper), digits),
+    claim_type = if_else(is.na(claim_id), "pipeline", claim_type)
+  )
+
+stopifnot(!anyNA(gt$claim_type))
+
+# Disposition: what became of each defect ----
+# corrected_here is computed from the errata spine and never typed. Every other
+# judgment is taken from what the README already says happened, keyed the way
+# defect_locus is keyed; a defect nobody has judged stays NA.
+disposition_judgments <- tribble(
+  ~pattern, ~judgment, ~disposition_reason,
+  "^ideology: ", "documented_only",
+    "The README describes the deposit's dplyr::recode failure and the rewrite rebuilds the column from the wave 1 raw file; the published table is right, so the article needs no erratum."
+)
+
+judgment_for <- function(key, column) {
+  hit <- disposition_judgments[[column]][map_lgl(disposition_judgments$pattern,
+                                                 ~ str_detect(key, .x))]
+  if (length(hit) == 0) NA_character_ else hit[1]
+}
+
+gt <- gt |>
+  mutate(
+    corrected_here = !is.na(claim_id) & claim_id %in% cited_claim_ids,
+    disposition = case_when(
+      is.na(defect_locus) ~ NA_character_,
+      corrected_here ~ "corrected_here",
+      .default = map_chr(locus_key, judgment_for, column = "judgment")
+    ),
+    disposition_reason = if_else(
+      !is.na(disposition) & disposition != "corrected_here",
+      map_chr(locus_key, judgment_for, column = "disposition_reason"),
+      NA_character_
+    )
+  )
+
+undisposed <- gt |> filter(defect_locus == "paper_internal", is.na(disposition))
+if (nrow(undisposed) > 0) {
+  print(undisposed |> select(claim_id, table_figure, claim), n = nrow(undisposed))
+  stop(str_glue("{nrow(undisposed)} paper_internal rows carry no disposition."))
+}
+print(gt |> filter(!is.na(defect_locus)) |> count(defect_locus, disposition))
+
+# Float coverage ----
+# One row per published float. A table's published_numbers is the cell count the
+# article prints, the value_paper of its coverage row; covered counts the cells
+# compared above, and the two reproduced columns count the cells each pipeline
+# matches. A figure prints no numbers, so what it carries is a count of plotted
+# estimates, reproduced when the rewrite plots as many as the article does.
+float_cells <- gt |>
+  filter(table_figure %in% floats$float, str_starts(table_figure, "Table"),
+         is.na(claim_id) | !str_starts(claim_id, "float_"))
+
+cell_counts <- float_cells |>
+  summarize(
+    covered = sum(!is.na(value_paper)),
+    reproduced_by_rewrite = sum(match_rewrite == 1, na.rm = TRUE),
+    reproduced_by_archive = if_else(all(is.na(match)), NA_integer_,
+                                    sum(match == 1, na.rm = TRUE)),
+    .by = table_figure
+  )
+
+coverage_rows <- gt |>
+  filter(str_starts(claim_id, "float_")) |>
+  transmute(table_figure, coverage_paper = as.integer(value_paper),
+            coverage_reproduced = match_rewrite == 1)
+
+no_data_notes <- c(
+  "Figure 1" = "A theoretical diagram; prints no numbers.",
+  "Figure 2" = "A theoretical diagram; prints no numbers.",
+  "Figure 3" = "A theoretical diagram; prints no numbers.",
+  "Table A.1" = "Enumerates the 32 causal models; carries no data.",
+  "Figure A.1" = "A causal graph elaborating the basic model; prints no numbers.",
+  "Figure D.4" = "Reproduces the treatment images; prints no numbers."
+)
+
+float_coverage <- floats |>
+  left_join(cell_counts, by = c("float" = "table_figure")) |>
+  left_join(coverage_rows, by = c("float" = "table_figure")) |>
+  mutate(
+    is_figure = str_starts(float, "Figure"),
+    published_numbers = if_else(carries_data & !is_figure, coverage_paper, 0L),
+    covered = replace_na(covered, 0L),
+    reproduced_by_rewrite = replace_na(reproduced_by_rewrite, 0L),
+    reproduced_by_archive = if_else(carries_data & !is_figure, reproduced_by_archive, 0L),
+    plotted = if_else(carries_data & is_figure, coverage_paper, NA_integer_),
+    plotted_reproduced = if_else(carries_data & is_figure,
+                                 if_else(coverage_reproduced, coverage_paper, 0L), NA_integer_),
+    note = case_when(
+      !carries_data ~ unname(no_data_notes[float]),
+      is_figure ~ "Prints no numbers on its face; plotted counts 16 outcomes by 4 treatments by the samples the panel carries.",
+      .default = NA_character_
+    )
+  ) |>
+  select(float, published_numbers, covered, reproduced_by_rewrite, reproduced_by_archive,
+         plotted, plotted_reproduced, note)
+
+# Every table carrying data has to be covered cell for cell.
+stopifnot(
+  nrow(float_coverage) == nrow(floats),
+  !anyNA(float_coverage$note[!floats$carries_data]),
+  with(filter(float_coverage, str_starts(float, "Table"), published_numbers > 0),
+       all(covered == published_numbers))
+)
+
+write_csv(float_coverage, here::here("ground_truth", "float_coverage.csv"))
+print(float_coverage, n = nrow(float_coverage), width = 200)
+
+# The ground truth, in the canonical column order ----
+gt <- gt |>
+  mutate(across(c(match, match_rewrite, holds), as.logical)) |>
+  select(paper_id, claim_id, location = table_figure, claim_type, claim, value_paper,
+         digits, value_script, match, value_rewrite, match_rewrite, holds, defect_locus,
+         disposition, disposition_reason, notes)
 
 write_csv(gt, here::here("ground_truth", "coppock_green_2022_ground_truth.csv"))
 
-print(gt |> select(claim_id, table_figure, claim, value_script, value_paper, match,
-                   value_rewrite, match_rewrite, holds, defect_locus),
+print(gt |> select(claim_id, location, claim, value_script, value_paper, match,
+                   value_rewrite, match_rewrite, holds, defect_locus, disposition),
       n = nrow(gt), width = 250)
 
 print(tibble(

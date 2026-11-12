@@ -1,0 +1,18 @@
+float,published_numbers,covered,reproduced_by_rewrite,reproduced_by_archive,plotted,plotted_reproduced,note
+Figure 1,0,0,0,0,NA,NA,A theoretical diagram; prints no numbers.
+Figure 2,0,0,0,0,NA,NA,A theoretical diagram; prints no numbers.
+Figure 3,0,0,0,0,NA,NA,A theoretical diagram; prints no numbers.
+Figure 4,0,0,0,0,192,192,Prints no numbers on its face; plotted counts 16 outcomes by 4 treatments by the samples the panel carries.
+Table 1,6,6,6,6,NA,NA,NA
+Table 2,50,50,50,50,NA,NA,NA
+Table 3,24,24,24,24,NA,NA,NA
+Table 4,20,20,20,20,NA,NA,NA
+Table A.1,0,0,0,0,NA,NA,Enumerates the 32 causal models; carries no data.
+Figure A.1,0,0,0,0,NA,NA,A causal graph elaborating the basic model; prints no numbers.
+Figure B.2,0,0,0,0,128,128,Prints no numbers on its face; plotted counts 16 outcomes by 4 treatments by the samples the panel carries.
+Figure B.3,0,0,0,0,64,64,Prints no numbers on its face; plotted counts 16 outcomes by 4 treatments by the samples the panel carries.
+Table B.2,87,87,87,82,NA,NA,NA
+Table C.3,40,40,40,40,NA,NA,NA
+Table C.4,30,30,30,30,NA,NA,NA
+Figure D.4,0,0,0,0,NA,NA,Reproduces the treatment images; prints no numbers.
+Table D.5,48,48,48,48,NA,NA,NA

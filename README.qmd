@@ -40,10 +40,14 @@ claims <- read_csv(here::here("ground_truth", "published_claims.csv"),
                                     value_paper = col_character())) |>
   mutate(needs_block = needs_block == "TRUE")
 manifest <- read_csv(here::here("original_manifest.csv"), show_col_types = FALSE)
-status <- read_csv(here::here("ground_truth", "archive_script_status.csv"),
-                   show_col_types = FALSE)
-generated <- read_csv(here::here("ground_truth", "archive_generated_files.csv"),
-                      show_col_types = FALSE)
+# One row per deposited script per pass, widened here to one row per script for the
+# tables below.
+status <- read_csv(here::here("ground_truth", "archive_run_status.csv"),
+                   show_col_types = FALSE) |>
+  pivot_wider(id_cols = c(script, role), names_from = pass,
+              values_from = c(outcome, stopped_at))
+overwrites <- read_csv(here::here("ground_truth", "archive_overwrites.csv"),
+                       show_col_types = FALSE)
 archive_values <- read_csv(here::here("ground_truth", "archive_values.csv"),
                            show_col_types = FALSE)
 
@@ -123,7 +127,7 @@ Two questions, answered before the detail.
 
 Only after a reader rebuilds the folder tree it assumes. Every file in the deposit sits flat in one directory, but every script addresses `programs/analysis/`, `programs/cleaning/`, `programs/helpers/`, `data/raw/` and `data/clean/`, and writes to `../Drafts/figures/` and `../Drafts/tables/`. One cleaning script additionally reads `data/raw/Trump605/`, a folder the deposit flattens into a single file at the top level. Nothing in the archive creates any of those directories, and the deposit's own `README.txt` concedes the point, saying the paths will "(probably!)" be correct. Rebuild the tree and all `r sum(status$role == "analysis")` analysis scripts run without error on a current R installation and reproduce the published tables and figures.
 
-The cleaning scripts are a different matter, and they are why the deposit's clean data cannot be rebuilt from its raw data. Given only the raw files and the code, `r sum(status$role == "cleaning" & status$stripped_status == 0)` of the `r sum(status$role == "cleaning")` cleaning scripts finishes, `r sum(generated$stripped_rebuilt)` of the `r nrow(generated)` analysis-ready files it takes to run the paper get written, and **every one of the `r sum(status$role == "analysis")` analysis scripts then fails**, each on the first line that tries to read a clean data file that no longer exists. The archive passes only because it ships the outputs of code that no longer runs.
+The cleaning scripts are a different matter, and they are why the deposit's clean data cannot be rebuilt from its raw data. Given only the raw files and the code, `r sum(status$role == "cleaning" & status$outcome_stripped == "clean")` of the `r sum(status$role == "cleaning")` cleaning scripts finishes, `r sum(overwrites$pass == "stripped" & overwrites$effect == "rebuilt")` of the 7 analysis-ready files it takes to run the paper get written, and **every one of the `r sum(status$role == "analysis")` analysis scripts then fails**, each on the first line that tries to read a clean data file that no longer exists. The archive passes only because it ships the outputs of code that no longer runs.
 
 ## Does the maintained rewrite reproduce the paper?
 
@@ -154,9 +158,9 @@ kbl <- status |>
   transmute(
     Script = script,
     Role = role,
-    `Stripped to data and code` = if_else(stripped_status == 0, "Runs", "Fails"),
-    `As deposited` = if_else(deposited_status == 0, "Runs", "Fails"),
-    Note = coalesce(str_trunc(deposited_error, 90), "")
+    `Stripped to data and code` = if_else(outcome_stripped == "clean", "Runs", "Fails"),
+    `As deposited` = if_else(outcome_as_shipped == "clean", "Runs", "Fails"),
+    Note = coalesce(str_trunc(stopped_at_as_shipped, 90), "")
   ) |>
   kable(booktabs = TRUE,
         caption = "Every script in the deposited archive, run against a reconstructed folder tree with and without the analysis-ready files the deposit ships.")
@@ -168,20 +172,19 @@ latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale
 **Running the deposit in its own directory would damage the deposit.** The cleaning scripts write into `data/clean/` and `data/raw/`, which is where the deposited data live. Three deposited files are written over by a single run of the deposit as it stands, one of which comes back with different contents.
 
 ```{r overwrite_table}
-kbl <- generated |>
+kbl <- overwrites |>
   transmute(
+    Pass = if_else(pass == "stripped", "Stripped to data and code", "As deposited"),
     File = file,
-    `Rebuilt when stripped` = if_else(stripped_rebuilt, "Yes", "No"),
-    `Rebuilt copy matches deposit` = case_when(
-      is.na(stripped_matches_deposit) ~ "",
-      stripped_matches_deposit ~ "Yes",
+    Effect = if_else(effect == "rebuilt", "Rebuilt", "Written over"),
+    `Contents match the deposit` = case_when(
+      is.na(matches_deposit) ~ "",
+      matches_deposit ~ "Yes",
       .default = "No"
-    ),
-    `Written over by a run as deposited` = if_else(deposited_overwritten, "Yes", "No"),
-    `Contents unchanged after that run` = if_else(deposited_matches_deposit, "Yes", "No")
+    )
   ) |>
   kable(booktabs = TRUE,
-        caption = "The seven deposited files that deposited code also writes.")
+        caption = "Deposited files that deposited code writes, by pass. The stripped pass withholds the seven analysis-ready files the deposit ships, so a file appears under it only if the deposit's own code rebuilds it.")
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale_down", "hold_position")))
 ```
 
@@ -270,9 +273,9 @@ Neither changes a quantity, which is why the errata note was first written witho
 ```{r gt_summary}
 kbl <- gt |>
   mutate(Section = case_when(
-    table_figure == "Text" ~ "In-text quantities",
-    str_starts(table_figure, "Figure") ~ "Figures",
-    str_detect(table_figure, "\\.") ~ "Appendix tables",
+    location == "Text" ~ "In-text quantities",
+    str_starts(location, "Figure") ~ "Figures",
+    str_detect(location, "\\.") ~ "Appendix tables",
     .default = "Main text tables"
   )) |>
   group_by(Section) |>
@@ -300,7 +303,7 @@ Every quantity in the ground truth is read out of a file in `maintained/output/`
 ```{r gt_failures}
 kbl <- gt |>
   filter(match_rewrite == 0 | match == 0) |>
-  transmute(Where = table_figure, Claim = claim,
+  transmute(Where = location, Claim = claim,
             Published = value_paper,
             Archive = if_else(is.na(value_script), "", sprintf("%.3g", value_script)),
             Rewrite = if_else(str_ends(value_paper, "%"),

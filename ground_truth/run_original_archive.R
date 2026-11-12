@@ -1,6 +1,6 @@
 # coppock_green_2022/ground_truth/run_original_archive.R
-# Output: ground_truth/archive_values.csv, ground_truth/archive_script_status.csv,
-#   ground_truth/archive_generated_files.csv
+# Output: ground_truth/archive_values.csv, ground_truth/archive_run_status.csv,
+#   ground_truth/archive_overwrites.csv
 # Depends on: original/ (run download_original.R first)
 # Description: Runs every deposited script and reads the numbers they write back
 #   out of their own LaTeX output, so the archive column of the ground truth is
@@ -20,7 +20,8 @@
 #   data and its code, which is the only way to see whether a script passes on its
 #   own work or on an intermediate the deposit ships. The deposited pass restores
 #   those intermediates and is the run the ground truth reads. The two exit
-#   statuses are recorded per script.
+#   statuses are recorded per script, one row per script per pass, with the
+#   deposited pass named as_shipped.
 #
 #   This script is not part of run_all.R. It needs the packages the deposit was
 #   written against (stargazer, xtable, coefplot, psych, car, rmeta), which the
@@ -186,23 +187,41 @@ generated_files <- generated_files |>
                                          matches_deposited_copy)
   )
 
-write_csv(generated_files, here::here("ground_truth", "archive_generated_files.csv"))
 print(generated_files)
 
-script_status <- tibble(
+# The two archive tables, in the canonical long form ----
+# A file appears in archive_overwrites.csv only where a pass did something to it: rebuilt
+# under the stripped pass, or written over under the as-shipped pass. A withheld file the
+# stripped pass never rebuilds has no row, and its absence is the record.
+script_roles <- tibble(
   script = c(cleaning_scripts, analysis_scripts),
   role = rep(c("cleaning", "analysis"),
              times = c(length(cleaning_scripts), length(analysis_scripts)))
-) |>
-  left_join(select(stripped, script, stripped_status = exit_status,
-                   stripped_error = error), by = "script") |>
-  left_join(select(deposited, script, deposited_status = exit_status,
-                   deposited_error = error), by = "script")
+)
 
-stopifnot(nrow(script_status) == length(cleaning_scripts) + length(analysis_scripts))
+run_status <- bind_rows(stripped = stripped, as_shipped = deposited, .id = "pass") |>
+  left_join(script_roles, by = "script") |>
+  transmute(pass, script, role, exit_status,
+            outcome = if_else(exit_status == 0, "clean", "error"),
+            stopped_at = error)
 
-write_csv(script_status, here::here("ground_truth", "archive_script_status.csv"))
-print(script_status |> select(script, role, stripped_status, deposited_status), n = nrow(script_status))
+stopifnot(nrow(run_status) == 2 * nrow(script_roles), !anyNA(run_status$role))
+
+overwrites <- bind_rows(
+  generated_files |>
+    filter(stripped_rebuilt) |>
+    transmute(pass = "stripped", file, effect = "rebuilt",
+              matches_deposit = stripped_matches_deposit),
+  generated_files |>
+    filter(deposited_overwritten) |>
+    transmute(pass = "as_shipped", file, effect = "overwritten",
+              matches_deposit = deposited_matches_deposit)
+)
+
+write_csv(run_status, here::here("ground_truth", "archive_run_status.csv"))
+write_csv(overwrites, here::here("ground_truth", "archive_overwrites.csv"))
+print(run_status |> select(pass, script, role, outcome), n = nrow(run_status))
+print(overwrites)
 
 if (any(deposited$exit_status[deposited$script %in% analysis_scripts] != 0)) {
   failed <- deposited |> filter(script %in% analysis_scripts, exit_status != 0)
