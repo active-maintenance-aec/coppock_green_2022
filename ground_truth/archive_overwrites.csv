@@ -1,5 +1,10 @@
 pass,file,effect,matches_deposit
+stripped,study_1_mturk_cleaned.rds,withheld,NA
+stripped,study_1_elite_cleaned.rds,withheld,NA
 stripped,study_2_lucid_clean.rds,rebuilt,TRUE
+stripped,original_trump_white_clean.rds,withheld,NA
+stripped,replication_trump_white_clean.rds,withheld,NA
+stripped,studies_1_2_replications_lucid_cleaned.rds,withheld,NA
 stripped,factor_analysis_models.rdata,rebuilt,FALSE
 as_shipped,study_2_lucid_clean.rds,overwritten,TRUE
 as_shipped,replication_trump_white_clean.rds,overwritten,TRUE

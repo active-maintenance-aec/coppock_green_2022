@@ -338,14 +338,12 @@ quantified <- quantified |>
   mutate(placed = map2(values, spans, placement))
 value_placed <- map_lgl(quantified$placed, all)
 
-# The placement is written to the spine as values_in_spans, one logical per corrected
-# value in the same order, so a reader can see it without rerunning this gate.
+# The placement is written to the spine as values_in_spans, one logical per entry: TRUE
+# when every corrected value is the token its sentence prints, NA for an entry with no
+# values. The gate below stops on FALSE, because no entry here stores a value on the
+# claim's scale rather than the sentence's.
 entries <- entries |>
-  left_join(
-    quantified |>
-      transmute(entry, values_in_spans = map_chr(placed, \(p) str_c(p, collapse = ";"))),
-    by = "entry"
-  )
+  left_join(transmute(quantified, entry, values_in_spans = value_placed), by = "entry")
 
 if (!all(value_placed)) {
   print(quantified |> filter(!value_placed) |> select(entry, title, corrected_values, corrected))

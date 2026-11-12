@@ -127,7 +127,7 @@ Two questions, answered before the detail.
 
 Only after a reader rebuilds the folder tree it assumes. Every file in the deposit sits flat in one directory, but every script addresses `programs/analysis/`, `programs/cleaning/`, `programs/helpers/`, `data/raw/` and `data/clean/`, and writes to `../Drafts/figures/` and `../Drafts/tables/`. One cleaning script additionally reads `data/raw/Trump605/`, a folder the deposit flattens into a single file at the top level. Nothing in the archive creates any of those directories, and the deposit's own `README.txt` concedes the point, saying the paths will "(probably!)" be correct. Rebuild the tree and all `r sum(status$role == "analysis")` analysis scripts run without error on a current R installation and reproduce the published tables and figures.
 
-The cleaning scripts are a different matter, and they are why the deposit's clean data cannot be rebuilt from its raw data. Given only the raw files and the code, `r sum(status$role == "cleaning" & status$outcome_stripped == "clean")` of the `r sum(status$role == "cleaning")` cleaning scripts finishes, `r sum(overwrites$pass == "stripped" & overwrites$effect == "rebuilt")` of the 7 analysis-ready files it takes to run the paper get written, and **every one of the `r sum(status$role == "analysis")` analysis scripts then fails**, each on the first line that tries to read a clean data file that no longer exists. The archive passes only because it ships the outputs of code that no longer runs.
+The cleaning scripts are a different matter, and they are why the deposit's clean data cannot be rebuilt from its raw data. Given only the raw files and the code, `r sum(status$role == "cleaning" & status$outcome_stripped == "clean")` of the `r sum(status$role == "cleaning")` cleaning scripts finishes, `r sum(overwrites$pass == "stripped" & overwrites$effect == "rebuilt")` of the `r sum(overwrites$pass == "stripped")` analysis-ready files it takes to run the paper get written, and **every one of the `r sum(status$role == "analysis")` analysis scripts then fails**, each on the first line that tries to read a clean data file that no longer exists. The archive passes only because it ships the outputs of code that no longer runs.
 
 ## Does the maintained rewrite reproduce the paper?
 
@@ -176,7 +176,8 @@ kbl <- overwrites |>
   transmute(
     Pass = if_else(pass == "stripped", "Stripped to data and code", "As deposited"),
     File = file,
-    Effect = if_else(effect == "rebuilt", "Rebuilt", "Written over"),
+    Effect = case_match(effect, "rebuilt" ~ "Rebuilt", "withheld" ~ "Withheld, not rebuilt",
+                        "overwritten" ~ "Written over"),
     `Contents match the deposit` = case_when(
       is.na(matches_deposit) ~ "",
       matches_deposit ~ "Yes",
@@ -184,7 +185,7 @@ kbl <- overwrites |>
     )
   ) |>
   kable(booktabs = TRUE,
-        caption = "Deposited files that deposited code writes, by pass. The stripped pass withholds the seven analysis-ready files the deposit ships, so a file appears under it only if the deposit's own code rebuilds it.")
+        caption = "The analysis-ready files the deposit ships, by pass. The stripped pass withholds every one of them and records whether the deposit's own code rebuilds it; the as-shipped pass records each one a run writes over.")
 latex_only(kbl, function(k) kable_styling(k, latex_options = c("striped", "scale_down", "hold_position")))
 ```
 
@@ -273,10 +274,10 @@ Neither changes a quantity, which is why the errata note was first written witho
 ```{r gt_summary}
 kbl <- gt |>
   mutate(Section = case_when(
-    location == "Text" ~ "In-text quantities",
-    str_starts(location, "Figure") ~ "Figures",
-    str_detect(location, "\\.") ~ "Appendix tables",
-    .default = "Main text tables"
+    str_detect(location, "^(Appendix f|F)igure [A-D]?\\.?[0-9]+(,|$)") ~ "Figures",
+    str_detect(location, "^(Appendix t|T)able [A-D]\\.[0-9]+(,|$)") ~ "Appendix tables",
+    str_detect(location, "^Table [0-9]+(,|$)") ~ "Main text tables",
+    .default = "In-text quantities"
   )) |>
   group_by(Section) |>
   summarize(

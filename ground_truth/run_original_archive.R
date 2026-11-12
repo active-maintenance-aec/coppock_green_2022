@@ -190,9 +190,9 @@ generated_files <- generated_files |>
 print(generated_files)
 
 # The two archive tables, in the canonical long form ----
-# A file appears in archive_overwrites.csv only where a pass did something to it: rebuilt
-# under the stripped pass, or written over under the as-shipped pass. A withheld file the
-# stripped pass never rebuilds has no row, and its absence is the record.
+# Every shipped intermediate has a row under the stripped pass: rebuilt if the deposit's
+# own code wrote it again, withheld if it did not. Under the as-shipped pass a file has a
+# row only where the run wrote over it.
 script_roles <- tibble(
   script = c(cleaning_scripts, analysis_scripts),
   role = rep(c("cleaning", "analysis"),
@@ -209,9 +209,9 @@ stopifnot(nrow(run_status) == 2 * nrow(script_roles), !anyNA(run_status$role))
 
 overwrites <- bind_rows(
   generated_files |>
-    filter(stripped_rebuilt) |>
-    transmute(pass = "stripped", file, effect = "rebuilt",
-              matches_deposit = stripped_matches_deposit),
+    transmute(pass = "stripped", file,
+              effect = if_else(stripped_rebuilt, "rebuilt", "withheld"),
+              matches_deposit = if_else(stripped_rebuilt, stripped_matches_deposit, NA)),
   generated_files |>
     filter(deposited_overwritten) |>
     transmute(pass = "as_shipped", file, effect = "overwritten",

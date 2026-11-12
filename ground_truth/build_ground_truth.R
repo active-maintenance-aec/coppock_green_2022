@@ -1307,7 +1307,8 @@ stopifnot(nrow(verdict_check) == nrow(printed))
 # row), so it is a pipeline quantity and its precision is read off the string the
 # article prints, unless the row above already carries a digit count of its own.
 gt <- gt |>
-  left_join(select(claims, claim_id, claim_type, extracted_digits = digits),
+  left_join(select(claims, claim_id, claim_type, extracted_digits = digits,
+                   extracted_location = location),
             by = "claim_id") |>
   mutate(
     extracted_digits = as.integer(extracted_digits),
@@ -1330,7 +1331,7 @@ gt <- gt |>
     claim_type = if_else(is.na(claim_id), "pipeline", claim_type)
   )
 
-stopifnot(!anyNA(gt$claim_type))
+stopifnot(!anyNA(gt$claim_type), !anyNA(gt$extracted_location[!is.na(gt$claim_id)]))
 
 # Disposition: what became of each defect ----
 # corrected_here is computed from the errata spine and never typed. Every other
@@ -1436,9 +1437,12 @@ write_csv(float_coverage, here::here("ground_truth", "float_coverage.csv"))
 print(float_coverage, n = nrow(float_coverage), width = 200)
 
 # The ground truth, in the canonical column order ----
+# A row the extraction names takes the extraction's location; a float cell keeps the
+# float's label as printed.
 gt <- gt |>
-  mutate(across(c(match, match_rewrite, holds), as.logical)) |>
-  select(paper_id, claim_id, location = table_figure, claim_type, claim, value_paper,
+  mutate(across(c(match, match_rewrite, holds), as.logical),
+         location = if_else(is.na(claim_id), table_figure, extracted_location)) |>
+  select(paper_id, claim_id, location, claim_type, claim, value_paper,
          digits, value_script, match, value_rewrite, match_rewrite, holds, defect_locus,
          disposition, disposition_reason, notes)
 

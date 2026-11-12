@@ -241,15 +241,20 @@ different contents.
 
 | Pass | File | Effect | Contents match the deposit |
 |:---|:---|:---|:---|
+| Stripped to data and code | study_1_mturk_cleaned.rds | Withheld, not rebuilt |  |
+| Stripped to data and code | study_1_elite_cleaned.rds | Withheld, not rebuilt |  |
 | Stripped to data and code | study_2_lucid_clean.rds | Rebuilt | Yes |
+| Stripped to data and code | original_trump_white_clean.rds | Withheld, not rebuilt |  |
+| Stripped to data and code | replication_trump_white_clean.rds | Withheld, not rebuilt |  |
+| Stripped to data and code | studies_1_2_replications_lucid_cleaned.rds | Withheld, not rebuilt |  |
 | Stripped to data and code | factor_analysis_models.rdata | Rebuilt | No |
 | As deposited | study_2_lucid_clean.rds | Written over | Yes |
 | As deposited | replication_trump_white_clean.rds | Written over | Yes |
 | As deposited | factor_analysis_models.rdata | Written over | No |
 
-Deposited files that deposited code writes, by pass. The stripped pass
-withholds the seven analysis-ready files the deposit ships, so a file
-appears under it only if the deposit’s own code rebuilds it.
+The analysis-ready files the deposit ships, by pass. The stripped pass
+withholds every one of them and records whether the deposit’s own code
+rebuilds it; the as-shipped pass records each one a run writes over.
 
 **One published column cannot be recovered from the deposit’s clean
 data.** `study_1_elite_cleaning.R` builds the elite ideology variable
@@ -468,13 +473,13 @@ unverifiable.
 | Table B.2 | ideology: Libertarian (Elites) | 10.2% | 0 | 10.20% | archive |
 | Table B.2 | ideology: Moderate (Elites) | 32.0% | 0 | 32.00% | archive |
 | Table B.2 | ideology: Other (Elites) | 3.7% | 75.4 | 3.70% | archive |
-| Text | MTurk average within-domain correlation, as given in the body text | .29 | 0.3 | 0.297 | paper_internal |
-| Text | Pooled indirect-to-direct ratio | 1.4% | -2.77 | -1.68% | paper_internal |
-| Text | Elite sample holding a graduate degree | 71% |  | 71.57% | paper_internal |
-| Text | MTurk sample holding a graduate degree | 13% |  | 12.40% | paper_internal |
-| Text | Nontarget outcome measures in study 2, as the design paragraph counts them | 3 |  | 4 | paper_internal |
-| Text | Its standard error, restated in prose | 0.06 |  | 0.0663 | paper_internal |
-| Text | Average spillover effect as a share of the direct effect, restated in the discussion | 1.4% |  | -1.68% | paper_internal |
+| Static constraint, p. 731 | MTurk average within-domain correlation, as given in the body text | .29 | 0.3 | 0.297 | paper_internal |
+| Dynamic constraint, p. 732 | Pooled indirect-to-direct ratio | 1.4% | -2.77 | -1.68% | paper_internal |
+| Study 1, p. 730 | Elite sample holding a graduate degree | 71% |  | 71.57% | paper_internal |
+| Study 1, p. 730 | MTurk sample holding a graduate degree | 13% |  | 12.40% | paper_internal |
+| Study 2, p. 733 | Nontarget outcome measures in study 2, as the design paragraph counts them | 3 |  | 4 | paper_internal |
+| Study 3, p. 734 | Its standard error, restated in prose | 0.06 |  | 0.0663 | paper_internal |
+| Discussion, p. 735 | Average spillover effect as a share of the direct effect, restated in the discussion | 1.4% |  | -1.68% | paper_internal |
 
 Every claim the archive or the rewrite does not match.
 
